@@ -1,16 +1,16 @@
-package io.tokenanalyst.jsonrpc
+package io.tokenanalyst.bitcoinrpc
 
 import cats.effect.{ExitCode, IO, IOApp}
-
+import scala.concurrent.ExecutionContext.global
 import scala.util.{Failure, Success}
 
 object TestApp extends IOApp {
 
   def getConfig = {
-    (sys.env.get("PASSWORD"), sys.env.get("USER"), sys.env.get("RPC_URL")) match {
-      case (Some(pass), Some(user), Some(url)) =>
-        Success(Config(url, user, pass))
-      case _ => Failure(new Exception("Pass RPC_URL, USER, PASSWORD."))
+    (sys.env.get("PASSWORD"), sys.env.get("USER"), sys.env.get("HOST")) match {
+      case (Some(pass), Some(user), Some(host)) =>
+        Success(Config(host, user, pass))
+      case _ => Failure(new Exception("Pass HOST, USER, PASSWORD."))
     }
   }
 
@@ -21,10 +21,15 @@ object TestApp extends IOApp {
       next <- loop(socket)
     } yield next
 
-  def run(args: List[String]): IO[ExitCode] =
-    ZeroMQ.socket("172.31.32.41", 28332).use { socket =>
-      for {
-        _ <- loop(socket)
-      } yield ExitCode(0)
+  def run(args: List[String]): IO[ExitCode] = {
+    implicit val config = getConfig.get
+    implicit val ec = global
+    BitcoinRPC.openAll().use {
+      case (client,_) =>
+        for {
+          block <- BitcoinRPC.getBlock(client, "00000000000000000012fb9247e97999280cc8c1aedde0e2f2e3e7383f909e20")
+          _ <- IO { println(block) }
+        } yield ExitCode(0)
     }
+  }
 }

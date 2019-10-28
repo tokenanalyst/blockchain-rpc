@@ -1,4 +1,4 @@
-package io.tokenanalyst.jsonrpc
+package io.tokenanalyst.bitcoinrpc
 
 import io.circe.Decoder
 import io.circe.Json

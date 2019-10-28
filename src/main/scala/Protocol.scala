@@ -1,4 +1,4 @@
-package io.tokenanalyst.jsonrpc
+package io.tokenanalyst.bitcoinrpc
 
 object Protocol {
     sealed trait RPCResponse
