@@ -2,10 +2,15 @@ lazy val commonSettings = Seq(
   organization := "tokenanalyst",
   version := "1.0.0",
   scalaVersion := "2.12.10",
-  description := "json-rpc")
+  description := "bitcoin-rpc")
 
-lazy val core = (project in file(".")).
+lazy val bitcoinrpc = (project in file(".")).
   settings(commonSettings: _*).
+  settings(
+    assemblyJarName in assembly := "bitcoin-rpc.jar",
+    publishMavenStyle := false,
+    publishTo := Some(Resolver.url("TA-S3", url("s3://ivy-jar-repository-ta/"))(Resolver.ivyStylePatterns))
+  ).
   settings(
     libraryDependencies ++= http4s ++ json ++ zmq
   )
@@ -16,7 +21,6 @@ val workaround = {
 }
 
 val http4sVersion = "0.20.11"
-
 
 lazy val http4s = Seq(
   "org.http4s" %% "http4s-dsl" % http4sVersion,
