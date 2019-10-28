@@ -34,7 +34,6 @@ import cats.effect.ContextShift
 
 import Protocol._
 
-
 import scala.concurrent.ExecutionContext
 import org.http4s.client.blaze.BlazeClientBuilder
 
@@ -115,10 +114,8 @@ trait Calls {
   def getBestBlockHash(
     client: Client[IO]
   )(implicit config: Config): IO[Json] = {
-    BitcoinRPC.requestJson[BestBlockHashRequest](
-      client,
-      new BestBlockHashRequest
-    )
+    BitcoinRPC
+      .requestJson[BestBlockHashRequest](client, new BestBlockHashRequest)
   }
 
   def getBestBlockHeight(
@@ -128,4 +125,20 @@ trait Calls {
       hash <- getBestBlockHash(client)
       block <- getBlock(client, hash.asObject.get("result").get.asString.get)
     } yield block.height
+
+  def getBlockHashByHeight(client: Client[IO],
+                           height: Long)(implicit config: Config): IO[Json] =
+    BitcoinRPC.requestJson[BlockHashByHeightRequest](
+      client,
+      BlockHashByHeightRequest(height)
+    )
+
+  def getBlockDataByHeight(client: Client[IO], height: Long)(
+    implicit config: Config
+  ): IO[BlockResponse] =
+    for {
+      hashResponse <- getBlockHashByHeight(client, height)
+      hash <- IO(hashResponse.asObject.get("result").get.asString.get)
+      block <- getBlock(client, hash)
+    } yield block
 }
