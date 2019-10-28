@@ -4,7 +4,7 @@
   import cats.effect.{ExitCode, IO, IOApp}
   import scala.concurrent.ExecutionContext.global
   
-  object TestApp extends IOApp {
+  object Main extends IOApp {
 
     def run(args: List[String]): IO[ExitCode] = {
     
