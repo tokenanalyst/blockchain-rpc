@@ -18,20 +18,18 @@ import org.http4s.Uri
 import scala.concurrent.ExecutionContext
 import org.http4s.client.blaze.BlazeClientBuilder
 
-case class Config(
-    host: String,
-    user: String,
-    password: String,
-    port: Option[Int] = None,
-    zmqPort: Option[Int] = None
-)
+case class Config(host: String,
+                  user: String,
+                  password: String,
+                  port: Option[Int] = None,
+                  zmqPort: Option[Int] = None)
 
 object BitcoinRPC extends Http4sClientDsl[IO] with Calls {
 
   def openAll()(
-      implicit config: Config,
-      ec: ExecutionContext,
-      cs: ContextShift[IO]
+    implicit config: Config,
+    ec: ExecutionContext,
+    cs: ContextShift[IO]
   ): Resource[IO, (Client[IO], ZeroMQ.Socket)] =
     for {
       client <- BlazeClientBuilder[IO](ec).resource
@@ -39,25 +37,24 @@ object BitcoinRPC extends Http4sClientDsl[IO] with Calls {
     } yield (client, socket)
 
   def request[A <: RPCRequest: Encoder, B <: RPCResponse: Decoder](
-      client: Client[IO],
-      request: A
+    client: Client[IO],
+    request: A
   )(implicit config: Config): IO[B] =
     for {
       req <- post(request)
       res <- client.expect[B](req)
     } yield res
 
-  def requestJson[A <: RPCRequest: Encoder](
-      client: Client[IO],
-      request: A
-  )(implicit config: Config): IO[Json] =
+  def requestJson[A <: RPCRequest: Encoder](client: Client[IO], request: A)(
+    implicit config: Config
+  ): IO[Json] =
     for {
       req <- post(request)
       res <- client.expect[Json](req)
     } yield res
 
   private def post[A <: RPCRequest: Encoder](
-      request: A
+    request: A
   )(implicit config: Config): IO[Request[IO]] = {
     (for {
       url <- Uri.fromString(s"http://${config.host}:8332")
@@ -78,21 +75,37 @@ object BitcoinRPC extends Http4sClientDsl[IO] with Calls {
   }
 }
 
-trait Calls { 
+trait Calls {
   import RPCEncoders._
   import RPCDecoders._
 
-  def getBlock(client: Client[IO], hash: String)(
-    implicit config: Config
-  ): IO[BlockResponse] =  { 
+  def getBlock(client: Client[IO],
+               hash: String)(implicit config: Config): IO[BlockResponse] = {
     BitcoinRPC.request[BlockRequest, BlockResponse](client, BlockRequest(hash))
   }
   def getTransaction(client: Client[IO], hash: String)(
-      implicit config: Config
-  ): IO[TransactionResponse] = { 
+    implicit config: Config
+  ): IO[TransactionResponse] = {
     BitcoinRPC.request[TransactionRequest, TransactionResponse](
       client,
       TransactionRequest(hash)
     )
   }
+
+  def getBestBlockHash(
+    client: Client[IO]
+  )(implicit config: Config): IO[Json] = {
+    BitcoinRPC.requestJson[BestBlockHashRequest](
+      client,
+      new BestBlockHashRequest
+    )
+  }
+
+  def getBestBlockHeight(
+    client: Client[IO]
+  )(implicit config: Config): IO[Long] =
+    for {
+      hash <- getBestBlockHash(client)
+      block <- getBlock(client, hash.asObject.get("result").get.asString.get)
+    } yield block.height
 }

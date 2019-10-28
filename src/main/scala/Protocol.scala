@@ -3,9 +3,8 @@ package io.tokenanalyst.bitcoinrpc
 object Protocol {
     sealed trait RPCResponse
     case class FeeResponse(feerate: Double, blocks: Int) extends RPCResponse
-    case class BestBlockHashResponse(hash: String) extends RPCResponse
     case class BlockResponse(
-      height: Long, 
+      height: Long,
       hash: String,
       previousblockhash: String,
       nonce: Long,
@@ -19,7 +18,7 @@ object Protocol {
       size: Long,
       mediantime: Long,
       time: Long,
-      nTx: Int, 
+      nTx: Int,
       tx: List[String]
     ) extends RPCResponse
 
@@ -27,10 +26,10 @@ object Protocol {
       coinbase: String,
       sequence: Long
     )
-    
+
     case class TransactionResponseScript(
       asm: String,
-      hex: String, 
+      hex: String,
       reqSigs: Option[Int],
       `type`: String,
       addresses: Option[List[String]]
@@ -56,11 +55,10 @@ object Protocol {
       vout: List[TransactionResponseVout],
       locktime: Long
     ) extends RPCResponse
-  
+
     sealed trait RPCRequest
     case class FeeRequest(blocks: Int) extends RPCRequest
     case class BlockRequest(hash: String) extends RPCRequest
     case class TransactionRequest(hash: String) extends RPCRequest
     case class BestBlockHashRequest() extends RPCRequest
   }
-  
