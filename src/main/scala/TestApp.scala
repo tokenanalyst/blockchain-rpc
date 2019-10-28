@@ -1,7 +1,8 @@
 package io.tokenanalyst.jsonrpc
 
-import scala.util.{Success, Failure}
-import cats.effect.{IO, IOApp, ExitCode}
+import cats.effect.{ExitCode, IO, IOApp}
+
+import scala.util.{Failure, Success}
 
 object TestApp extends IOApp {
 
@@ -13,14 +14,17 @@ object TestApp extends IOApp {
     }
   }
 
-  def run(args: List[String]): IO[ExitCode] = 
+  def loop(socket: ZeroMQ.Socket): IO[Unit] =
     for {
-      config <- IO.fromTry(getConfig)
-      block <- Simple.getBlock(
-        config,
-        "000000000000000000100ed429cdd0f596a35317d0c7f754cf6f4e5110ce6307"
-      )
-      tx <- Simple.getTransaction(config, block.tx.head)
-      _ <- IO { println(tx) }
-    } yield ExitCode(0)
+      msg <- IO(socket.nextBlock())
+      _ <- IO(println(msg))
+      next <- loop(socket)
+    } yield next
+
+  def run(args: List[String]): IO[ExitCode] =
+    ZeroMQ.socket("172.31.32.41", 28332).use { socket =>
+      for {
+        _ <- loop(socket)
+      } yield ExitCode(0)
+    }
 }

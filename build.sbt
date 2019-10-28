@@ -7,7 +7,7 @@ lazy val commonSettings = Seq(
 lazy val core = (project in file(".")).
   settings(commonSettings: _*).
   settings(
-    libraryDependencies ++= http4s ++ json 
+    libraryDependencies ++= http4s ++ json ++ zmq
   )
 
 val workaround = {
@@ -15,16 +15,21 @@ val workaround = {
   ()
 }
 
-lazy val json = Seq(
-  "org.http4s" %% "http4s-circe" % http4sVersion,
-  "io.circe" %% "circe-generic" % "0.11.1",
-  "io.circe" %% "circe-literal" % "0.11.1",
-)
-
 val http4sVersion = "0.20.11"
+
 
 lazy val http4s = Seq(
   "org.http4s" %% "http4s-dsl" % http4sVersion,
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
   "org.http4s" %% "http4s-blaze-client" % http4sVersion
+)
+
+lazy val json = Seq(
+  "org.http4s" %% "http4s-circe" % http4sVersion,
+  "io.circe" %% "circe-generic" % "0.11.1",
+  "io.circe" %% "circe-literal" % "0.11.1"
+)
+
+lazy val zmq = Seq (
+  "org.zeromq" % "jeromq" % "0.5.1"
 )
