@@ -1,5 +1,16 @@
 # bitcoin-rpc
 
+## Supported methods
+
+| Bitcoind RPC method  | description  |  bitcoin-rpc method |
+|---|---|---|
+| getblockhash  | Gets the block hash at a specific height  |  getBlockHash(height: Long) |
+| getbestblockhash  |  Gets the block tip hash | getBestBlockHash()  |
+| getblock  | Gets the block with transaction ids  |  getBlock(hash: String) |
+| getblock  | Gets the block with transaction ids  |  getBlock(height: Long) |
+
+## Example
+
 ```
   import cats.effect.{ExitCode, IO, IOApp}
   import scala.concurrent.ExecutionContext.global
