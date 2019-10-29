@@ -43,7 +43,7 @@ object TestApp extends IOApp {
     BitcoinRPC.openAll().use {
       case (client,_) =>
         for {
-          block <- BitcoinRPC.getBlock(client, 1L)
+          block <- BitcoinRPC.getTransaction(client, "787e26b4886a7e67062bec2b6a1934639ad09f5e8060ed950b402044722af8fa")
           _ <- IO { println(block) }
         } yield ExitCode(0)
     }
