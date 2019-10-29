@@ -32,6 +32,8 @@ import io.circe.generic.auto._
 import cats.effect.{IO, ContextShift, Resource}
 import cats.effect.ContextShift
 
+import com.typesafe.scalalogging.LazyLogging
+
 import Protocol._
 
 import scala.concurrent.ExecutionContext
@@ -45,7 +47,7 @@ case class Config(
     zmqPort: Option[Int] = None
 )
 
-object BitcoinRPC extends Http4sClientDsl[IO] with Calls {
+object BitcoinRPC extends Http4sClientDsl[IO] with Calls with LazyLogging {
 
   def openAll()(
       implicit config: Config,
@@ -90,7 +92,7 @@ object BitcoinRPC extends Http4sClientDsl[IO] with Calls {
           Accept(MediaType.application.json)
         )
       )
-      _ <- Right(println(request.asJson))
+      _ <- Right(logger.debug(request.asJson.toString()))
     } yield p)
       .getOrElse(throw new Exception("No proper exception handling yet"))
   }

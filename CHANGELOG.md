@@ -1,3 +1,7 @@
+# 1.6
+
+* added logging subsystem, log to DEBUG
+
 # 1.5
 
 * added input fields txid, vout, scriptSig for TransactionResponse inputs  
