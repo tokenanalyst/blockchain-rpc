@@ -80,4 +80,5 @@ object Protocol {
     case class BlockHashRequest(height: Long) extends RPCRequest
     case class TransactionRequest(hash: String) extends RPCRequest
     case class BestBlockHashRequest() extends RPCRequest
+    case class BlockHashByHeightRequest(height: Long) extends RPCRequest
   }

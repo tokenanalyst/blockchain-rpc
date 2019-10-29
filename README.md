@@ -15,8 +15,14 @@
       BitcoinRPC.openAll().use {
         case (http, zmq) =>
           for {
+            
+            // retrieving a simple block by hash
             block <- BitcoinRPC.getBlock(http, 
             "00000000000000000012fb9247e97999280cc8c1aedde0e2f2e3e7383f909e20")
+            
+            // listening for new blocks
+            newBlockHash <- zmq.nextBlock()
+            
             _ <- IO { println(block) }
           } yield ExitCode(0)
       }
