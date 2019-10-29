@@ -43,7 +43,7 @@ object TestApp extends IOApp {
     BitcoinRPC.openAll().use {
       case (client,_) =>
         for {
-          block <- BitcoinRPC.getBestBlockHeight(client)
+          block <- BitcoinRPC.getBlock(client, 1L)
           _ <- IO { println(block) }
         } yield ExitCode(0)
     }

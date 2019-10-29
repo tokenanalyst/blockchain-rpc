@@ -62,6 +62,11 @@ object RPCEncoders {
       final def apply(a: BestBlockHashRequest): Json =
         Json.obj(requestFields("getbestblockhash", Array[Json]()): _*)
     }
+
+    implicit val blockHashRequest = new RPCEncoder[BlockHashRequest] {
+      final def apply(a: BlockHashRequest): Json =
+      Json.obj(requestFields("getblockhash", Array[Json](Json.fromLong(a.height))): _*)
+    }
   
     implicit val blockRequest = new RPCEncoder[BlockRequest] {
       final def apply(a: BlockRequest): Json =
