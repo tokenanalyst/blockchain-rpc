@@ -41,8 +41,16 @@ object Protocol {
     ) extends RPCResponse
 
     case class TransactionResponseVin(
-      coinbase: String,
+      txid: Option[String], 
+      vout: Option[Int], 
+      scriptSig: Option[TransactionResponseScriptSig],
+      coinbase: Option[String],
       sequence: Long
+    )
+
+    case class TransactionResponseScriptSig(
+      asm: String,
+      hex: String
     )
 
     case class TransactionResponseScript(
