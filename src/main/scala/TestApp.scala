@@ -47,11 +47,9 @@ object TestApp extends IOApp {
     BitcoinRPC
       .openAll()
       .use {
-        case (client, _) =>
+        case (client, zmq) =>
           for {
-//            _ <- loop(ws, client)
-            b <- BitcoinRPC.getTransactions(client, Seq("87f3beec026e352accc9a8410feebece15023a2e7c289e60ba11fee23fcc7a91", "e6678663bd7f35d91c05c29f68562e7e48bc1c94f55cdf4f7599cc8f8168dc4e"))
-            _ <- IO(println(b))
+            _ <- loop(zmq, client)
           } yield ExitCode.Success
       }
   }

@@ -48,17 +48,8 @@ object ZeroMQ {
     socket.connect(f"tcp://$host:$port")
 
     def nextBlock(): String = {
-      while(!context.isClosed && !Thread.currentThread().isInterrupted) {
-        println(s"isInterrupted: ${Thread.currentThread().isInterrupted}")
-        val msg = ZMsg.recvMsg(socket, ZMQ.NOBLOCK)
-        if(msg!=null) {
-          return messageFromZMsg(msg).body
-        } else {
-          println("sleeping")
-          Thread.sleep(1000)
-        }
-      }
-      throw new Exception("Interrupted")
+      val msg = ZMsg.recvMsg(socket)
+      messageFromZMsg(msg).body
     }
 
     override def close() = {
