@@ -16,6 +16,7 @@
   */
 package io.tokenanalyst.bitcoinrpc
 
+import java.io.Closeable
 import java.nio.ByteBuffer
 
 import cats.effect.{IO, Resource}
@@ -38,7 +39,7 @@ object ZeroMQ {
     message(topic, body, seq)
   }
 
-  class Socket(host: String, port: Int) extends AutoCloseable {
+  class Socket(host: String, port: Int) extends Closeable {
     val context = new ZContext()
     val socket: ZMQ.Socket = context.createSocket(SocketType.SUB)
     //http://api.zeromq.org/2-1:zmq-setsockopt
@@ -46,18 +47,26 @@ object ZeroMQ {
     socket.subscribe(HASH_BLOCK)
     socket.connect(f"tcp://$host:$port")
 
-    def nextBlock() = {
-      val msg = ZMsg.recvMsg(socket)
-      messageFromZMsg(msg).body
+    def nextBlock(): String = {
+      while(!context.isClosed && !Thread.currentThread().isInterrupted) {
+        println(s"isInterrupted: ${Thread.currentThread().isInterrupted}")
+        val msg = ZMsg.recvMsg(socket, ZMQ.NOBLOCK)
+        if(msg!=null) {
+          return messageFromZMsg(msg).body
+        } else {
+          println("sleeping")
+          Thread.sleep(1000)
+        }
+      }
+      throw new Exception("Interrupted")
     }
 
-    override def close() = context.close()
+    override def close() = {
+      println("closing...")
+      context.close()
+    }
   }
 
   def socket(host: String, port: Int): Resource[IO, Socket] =
-    Resource.make {
-      IO(new Socket(host, port))
-    } { socket =>
-      IO(socket.close()).handleErrorWith(_ => IO.unit)
-    }
+    Resource.fromAutoCloseable(IO(new Socket(host, port)))
 }
