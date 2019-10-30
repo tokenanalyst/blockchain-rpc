@@ -26,6 +26,7 @@ import org.http4s.Uri
 import org.http4s.{BasicCredentials, MediaType, Request}
 
 import io.circe.{Decoder, Encoder, Json}
+import io.circe._
 import io.circe.syntax._
 import io.circe.generic.auto._
 
@@ -110,7 +111,9 @@ trait Calls {
 
   def getBlock(client: Client[IO], height: Long)(
       implicit config: Config
-  ): IO[BlockResponse] =
+  ): IO[BlockResponse] = if(height == 0L)
+    IO.pure(Blocks.Genesis)
+   else 
     for {
       hash <- getBlockHash(client, height)
       data <- getBlock(client, hash)
