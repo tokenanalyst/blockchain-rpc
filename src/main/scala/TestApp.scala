@@ -44,6 +44,7 @@ object TestApp extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
     implicit val config = getConfig.get
     implicit val ec = global
+<<<<<<< HEAD
     BitcoinRPC
       .openAll()
       .use {
@@ -52,5 +53,14 @@ object TestApp extends IOApp {
             _ <- loop(ws, client)
           } yield ExitCode.Success
       }
+=======
+    BitcoinRPC.openAll().use {
+      case (client,_) =>
+        for {
+          block <- BitcoinRPC.getBlock(client, 0L) 
+          _ <- IO { println(block) }
+        } yield ExitCode(0)
+    }
+>>>>>>> 595439069ae2e0aa1622fbfe3ac4f2be64b00908
   }
 }

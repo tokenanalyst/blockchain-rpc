@@ -31,7 +31,8 @@ lazy val http4s = Seq(
 lazy val json = Seq(
   "org.http4s" %% "http4s-circe" % http4sVersion,
   "io.circe" %% "circe-generic" % "0.11.1",
-  "io.circe" %% "circe-literal" % "0.11.1"
+  "io.circe" %% "circe-literal" % "0.11.1",
+  "io.circe" %% "circe-parser" % "0.11.1"
 )
 
 lazy val log = Seq(
