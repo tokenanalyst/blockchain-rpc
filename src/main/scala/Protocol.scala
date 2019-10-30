@@ -19,6 +19,7 @@ package io.tokenanalyst.bitcoinrpc
 object Protocol {
     sealed trait RPCResponse
     
+    case class BatchResponse[A](seq: Seq[A]) extends RPCResponse
     case class FeeResponse(feerate: Double, blocks: Int) extends RPCResponse
     case class BlockHashResponse(hash: String) extends RPCResponse
     case class BlockResponse(
@@ -85,6 +86,7 @@ object Protocol {
     ) extends RPCResponse
 
     sealed trait RPCRequest
+    case class BatchRequest[A](seq: Seq[A]) extends RPCRequest
     case class FeeRequest(blocks: Int) extends RPCRequest
     case class BlockRequest(hash: String) extends RPCRequest
     case class BlockHashRequest(height: Long) extends RPCRequest
