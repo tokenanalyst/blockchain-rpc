@@ -44,23 +44,15 @@ object TestApp extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
     implicit val config = getConfig.get
     implicit val ec = global
-<<<<<<< HEAD
     BitcoinRPC
       .openAll()
       .use {
-        case (client, ws) =>
+        case (client, _) =>
           for {
-            _ <- loop(ws, client)
+//            _ <- loop(ws, client)
+            b <- BitcoinRPC.getTransactions(client, Seq("87f3beec026e352accc9a8410feebece15023a2e7c289e60ba11fee23fcc7a91", "e6678663bd7f35d91c05c29f68562e7e48bc1c94f55cdf4f7599cc8f8168dc4e"))
+            _ <- IO(println(b))
           } yield ExitCode.Success
       }
-=======
-    BitcoinRPC.openAll().use {
-      case (client,_) =>
-        for {
-          block <- BitcoinRPC.getBlock(client, 0L) 
-          _ <- IO { println(block) }
-        } yield ExitCode(0)
-    }
->>>>>>> 595439069ae2e0aa1622fbfe3ac4f2be64b00908
   }
 }

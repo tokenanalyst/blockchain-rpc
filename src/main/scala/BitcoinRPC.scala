@@ -16,44 +16,36 @@
   */
 package io.tokenanalyst.bitcoinrpc
 
+import cats.effect.{ContextShift, IO, Resource}
+import com.typesafe.scalalogging.LazyLogging
+import io.circe.generic.auto._
+import io.circe.syntax._
+import io.circe.{Decoder, Encoder, Json}
+import io.tokenanalyst.bitcoinrpc.Protocol._
 import org.http4s.circe.CirceEntityDecoder._
 import org.http4s.circe.CirceEntityEncoder._
 import org.http4s.client.Client
+import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.client.dsl.Http4sClientDsl
 import org.http4s.dsl.io._
 import org.http4s.headers.{Authorization, _}
-import org.http4s.Uri
-import org.http4s.{BasicCredentials, MediaType, Request}
+import org.http4s.{BasicCredentials, MediaType, Request, Uri}
 
-import io.circe.{Decoder, Encoder, Json}
-import io.circe._
-import io.circe.syntax._
-import io.circe.generic.auto._
-
-import cats.effect.{IO, ContextShift, Resource}
-import cats.effect.ContextShift
-
-import com.typesafe.scalalogging.LazyLogging
-
-import Protocol._
-
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext
-import org.http4s.client.blaze.BlazeClientBuilder
 
-case class Config(
-    host: String,
-    user: String,
-    password: String,
-    port: Option[Int] = None,
-    zmqPort: Option[Int] = None
-)
+case class Config(host: String,
+                  user: String,
+                  password: String,
+                  port: Option[Int] = None,
+                  zmqPort: Option[Int] = None)
 
 object BitcoinRPC extends Http4sClientDsl[IO] with Calls with LazyLogging {
 
   def openAll()(
-      implicit config: Config,
-      ec: ExecutionContext,
-      cs: ContextShift[IO]
+    implicit config: Config,
+    ec: ExecutionContext,
+    cs: ContextShift[IO]
   ): Resource[IO, (Client[IO], ZeroMQ.Socket)] =
     for {
       client <- BlazeClientBuilder[IO](ec).resource
@@ -61,8 +53,8 @@ object BitcoinRPC extends Http4sClientDsl[IO] with Calls with LazyLogging {
     } yield (client, socket)
 
   def request[A <: RPCRequest: Encoder, B <: RPCResponse: Decoder](
-      client: Client[IO],
-      request: A
+    client: Client[IO],
+    request: A
   )(implicit config: Config): IO[B] =
     for {
       req <- post(request)
@@ -70,7 +62,7 @@ object BitcoinRPC extends Http4sClientDsl[IO] with Calls with LazyLogging {
     } yield res
 
   def requestJson[A <: RPCRequest: Encoder](client: Client[IO], request: A)(
-      implicit config: Config
+    implicit config: Config
   ): IO[Json] =
     for {
       req <- post(request)
@@ -78,7 +70,7 @@ object BitcoinRPC extends Http4sClientDsl[IO] with Calls with LazyLogging {
     } yield res
 
   private def post[A <: RPCRequest: Encoder](
-      request: A
+    request: A
   )(implicit config: Config): IO[Request[IO]] = {
     (for {
       url <- Uri.fromString(s"http://${config.host}:8332")
@@ -100,45 +92,38 @@ object BitcoinRPC extends Http4sClientDsl[IO] with Calls with LazyLogging {
 }
 
 trait Calls {
-  import RPCEncoders._
   import RPCDecoders._
+  import RPCEncoders._
 
-  def getBlock(client: Client[IO], hash: String)(
-      implicit config: Config
-  ): IO[BlockResponse] = {
+  def getBlock(client: Client[IO],
+               hash: String)(implicit config: Config): IO[BlockResponse] = {
     BitcoinRPC.request[BlockRequest, BlockResponse](client, BlockRequest(hash))
   }
 
-  def getBlock(client: Client[IO], height: Long)(
-      implicit config: Config
-  ): IO[BlockResponse] = if(height == 0L)
-    IO.pure(Blocks.Genesis)
-   else 
+  def getBlock(client: Client[IO],
+               height: Long)(implicit config: Config): IO[BlockResponse] =
     for {
       hash <- getBlockHash(client, height)
       data <- getBlock(client, hash)
     } yield data
 
-  def getBlockHash(client: Client[IO], height: Long)(
-      implicit config: Config
-  ): IO[String] =
+  def getBlockHash(client: Client[IO],
+                   height: Long)(implicit config: Config): IO[String] =
     for {
       json <- BitcoinRPC
-        .requestJson[BlockHashRequest](client, new BlockHashRequest(height))
+        .requestJson[BlockHashRequest](client, BlockHashRequest(height))
     } yield json.asObject.get("result").get.asString.get
 
   def getBestBlockHash(
-      client: Client[IO]
+    client: Client[IO]
   )(implicit config: Config): IO[String] =
     for {
-      json <- BitcoinRPC.requestJson[BestBlockHashRequest](
-        client,
-        new BestBlockHashRequest
-      )
+      json <- BitcoinRPC
+        .requestJson[BestBlockHashRequest](client, new BestBlockHashRequest)
     } yield json.asObject.get("result").get.asString.get
 
   def getBestBlockHeight(
-      client: Client[IO]
+    client: Client[IO]
   )(implicit config: Config): IO[Long] =
     for {
       hash <- getBestBlockHash(client)
@@ -147,15 +132,46 @@ trait Calls {
 
   def getTransactions(client: Client[IO], hashes: Seq[String])(
     implicit config: Config
-  ): IO[BatchResponse[TransactionResponse]] = 
-    BitcoinRPC.request[BatchRequest[TransactionRequest], BatchResponse[TransactionResponse]](
-      client, BatchRequest[TransactionRequest](hashes.map(TransactionRequest.apply)))
+  ): IO[BatchResponse[TransactionResponse]] = {
+    val list = ListBuffer(hashes: _*)
+    val genesisTransactionIndex =
+      list.indexOf(Transactions.GenesisTransactionHash)
+
+    if (genesisTransactionIndex >= 0) {
+      list.remove(genesisTransactionIndex)
+    }
+
+    val result =
+      BitcoinRPC.request[BatchRequest[TransactionRequest], BatchResponse[
+        TransactionResponse
+      ]](
+        client,
+        BatchRequest[TransactionRequest](list.map(TransactionRequest.apply))
+      )
+
+    if (genesisTransactionIndex >= 0) {
+      for {
+        batcResponse <- result
+        listResult <- IO(ListBuffer(batcResponse.seq: _*))
+        _ <- IO(
+          listResult
+            .insert(genesisTransactionIndex, Transactions.GenesisTransaction)
+        )
+      } yield BatchResponse(listResult)
+    } else {
+      result
+    }
+  }
 
   def getTransaction(client: Client[IO], hash: String)(
-      implicit config: Config
-  ): IO[TransactionResponse] = 
-    BitcoinRPC.request[TransactionRequest, TransactionResponse](
-      client,
-      TransactionRequest(hash)
-    )
+    implicit config: Config
+  ): IO[TransactionResponse] =
+    if (hash != Transactions.GenesisTransactionHash) {
+      BitcoinRPC.request[TransactionRequest, TransactionResponse](
+        client,
+        TransactionRequest(hash)
+      )
+    } else {
+      IO(Transactions.GenesisTransaction)
+    }
 }
