@@ -144,7 +144,7 @@ trait Calls {
 
   def getTransactions(client: Client[IO], hashes: Seq[String])(
     implicit config: Config
-  ): IO[List[TransactionResponse]] = 
+  ): IO[BatchResponse[TransactionResponse]] = 
     BitcoinRPC.request[BatchRequest[TransactionRequest], BatchResponse[TransactionResponse]](
       client, BatchRequest[TransactionRequest](hashes.map(TransactionRequest.apply)))
 
