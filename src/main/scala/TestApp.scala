@@ -19,6 +19,10 @@ package io.tokenanalyst.bitcoinrpc
 import cats.effect.{ExitCode, IO, IOApp}
 import scala.concurrent.ExecutionContext.global
 import scala.util.{Failure, Success}
+import Protocol.{BatchRequest, TransactionRequest, BatchResponse, TransactionResponse}
+import RPCEncoders._
+import RPCDecoders._
+import io.circe.generic.auto._
 
 object TestApp extends IOApp {
 
@@ -43,8 +47,8 @@ object TestApp extends IOApp {
     BitcoinRPC.openAll().use {
       case (client,_) =>
         for {
-          block <- BitcoinRPC.getTransaction(client, "afd758cf6a2e8aed2d1285d9c216bc59fdff5b8b01c5178b4a11c73fe6a6ffe1")
-          _ <- IO { println(block) }
+          tx <- BitcoinRPC.getTransaction(client, "1714973540064115f076dfc50567a0fde3a298c79237319abaddef8e6ef835cd")
+          _ <- IO { println(tx) }
         } yield ExitCode(0)
     }
   }
