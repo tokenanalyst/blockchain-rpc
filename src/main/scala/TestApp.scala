@@ -21,6 +21,10 @@ import org.http4s.client.Client
 
 import scala.concurrent.ExecutionContext.global
 import scala.util.{Failure, Success}
+import Protocol.{BatchRequest, TransactionRequest, BatchResponse, TransactionResponse}
+import RPCEncoders._
+import RPCDecoders._
+import io.circe.generic.auto._
 
 object TestApp extends IOApp {
 

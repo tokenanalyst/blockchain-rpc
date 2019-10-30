@@ -1,3 +1,8 @@
+# 1.7
+
+* added batching of requests
+* added getTransactions method
+
 # 1.6
 
 * added logging subsystem, log to DEBUG

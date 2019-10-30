@@ -142,13 +142,17 @@ trait Calls {
       block <- getBlock(client, hash)
     } yield block.height
 
+  def getTransactions(client: Client[IO], hashes: Seq[String])(
+    implicit config: Config
+  ): IO[List[TransactionResponse]] = 
+    BitcoinRPC.request[BatchRequest[TransactionRequest], BatchResponse[TransactionResponse]](
+      client, BatchRequest[TransactionRequest](hashes.map(TransactionRequest.apply)))
+
   def getTransaction(client: Client[IO], hash: String)(
       implicit config: Config
-  ): IO[TransactionResponse] = {
+  ): IO[TransactionResponse] = 
     BitcoinRPC.request[TransactionRequest, TransactionResponse](
       client,
       TransactionRequest(hash)
     )
-  }
-
 }

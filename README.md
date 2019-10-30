@@ -11,6 +11,8 @@ bitcoin-rpc is a typesafe bitcoind RPC client written in and to be used with Sca
 | getbestblockhash  |  Gets the block tip hash | getBestBlockHash()  |
 | getblock  | Gets the block with transaction ids  |  getBlock(hash: String) |
 | getblockhash, getblock  | Gets the block with transaction ids  |  getBlock(height: Long) |
+| getrawtransaction | Gets raw transaction data | getTransaction(hash: String) |
+| batch of getrawtransaction | Gets raw transaction data | getTransactions(hashes: Seq[String]) |
 
 ## Example
 
