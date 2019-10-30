@@ -48,16 +48,18 @@ object ZeroMQ {
 
     def nextBlock() = {
       val msg = ZMsg.recvMsg(socket)
-      messageFromZMsg(msg).body
+       messageFromZMsg(msg).body
     }
 
-    override def close() = context.close()
+    override def close() =  { 
+      context.close()
+    }
   }
 
   def socket(host: String, port: Int): Resource[IO, Socket] =
     Resource.make {
       IO(new Socket(host, port))
     } { socket =>
-      IO(socket.close()).handleErrorWith(_ => IO.unit)
+      IO(socket.close())
     }
 }
