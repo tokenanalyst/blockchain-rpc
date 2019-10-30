@@ -35,6 +35,16 @@ object RPCDecoders {
     new Decoder[A] {
       def apply(a: HCursor): Decoder.Result[A] = a.downField("result").as[A]
     }
+
+  implicit def batch[A <: RPCResponse: Decoder](implicit decoder: Decoder[A])
+     = new RPCDecoder[BatchResponse[A]] {
+    
+      def apply(res: BatchResponse[A]): Json = {
+       res.seq.map { a => 
+          decoder.apply(a) 
+        }
+      }
+  }
 }
 
 object RPCEncoders {
@@ -47,6 +57,14 @@ object RPCEncoders {
     ("method", Json.fromString(method)),
     ("params", Json.fromValues(params))
   )
+
+  implicit def batchRequest[A <: RPCRequest](implicit encoder: RPCEncoder[A]) = 
+    new RPCEncoder[BatchRequest[A]] {
+      final def apply(req: BatchRequest[A]): Json = {  
+        val jsons = req.seq.map { i => encoder.apply(i)} 
+        Json.arr(jsons:_*)
+      }
+  }
 
   implicit val transactionRequest = new RPCEncoder[TransactionRequest] {
     final def apply(a: TransactionRequest): Json =
