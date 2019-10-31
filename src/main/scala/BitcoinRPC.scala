@@ -33,6 +33,7 @@ import org.http4s.{BasicCredentials, MediaType, Request, Uri}
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
 
 case class Config(host: String,
                   user: String,
@@ -48,7 +49,9 @@ object BitcoinRPC extends Http4sClientDsl[IO] with Calls with LazyLogging {
     cs: ContextShift[IO]
   ): Resource[IO, (Client[IO], ZeroMQ.Socket)] =
     for {
-      client <- BlazeClientBuilder[IO](ec).resource
+      client <- BlazeClientBuilder[IO](ec)
+        .withConnectTimeout(2.minutes)
+        .resource
       socket <- ZeroMQ.socket(config.host, config.zmqPort.getOrElse(28332))
     } yield (client, socket)
 
