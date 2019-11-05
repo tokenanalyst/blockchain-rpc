@@ -177,4 +177,10 @@ trait Calls {
     } else {
       IO(Transactions.GenesisTransaction)
     }
+
+  def estimateSmartFee(client: Client[IO], height: Int)(
+    implicit config: Config
+  ): IO[FeeResponse] = {
+    BitcoinRPC.request[FeeRequest, FeeResponse](client, FeeRequest(height))
+  }
 }

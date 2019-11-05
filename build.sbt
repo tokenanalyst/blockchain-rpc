@@ -1,6 +1,6 @@
 lazy val commonSettings = Seq(
   organization := "io.tokenanalyst",
-  version := "1.9.1",
+  version := "1.10.0",
   scalaVersion := "2.12.10",
   description := "bitcoin-rpc")
 
