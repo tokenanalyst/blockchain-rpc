@@ -19,108 +19,117 @@ package io.tokenanalyst.bitcoinrpc.bitcoin
 import io.circe.generic.auto._
 import io.tokenanalyst.bitcoinrpc.{BasicMethods, Bitcoin}
 import cats.effect.IO
-
 import RPCEncoders._
 import RPCDecoders._
 import Protocol._
 
+import scala.collection.mutable.ListBuffer
+
 object Instances {
-  implicit val getBlockInstance = new BasicMethods.GetBlock[Bitcoin, BlockResponse] {
-    def getBlock(a: Bitcoin, hash: String): IO[BlockResponse] = {
-      a.client.request[BlockRequest, BlockResponse](BlockRequest(hash))
-    }
-  }
-}
-
-/*
-trait Calls {
-  import RPCDecoders._
-  import RPCEncoders._
-
-  def getBlock(client: Client[IO],
-               hash: String)(implicit config: Config): IO[BlockResponse] = {
-    BitcoinRPC.request[BlockRequest, BlockResponse](client, BlockRequest(hash))
-  }
-
-  def getBlock(client: Client[IO],
-               height: Long)(implicit config: Config): IO[BlockResponse] =
-    for {
-      hash <- getBlockHash(client, height)
-      data <- getBlock(client, hash)
-    } yield data
-
-  def getBlockHash(client: Client[IO],
-                   height: Long)(implicit config: Config): IO[String] =
-    for {
-      json <- BitcoinRPC
-        .requestJson[BlockHashRequest](client, BlockHashRequest(height))
-    } yield json.asObject.get("result").get.asString.get
-
-  def getBestBlockHash(
-    client: Client[IO]
-  )(implicit config: Config): IO[String] =
-    for {
-      json <- BitcoinRPC
-        .requestJson[BestBlockHashRequest](client, new BestBlockHashRequest)
-    } yield json.asObject.get("result").get.asString.get
-
-  def getBestBlockHeight(
-    client: Client[IO]
-  )(implicit config: Config): IO[Long] =
-    for {
-      hash <- getBestBlockHash(client)
-      block <- getBlock(client, hash)
-    } yield block.height
-
-  def getTransactions(client: Client[IO], hashes: Seq[String])(
-    implicit config: Config
-  ): IO[BatchResponse[TransactionResponse]] = {
-    val list = ListBuffer(hashes: _*)
-    val genesisTransactionIndex =
-      list.indexOf(Transactions.GenesisTransactionHash)
-
-    if (genesisTransactionIndex >= 0) {
-      list.remove(genesisTransactionIndex)
+  implicit val getBlockByHashInstance =
+    new BasicMethods.GetBlockByHash[Bitcoin, BlockResponse] {
+      def getBlockByHash(a: Bitcoin, hash: String): IO[BlockResponse] = {
+        a.client.request[BlockRequest, BlockResponse](BlockRequest(hash))
+      }
     }
 
-    val result =
-      BitcoinRPC.request[BatchRequest[TransactionRequest], BatchResponse[
-        TransactionResponse
-      ]](
-        client,
-        BatchRequest[TransactionRequest](list.map(TransactionRequest.apply))
-      )
+  implicit val getBlockByHeightInstance =
+    new BasicMethods.GetBlockByHeight[Bitcoin, BlockResponse] {
+      override def getBlockByHeight(
+          a: Bitcoin,
+          height: Long
+      ): IO[BlockResponse] =
+        for {
+          hash <- getBlockHashInstance.getBlockHash(a, height)
+          data <- getBlockByHashInstance.getBlockByHash(a, hash)
+        } yield data
+    }
 
-    if (genesisTransactionIndex >= 0) {
+  implicit val getBlockHashInstance = new BasicMethods.GetBlockHash[Bitcoin] {
+    override def getBlockHash(a: Bitcoin, height: Long): IO[String] =
       for {
-        batcResponse <- result
-        listResult <- IO(ListBuffer(batcResponse.seq: _*))
-        _ <- IO(
-          listResult
-            .insert(genesisTransactionIndex, Transactions.GenesisTransaction)
-        )
-      } yield BatchResponse(listResult)
-    } else {
-      result
-    }
+        json <- a.client
+          .requestJson[BlockHashRequest](BlockHashRequest(height))
+      } yield json.asObject.get("result").get.asString.get
   }
 
-  def getTransaction(client: Client[IO], hash: String)(
-    implicit config: Config
-  ): IO[TransactionResponse] =
-    if (hash != Transactions.GenesisTransactionHash) {
-      BitcoinRPC.request[TransactionRequest, TransactionResponse](
-        client,
-        TransactionRequest(hash)
-      )
-    } else {
-      IO(Transactions.GenesisTransaction)
+  implicit val getBestBlockHashInstance =
+    new BasicMethods.GetBestBlockHash[Bitcoin] {
+      override def getBestBlockHash(a: Bitcoin): IO[String] =
+        for {
+          json <- a.client
+            .requestJson[BestBlockHashRequest](new BestBlockHashRequest)
+        } yield json.asObject.get("result").get.asString.get
     }
 
-  def estimateSmartFee(client: Client[IO], height: Int)(
-    implicit config: Config
-  ): IO[FeeResponse] = {
-    BitcoinRPC.request[FeeRequest, FeeResponse](client, FeeRequest(height))
-  }
+  implicit val getBestBlockHeightInstance =
+    new BasicMethods.GetBestBlockHeight[Bitcoin] {
+      override def getBestBlockHeight(a: Bitcoin): IO[Long] =
+        for {
+          hash <- getBestBlockHashInstance.getBestBlockHash(a)
+          block <- getBlockByHashInstance.getBlockByHash(a, hash)
+        } yield block.height
+    }
+
+  implicit val getTransactionsInstance =
+    new BasicMethods.GetTransactions[Bitcoin, BatchResponse[
+      TransactionResponse
+    ]] {
+      override def getTransactions(
+          a: Bitcoin,
+          hashes: Seq[String]
+      ): IO[BatchResponse[TransactionResponse]] = {
+        val list = ListBuffer(hashes: _*)
+        val genesisTransactionIndex =
+          list.indexOf(Transactions.GenesisTransactionHash)
+
+        if (genesisTransactionIndex >= 0) {
+          list.remove(genesisTransactionIndex)
+        }
+
+        val result =
+          a.client.request[BatchRequest[TransactionRequest], BatchResponse[
+            TransactionResponse
+          ]](
+            BatchRequest[TransactionRequest](list.map(TransactionRequest.apply))
+          )
+
+        if (genesisTransactionIndex >= 0) {
+          for {
+            batcResponse <- result
+            listResult <- IO(ListBuffer(batcResponse.seq: _*))
+            _ <- IO(
+              listResult
+                .insert(
+                  genesisTransactionIndex,
+                  Transactions.GenesisTransaction
+                )
+            )
+          } yield BatchResponse(listResult)
+        } else {
+          result
+        }
+      }
+    }
+
+  implicit val getTransactionInstance =
+    new BasicMethods.GetTransaction[Bitcoin, TransactionResponse] {
+      override def getTransaction(
+          a: Bitcoin,
+          hash: String
+      ): IO[TransactionResponse] =
+        if (hash != Transactions.GenesisTransactionHash) {
+          a.client.request[TransactionRequest, TransactionResponse](
+            TransactionRequest(hash)
+          )
+        } else {
+          IO(Transactions.GenesisTransaction)
+        }
+    }
+
+  implicit val estimateSmartFeeInstance =
+    new BasicMethods.EstimateSmartFee[Bitcoin, FeeResponse] {
+      override def estimateSmartFee(a: Bitcoin, height: Long): IO[FeeResponse] =
+        a.client.request[FeeRequest, FeeResponse](FeeRequest(height))
+    }
 }
-*/

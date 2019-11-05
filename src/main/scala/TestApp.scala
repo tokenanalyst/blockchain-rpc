@@ -35,10 +35,10 @@ object TestApp extends IOApp {
     implicit val ec = global
 
     import bitcoin.Syntax._
-    RPCClient.bitcoin(config).use { bitcoin => 
-      for { 
-        block <- bitcoin.getBlock("0000000000000000000759de6ab39c2d8fb01e4481ba581761ddc1d50a57358d")
-        _ <- IO { println(block)}  
+    RPCClient.bitcoin(config).use { bitcoin =>
+      for {
+        block <- bitcoin.getBlockByHash("0000000000000000000759de6ab39c2d8fb01e4481ba581761ddc1d50a57358d")
+        _ <- IO { println(block)}
       } yield ExitCode(0)
     }
   }

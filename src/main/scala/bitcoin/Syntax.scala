@@ -19,12 +19,37 @@ package io.tokenanalyst.bitcoinrpc.bitcoin
 import io.tokenanalyst.bitcoinrpc.{Bitcoin, BasicMethods}
 
 import Instances._
-import BasicMethods._ 
+import BasicMethods._
 import Protocol._
 
-object Syntax { 
-    implicit class BitcoinOps(b: Bitcoin) {
-      def getBlock(hash: String) = 
-        implicitly[GetBlock[Bitcoin, BlockResponse]].getBlock(b, hash)
-    }
+object Syntax {
+  implicit class BitcoinOps(b: Bitcoin) {
+    def getBlockByHash(hash: String) =
+      implicitly[GetBlockByHash[Bitcoin, BlockResponse]].getBlockByHash(b, hash)
+
+    def getBlockByHeight(height: Long) =
+      implicitly[GetBlockByHeight[Bitcoin, BlockResponse]]
+        .getBlockByHeight(b, height)
+
+    def getBlockHash(height: Long) =
+      implicitly[GetBlockHash[Bitcoin]].getBlockHash(b, height)
+
+    def getBestBlockHash() =
+      implicitly[GetBestBlockHash[Bitcoin]].getBestBlockHash(b)
+
+    def getBestBlockHeigh() =
+      implicitly[GetBestBlockHeight[Bitcoin]].getBestBlockHeight(b)
+
+    def getTransactions(hashes: Seq[String]) =
+      implicitly[GetTransactions[Bitcoin, BatchResponse[TransactionResponse]]]
+        .getTransactions(b, hashes)
+
+    def getTransaction(hash: String) =
+      implicitly[GetTransaction[Bitcoin, TransactionResponse]]
+        .getTransaction(b, hash)
+
+    def estimateSmartFee(height: Long) =
+      implicitly[EstimateSmartFee[Bitcoin, FeeResponse]]
+        .estimateSmartFee(b, height)
   }
+}

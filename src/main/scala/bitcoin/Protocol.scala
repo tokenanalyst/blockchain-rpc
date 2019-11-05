@@ -84,7 +84,7 @@ object Protocol {
   ) extends RPCResponse
 
   case class BatchRequest[A](seq: Seq[A]) extends RPCRequest
-  case class FeeRequest(blocks: Int) extends RPCRequest
+  case class FeeRequest(block: Long) extends RPCRequest
   case class BlockRequest(hash: String) extends RPCRequest
   case class BlockHashRequest(height: Long) extends RPCRequest
   case class TransactionRequest(hash: String) extends RPCRequest
@@ -97,10 +97,10 @@ object Transactions {
   import io.circe.parser._
   import Protocol._
 
-  val GenesisTransactionHash =
+  lazy val GenesisTransactionHash =
     "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
 
-  val GenesisTransaction =
+  lazy val GenesisTransaction =
     parse(Source.fromResource("bitcoinGenesisTransaction.json").mkString)
       .flatMap { json =>
         json.as[TransactionResponse]

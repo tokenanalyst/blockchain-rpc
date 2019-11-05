@@ -31,12 +31,12 @@ import org.http4s.{BasicCredentials, MediaType, Request, Uri}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
-object RPCClient { 
+object RPCClient {
 
   def bitcoin(config: Config)(
     implicit ec: ExecutionContext,
     cs: ContextShift[IO]
-  ): Resource[IO, Bitcoin] = for(client <- make(config)) yield Bitcoin(client) 
+  ): Resource[IO, Bitcoin] = for(client <- make(config)) yield Bitcoin(client)
 
   def make(config: Config)(
     implicit ec: ExecutionContext,
@@ -52,9 +52,9 @@ object RPCClient {
 }
 
 class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config) extends Http4sClientDsl[IO] {
-  val uri = Uri.fromString(s"http://${config.host}:8332").getOrElse(throw new Exception("Could not parse URL")) 
+  val uri = Uri.fromString(s"http://${config.host}:8332").getOrElse(throw new Exception("Could not parse URL"))
   val mq = zmq
-  
+
   def request[A <: RPCRequest: Encoder, B <: RPCResponse: Decoder](
     request: A
   ): IO[B] =
@@ -63,7 +63,7 @@ class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config) extends 
       res <- client.expect[B](req)
     } yield res
 
-  def requestJson[A <: RPCRequest: Encoder](client: Client[IO], request: A): IO[Json] =
+  def requestJson[A <: RPCRequest: Encoder](request: A): IO[Json] =
     for {
       req <- post(request)
       res <- client.expect[Json](req)
