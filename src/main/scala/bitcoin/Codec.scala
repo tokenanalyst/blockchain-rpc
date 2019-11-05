@@ -66,7 +66,7 @@ object RPCEncoders {
   implicit val feeRequest = new RPCEncoder[FeeRequest] {
     final def apply(a: FeeRequest): Json =
       Json.obj(
-        requestFields("estimatesmartfee", Array(Json.fromInt(a.blocks))): _*
+        requestFields("estimatesmartfee", Array(Json.fromLong(a.block))): _*
       )
   }
 
