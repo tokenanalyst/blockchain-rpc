@@ -14,86 +14,25 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc
+package io.tokenanalyst.bitcoinrpc.bitcoin
 
-import cats.effect.{ContextShift, IO, Resource}
-import com.typesafe.scalalogging.LazyLogging
 import io.circe.generic.auto._
-import io.circe.syntax._
-import io.circe.{Decoder, Encoder, Json}
-import io.tokenanalyst.bitcoinrpc.Protocol._
-import org.http4s.circe.CirceEntityDecoder._
-import org.http4s.circe.CirceEntityEncoder._
-import org.http4s.client.Client
-import org.http4s.client.blaze.BlazeClientBuilder
-import org.http4s.client.dsl.Http4sClientDsl
-import org.http4s.dsl.io._
-import org.http4s.headers.{Authorization, _}
-import org.http4s.{BasicCredentials, MediaType, Request, Uri}
+import io.tokenanalyst.bitcoinrpc.{BasicMethods, Bitcoin}
+import cats.effect.IO
 
-import scala.collection.mutable.ListBuffer
-import scala.concurrent.ExecutionContext
-import scala.concurrent.duration._
+import RPCEncoders._
+import RPCDecoders._
+import Protocol._
 
-case class Config(host: String,
-                  user: String,
-                  password: String,
-                  port: Option[Int] = None,
-                  zmqPort: Option[Int] = None)
-
-object BitcoinRPC extends Http4sClientDsl[IO] with Calls with LazyLogging {
-
-  def openAll()(
-    implicit config: Config,
-    ec: ExecutionContext,
-    cs: ContextShift[IO]
-  ): Resource[IO, (Client[IO], ZeroMQ.Socket)] =
-    for {
-      client <- BlazeClientBuilder[IO](ec)
-        .withConnectTimeout(2.minutes)
-        .resource
-      socket <- ZeroMQ.socket(config.host, config.zmqPort.getOrElse(28332))
-    } yield (client, socket)
-
-  def request[A <: RPCRequest: Encoder, B <: RPCResponse: Decoder](
-    client: Client[IO],
-    request: A
-  )(implicit config: Config): IO[B] =
-    for {
-      req <- post(request)
-      res <- client.expect[B](req)
-    } yield res
-
-  def requestJson[A <: RPCRequest: Encoder](client: Client[IO], request: A)(
-    implicit config: Config
-  ): IO[Json] =
-    for {
-      req <- post(request)
-      res <- client.expect[Json](req)
-    } yield res
-
-  private def post[A <: RPCRequest: Encoder](
-    request: A
-  )(implicit config: Config): IO[Request[IO]] = {
-    (for {
-      url <- Uri.fromString(s"http://${config.host}:8332")
-      p <- Right(
-        POST(
-          request,
-          url,
-          Authorization(
-            BasicCredentials
-              .apply(config.user, config.password)
-          ),
-          Accept(MediaType.application.json)
-        )
-      )
-      _ <- Right(logger.debug(request.asJson.toString()))
-    } yield p)
-      .getOrElse(throw new Exception("No proper exception handling yet"))
+object Instances {
+  implicit val getBlockInstance = new BasicMethods.GetBlock[Bitcoin, BlockResponse] {
+    def getBlock(a: Bitcoin, hash: String): IO[BlockResponse] = {
+      a.client.request[BlockRequest, BlockResponse](BlockRequest(hash))
+    }
   }
 }
 
+/*
 trait Calls {
   import RPCDecoders._
   import RPCEncoders._
@@ -184,3 +123,4 @@ trait Calls {
     BitcoinRPC.request[FeeRequest, FeeResponse](client, FeeRequest(height))
   }
 }
+*/

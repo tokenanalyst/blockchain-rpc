@@ -14,36 +14,17 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc
+package io.tokenanalyst.bitcoinrpc.bitcoin
 
-import cats.effect.IO
-import io.circe.Json
+import io.tokenanalyst.bitcoinrpc.{Bitcoin, BasicMethods}
 
-trait RPCResponse
-trait RPCRequest
+import Instances._
+import BasicMethods._ 
+import Protocol._
 
-trait RPCEncoder[A] {
-  def apply(a: A): Json
-}
-
-trait RPCDecoder[A] {
-  def apply(a: A): Json
-}
-
-case class Config(
-    host: String,
-    user: String,
-    password: String,
-    port: Option[Int] = None,
-    zmqPort: Option[Int] = None
-)
-
-sealed trait Blockchain
-case class Bitcoin(client: RPCClient) extends Blockchain
-case class Omni(client: RPCClient) extends Blockchain
-
-object BasicMethods {
-  trait GetBlock[A <: Blockchain, B] {
-    def getBlock(a: A, hash: String): IO[B]
+object Syntax { 
+    implicit class BitcoinOps(b: Bitcoin) {
+      def getBlock(hash: String) = 
+        implicitly[GetBlock[Bitcoin, BlockResponse]].getBlock(b, hash)
+    }
   }
-}
