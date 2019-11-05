@@ -5,6 +5,32 @@
 <br/>
 bitcoin-rpc is a typesafe bitcoind RPC client written in and to be used with Scala. Under the hood, it's using http4s, circe and cats-effect. It's in active development, but no official public release has been scheduled yet. We appreciate external contributions, please check issues for inspiration. 
 
+
+
+## Example
+
+```
+  package io.tokenanalyst.bitcoinrpc.examples
+
+  import cats.effect.{ExitCode, IO, IOApp}
+  import scala.concurrent.ExecutionContext.global
+  
+  import io.tokenanalyst.bitcoinrpc.RPCClient
+  import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
+  
+  object GetBlockHash extends IOApp {
+    def run(args: List[String]): IO[ExitCode] = {
+      implicit val ec = global
+      RPCClient.bitcoin("127.0.0.1", "username", "password").use { bitcoin =>
+        for {
+          block <- bitcoin.getBlockByHash("0000000000000000000759de6ab39c2d8fb01e4481ba581761ddc1d50a57358d")
+          _ <- IO { println(block)}
+        } yield ExitCode(0)
+      }
+    }
+  }
+```
+
 ## Supported methods
 
 | Bitcoind RPC methods  | description  |  bitcoin-rpc method |
@@ -15,35 +41,3 @@ bitcoin-rpc is a typesafe bitcoind RPC client written in and to be used with Sca
 | getblockhash, getblock  | Gets the block with transaction ids  |  getBlock(height: Long) |
 | getrawtransaction | Gets raw transaction data | getTransaction(hash: String) |
 | batch of getrawtransaction | Gets raw transaction data | getTransactions(hashes: Seq[String]) |
-
-## Example
-
-```
-  import cats.effect.{ExitCode, IO, IOApp}
-  import scala.concurrent.ExecutionContext.global
-  
-  object Main extends IOApp {
-
-    def run(args: List[String]): IO[ExitCode] = {
-    
-      implicit val config = Config("127.0.0.1","user","password")
-      implicit val ec = global
-      
-      // opening up resources for HTTP and ZeroMQ
-      BitcoinRPC.openAll().use {
-        case (http, zmq) =>
-          for {
-            
-            // retrieving a simple block by hash
-            block <- BitcoinRPC.getBlock(http, 
-            "00000000000000000012fb9247e97999280cc8c1aedde0e2f2e3e7383f909e20")
-            
-            // listening for new blocks
-            newBlockHash <- zmq.nextBlock()
-            
-            _ <- IO { println(block) }
-          } yield ExitCode(0)
-      }
-    }
-  }
-```

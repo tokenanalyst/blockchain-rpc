@@ -24,6 +24,10 @@ import Protocol._
 
 object Syntax {
   implicit class BitcoinOps(b: Bitcoin) {
+
+    def getNextBlockHash() = 
+      implicitly[GetNextBlockHash[Bitcoin]].getNextBlockHash(b)
+
     def getBlockByHash(hash: String) =
       implicitly[GetBlockByHash[Bitcoin, BlockResponse]].getBlockByHash(b, hash)
 

@@ -43,6 +43,10 @@ case class Bitcoin(client: RPCClient) extends Blockchain
 case class Omni(client: RPCClient) extends Blockchain
 
 object BasicMethods {
+  trait GetNextBlockHash[A <: Blockchain] { 
+    def getNextBlockHash(a: A): IO[String]
+  }
+
   trait GetBlockByHash[A <: Blockchain, B] {
     def getBlockByHash(a: A, hash: String): IO[B]
   }

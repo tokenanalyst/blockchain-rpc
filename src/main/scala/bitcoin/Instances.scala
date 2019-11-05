@@ -26,23 +26,18 @@ import Protocol._
 import scala.collection.mutable.ListBuffer
 
 object Instances {
-  implicit val getBlockByHashInstance =
-    new BasicMethods.GetBlockByHash[Bitcoin, BlockResponse] {
-      def getBlockByHash(a: Bitcoin, hash: String): IO[BlockResponse] = {
-        a.client.request[BlockRequest, BlockResponse](BlockRequest(hash))
-      }
+
+  implicit val getNextBlockHash = 
+    new BasicMethods.GetNextBlockHash[Bitcoin] { 
+      override def getNextBlockHash(a: Bitcoin): IO[String] = 
+        a.client.nextBlockHash()
     }
 
-  implicit val getBlockByHeightInstance =
-    new BasicMethods.GetBlockByHeight[Bitcoin, BlockResponse] {
-      override def getBlockByHeight(
-          a: Bitcoin,
-          height: Long
-      ): IO[BlockResponse] =
-        for {
-          hash <- getBlockHashInstance.getBlockHash(a, height)
-          data <- getBlockByHashInstance.getBlockByHash(a, hash)
-        } yield data
+  implicit val getBlockByHashInstance =
+    new BasicMethods.GetBlockByHash[Bitcoin, BlockResponse] {
+      override def getBlockByHash(a: Bitcoin, hash: String): IO[BlockResponse] = {
+        a.client.request[BlockRequest, BlockResponse](BlockRequest(hash))
+      }
     }
 
   implicit val getBlockHashInstance = new BasicMethods.GetBlockHash[Bitcoin] {
@@ -52,6 +47,17 @@ object Instances {
           .requestJson[BlockHashRequest](BlockHashRequest(height))
       } yield json.asObject.get("result").get.asString.get
   }
+
+  implicit val getBlockByHeightInstance =
+    new BasicMethods.GetBlockByHeight[Bitcoin, BlockResponse] {
+      override def getBlockByHeight(
+          a: Bitcoin,
+          height: Long
+      ): IO[BlockResponse] = for {
+          hash <- getBlockHashInstance.getBlockHash(a, height)
+          data <- getBlockByHashInstance.getBlockByHash(a, hash)
+        } yield data
+    }
 
   implicit val getBestBlockHashInstance =
     new BasicMethods.GetBestBlockHash[Bitcoin] {
