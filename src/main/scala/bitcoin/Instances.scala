@@ -19,8 +19,8 @@ package io.tokenanalyst.bitcoinrpc.bitcoin
 import io.circe.generic.auto._
 import io.tokenanalyst.bitcoinrpc.{BasicMethods, Bitcoin}
 import cats.effect.IO
-import RPCEncoders._
-import RPCDecoders._
+import Codecs._
+import io.tokenanalyst.bitcoinrpc.GenericRPCDecoders._
 import Protocol._
 
 import scala.collection.mutable.ListBuffer
