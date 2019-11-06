@@ -1,8 +1,6 @@
-addCompilerPlugin("io.tryp" % "splain" % "0.5.0" cross CrossVersion.patch)
-
 lazy val commonSettings = Seq(
   organization := "io.tokenanalyst",
-  version := "1.10.0",
+  version := "1.20.0",
   scalaVersion := "2.12.10",
   description := "bitcoin-rpc")
 

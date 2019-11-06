@@ -1,3 +1,12 @@
+# 1.20
+
+* added omni methods
+* added new API interface, resources etc.
+* added EnvConfig for fast configuration 
+* added optional parameters to make function
+* added various examples for usage
+* added more details in README.md
+
 # 1.7
 
 * added batching of requests

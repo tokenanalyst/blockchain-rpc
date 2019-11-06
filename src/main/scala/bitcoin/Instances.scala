@@ -59,7 +59,7 @@ object Instances {
       ): IO[BlockResponse] =
         for {
           hash <- getBlockHashInstance.getBlockHash(a, height)
-          data <- getBlockByHashInstance.getBlockByHash(a, hash)
+          data <- getBlockByHashInstance.getBlockByHash(a, hash) 
         } yield data
     }
 
