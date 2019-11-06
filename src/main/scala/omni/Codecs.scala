@@ -16,5 +16,47 @@
   */
 package io.tokenanalyst.bitcoinrpc.omni
 
-object RPCEncoders {
+import io.circe.Json
+import io.tokenanalyst.bitcoinrpc.Codecs._
+import io.tokenanalyst.bitcoinrpc.RPCEncoder
+import io.tokenanalyst.bitcoinrpc.omni.Protocol.BlockRequest
+import io.tokenanalyst.bitcoinrpc.omni.Protocol.{
+  BestBlockHashRequest,
+  BlockTransactionsRequest,
+  TransactionRequest
+}
+
+object Codecs {
+
+  implicit val listBlockTransactionsRequest =
+    new RPCEncoder[BlockTransactionsRequest] {
+      final def apply(a: BlockTransactionsRequest): Json = {
+        Json.obj(
+          requestFields(
+            "omni_listblocktransactions",
+            Array(Json.fromLong(a.height))
+          ): _*
+        )
+      }
+    }
+
+  implicit val getTransactionRequest = new RPCEncoder[TransactionRequest] {
+    final def apply(a: TransactionRequest): Json =
+      Json.obj(
+        requestFields(
+          "omni_gettransaction",
+          Array(Json.fromString(a.hash))
+        ): _*
+      )
+  }
+
+  implicit val bestBlockHashRequest = new RPCEncoder[BestBlockHashRequest] {
+    final def apply(a: BestBlockHashRequest): Json =
+      Json.obj(requestFields("getbestblockhash", Array[Json]()): _*)
+  }
+
+  implicit val blockRequest = new RPCEncoder[BlockRequest] {
+    final def apply(a: BlockRequest): Json =
+      Json.obj(requestFields("getblock", Array(Json.fromString(a.hash))): _*)
+  }
 }

@@ -17,7 +17,30 @@
 package io.tokenanalyst.bitcoinrpc.omni
 
 import io.tokenanalyst.bitcoinrpc.Omni
+import io.tokenanalyst.bitcoinrpc.OmniMethods._
+import io.tokenanalyst.bitcoinrpc.omni.Instances._
 
 object Syntax {
-  implicit class BitcoinOps(b: Omni) {}
+  implicit class OmniOps(omni: Omni) {
+    def listBlockTransactions(height: Long) = {
+      implicitly[ListBlockTransactions].listBlockTransactions(omni, height)
+    }
+
+    def getTransaction(hash: String) = {
+      implicitly[GetTransaction].getTransaction(omni, hash)
+    }
+
+    def getTransactions(hashes: Seq[String]) = {
+      implicitly[GetTransactions].getTransactions(omni, hashes)
+    }
+
+    def getBestBlockHash() =
+      implicitly[GetBestBlockHash].getBestBlockHash(omni)
+
+    def getBestBlockHeight() =
+      implicitly[GetBestBlockHeight].getBestBlockHeight(omni)
+
+    def getBlockByHash(hash: String) =
+      implicitly[GetBlockByHash].getBlockByHash(omni, hash)
+  }
 }

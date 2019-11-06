@@ -20,7 +20,6 @@ import io.tokenanalyst.bitcoinrpc.{RPCRequest, RPCResponse}
 import scala.io.Source
 
 object Protocol {
-  case class BatchResponse[A](seq: Seq[A]) extends RPCResponse
   case class FeeResponse(feerate: Double, blocks: Int) extends RPCResponse
   case class BlockHashResponse(hash: String) extends RPCResponse
   case class BlockResponse(
@@ -83,7 +82,6 @@ object Protocol {
       locktime: Long
   ) extends RPCResponse
 
-  case class BatchRequest[A](seq: Seq[A]) extends RPCRequest
   case class FeeRequest(block: Long) extends RPCRequest
   case class BlockRequest(hash: String) extends RPCRequest
   case class BlockHashRequest(height: Long) extends RPCRequest

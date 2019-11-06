@@ -16,6 +16,50 @@
   */
 package io.tokenanalyst.bitcoinrpc.omni
 
-object Protocol {
-}
+import io.tokenanalyst.bitcoinrpc._
 
+object Protocol {
+  case class TransactionResponse(
+      txid: String,
+      block: Long,
+      blockhash: String,
+      positioninblock: Option[Int],
+      version: Option[Int],
+      blocktime: Long,
+      valid: Option[Boolean],
+      type_int: Option[Int],
+      `type`: Option[String],
+      propertyid: Option[Int],
+      amount: Option[Double],
+      fee: Option[Double],
+      sendingaddress: String,
+      referenceaddress: Option[String]
+  ) extends RPCResponse
+
+  case class BlockResponse(
+      height: Long,
+      hash: String,
+      previousblockhash: Option[String],
+      nonce: Long,
+      strippedsize: Long,
+      merkleroot: String,
+      version: Int,
+      weight: Int,
+      difficulty: Double,
+      chainwork: String,
+      bits: String,
+      size: Long,
+      mediantime: Long,
+      time: Long,
+      tx: List[String]
+  ) extends RPCResponse
+
+  case class BlockTransactionsRequest(height: Long) extends RPCRequest
+
+  case class TransactionRequest(hash: String) extends RPCRequest
+
+  case class BestBlockHashRequest() extends RPCRequest
+
+  case class BlockRequest(hash: String) extends RPCRequest
+
+}

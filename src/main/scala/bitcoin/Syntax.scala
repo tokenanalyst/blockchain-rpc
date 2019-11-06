@@ -16,16 +16,15 @@
   */
 package io.tokenanalyst.bitcoinrpc.bitcoin
 
-import io.tokenanalyst.bitcoinrpc.{Bitcoin, BasicMethods}
-
-import Instances._
-import BasicMethods._
-import Protocol._
+import io.tokenanalyst.bitcoinrpc.BasicMethods._
+import io.tokenanalyst.bitcoinrpc.bitcoin.Instances._
+import io.tokenanalyst.bitcoinrpc.bitcoin.Protocol._
+import io.tokenanalyst.bitcoinrpc.{BatchResponse, Bitcoin}
 
 object Syntax {
   implicit class BitcoinOps(b: Bitcoin) {
 
-    def getNextBlockHash() = 
+    def getNextBlockHash() =
       implicitly[GetNextBlockHash[Bitcoin]].getNextBlockHash(b)
 
     def getBlockByHash(hash: String) =

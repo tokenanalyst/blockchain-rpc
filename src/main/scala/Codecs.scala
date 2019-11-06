@@ -1,9 +1,9 @@
 package io.tokenanalyst.bitcoinrpc
 
-import io.circe.{Decoder, HCursor, Json}
+import io.circe.{Decoder, Encoder, HCursor, Json}
 
-object GenericRPCDecoders {
-  implicit def batch[A <: RPCResponse: Decoder] =
+object Codecs {
+  implicit def batchResponse[A <: RPCResponse: Decoder] =
     new Decoder[BatchResponse[A]] {
       def apply(a: HCursor): Decoder.Result[BatchResponse[A]] =
         a.as[Seq[A]].map(s => BatchResponse(s))
@@ -12,9 +12,7 @@ object GenericRPCDecoders {
   implicit def deriveCirceDecoder[A <: RPCResponse: Decoder] = new Decoder[A] {
     def apply(a: HCursor): Decoder.Result[A] = a.downField("result").as[A]
   }
-}
 
-object GenericRPCEncoders {
   def requestFields(
       method: String,
       params: Iterable[Json]
@@ -34,4 +32,10 @@ object GenericRPCEncoders {
         Json.arr(jsons: _*)
       }
     }
+
+  implicit def deriveCirceEncoder[A <: RPCRequest](
+      implicit e: RPCEncoder[A]
+  ) = new Encoder[A] {
+    def apply(a: A): Json = e.apply(a)
+  }
 }

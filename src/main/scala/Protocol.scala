@@ -18,13 +18,13 @@ package io.tokenanalyst.bitcoinrpc
 
 import cats.effect.IO
 import io.circe.Json
+import io.tokenanalyst.bitcoinrpc.omni.Protocol.{BlockResponse, TransactionResponse}
 
 trait RPCResponse
 trait RPCRequest
 
 case class BatchResponse[A](seq: Seq[A]) extends RPCResponse
 case class BatchRequest[A](seq: Seq[A]) extends RPCRequest
-
 trait RPCEncoder[A] {
   def apply(a: A): Json
 }
@@ -38,10 +38,10 @@ case class Config(
     port: Option[Int],
     username: Option[String],
     password: Option[String],
-    zmqPort: Option[Int] 
+    zmqPort: Option[Int]
 )
 
-object EnvConfig { 
+object EnvConfig {
   val PasswordEnv = "BITCOIN_RPC_PASSWORD"
   val UsernameEnv = "BITCOIN_RPC_USERNAME"
   val HostEnv = "BITCOIN_RPC_HOST"
@@ -51,10 +51,11 @@ object EnvConfig {
   implicit val config: Config = {
     Seq(HostEnv, PortEnv, UsernameEnv, PasswordEnv, ZMQPortEnv)
       .map(sys.env.get(_)) match {
-        case Seq(None, _,_,_,_) => throw new Exception("Pass at least BITCOIN_RPC_HOST.")
-        case Seq(Some(h), port, user, pass, zmqPort) => 
-          Config(h, port.map(_.toInt), user, pass, zmqPort.map(_.toInt))
-      }
+      case Seq(None, _, _, _, _) =>
+        throw new Exception("Pass at least BITCOIN_RPC_HOST.")
+      case Seq(Some(h), port, user, pass, zmqPort) =>
+        Config(h, port.map(_.toInt), user, pass, zmqPort.map(_.toInt))
+    }
   }
 }
 
@@ -62,11 +63,37 @@ sealed trait Blockchain
 case class Bitcoin(client: RPCClient) extends Blockchain
 case class Omni(client: RPCClient) extends Blockchain
 
-object OmniMethods { 
+object OmniMethods {
+  trait ListBlockTransactions {
+    def listBlockTransactions(omni: Omni, height: Long): IO[Seq[String]]
+  }
+
+  trait GetTransaction {
+    def getTransaction(omni: Omni, hash: String): IO[TransactionResponse]
+  }
+
+  trait GetTransactions {
+    def getTransactions(
+        omni: Omni,
+        hashes: Seq[String]
+    ): IO[BatchResponse[TransactionResponse]]
+  }
+
+  trait GetBestBlockHash {
+    def getBestBlockHash(omni: Omni): IO[String]
+  }
+
+  trait GetBlockByHash {
+    def getBlockByHash(omni: Omni, hash: String): IO[BlockResponse]
+  }
+
+  trait GetBestBlockHeight {
+    def getBestBlockHeight(omni: Omni): IO[Long]
+  }
 }
 
 object BasicMethods {
-  trait GetNextBlockHash[A <: Blockchain] { 
+  trait GetNextBlockHash[A <: Blockchain] {
     def getNextBlockHash(a: A): IO[String]
   }
 
