@@ -82,7 +82,7 @@ This example makes use of the EnvConfig import, which automatically configures R
 | BITCOIN_RPC_PORT  | RPC port when not default | Optional Int |
 | BITCOIN_RPC_ZEROMQ_PORT  | ZeroMQ port when not default | Optional Int |
 
-## Supported methods
+## Supported Bitcoin methods
 
 | Bitcoind RPC methods  | description  |  bitcoin-rpc method |
 |---|---|---|
