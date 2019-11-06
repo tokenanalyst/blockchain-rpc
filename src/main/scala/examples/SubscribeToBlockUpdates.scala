@@ -25,12 +25,18 @@ import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
 object SubscribeToBlockUpdates extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
-    RPCClient.bitcoin("127.0.0.1", "username", "password").use { bitcoin =>
-      for {
-        hash <- bitcoin.getNextBlockHash()
-        block <- bitcoin.getBlockByHash(hash)
-        _ <- IO { println(block)}
-      } yield ExitCode(0)
-    }
+    RPCClient
+      .bitcoin(
+        host = "127.0.0.1",
+        username = Some("user"),
+        password = Some("password")
+      )
+      .use { bitcoin =>
+        for {
+          hash <- bitcoin.getNextBlockHash()
+          block <- bitcoin.getBlockByHash(hash)
+          _ <- IO { println(block) }
+        } yield ExitCode(0)
+      }
   }
 }
