@@ -23,8 +23,7 @@ object ZeroMQ {
     message(topic, body, seq)
   }
 
-  class Socket(host: String, port: Int)
-      extends Closeable {
+  class Socket(host: String, port: Int) extends Closeable {
     val context = new ZContext()
     val socket: ZMQ.Socket = context.createSocket(SocketType.SUB)
     //http://api.zeromq.org/2-1:zmq-setsockopt
@@ -32,7 +31,7 @@ object ZeroMQ {
     socket.subscribe(HASH_BLOCK)
     socket.connect(f"tcp://$host:$port")
 
-    def nextBlock(): String = {
+    def nextBlock(): IO[String] = IO {
       val msg = ZMsg.recvMsg(socket)
       messageFromZMsg(msg).body
     }

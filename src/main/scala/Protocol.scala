@@ -16,90 +16,65 @@
   */
 package io.tokenanalyst.bitcoinrpc
 
-import io.tokenanalyst.bitcoinrpc.Protocol.TransactionResponse
+import cats.effect.IO
+import io.circe.Json
 
-import scala.io.Source
+trait RPCResponse
+trait RPCRequest
 
-object Protocol {
-  sealed trait RPCResponse
+case class BatchResponse[A](seq: Seq[A]) extends RPCResponse
+case class BatchRequest[A](seq: Seq[A]) extends RPCRequest
 
-  case class BatchResponse[A](seq: Seq[A]) extends RPCResponse
-  case class FeeResponse(feerate: Double, blocks: Int) extends RPCResponse
-  case class BlockHashResponse(hash: String) extends RPCResponse
-  case class BlockResponse(height: Long,
-                           hash: String,
-                           previousblockhash: Option[String],
-                           nonce: Long,
-                           strippedsize: Long,
-                           merkleroot: String,
-                           version: Int,
-                           weight: Int,
-                           difficulty: Double,
-                           chainwork: String,
-                           bits: String,
-                           size: Long,
-                           mediantime: Long,
-                           time: Long,
-                           nTx: Int,
-                           tx: List[String])
-      extends RPCResponse
-
-  case class TransactionResponseVin(
-    txid: Option[String],
-    vout: Option[Int],
-    scriptSig: Option[TransactionResponseScriptSig],
-    coinbase: Option[String],
-    sequence: Long
-  )
-
-  case class TransactionResponseScriptSig(asm: String, hex: String)
-
-  case class TransactionResponseScript(asm: String,
-                                       hex: String,
-                                       reqSigs: Option[Int],
-                                       `type`: String,
-                                       addresses: Option[List[String]])
-
-  case class TransactionResponseVout(value: Double,
-                                     n: Int,
-                                     scriptPubKey: TransactionResponseScript)
-
-  case class TransactionResponse(confirmations: Option[Int],
-                                 blockhash: String,
-                                 blocktime: Long,
-                                 hash: String,
-                                 hex: String,
-                                 txid: String,
-                                 time: Long,
-                                 vsize: Int,
-                                 size: Int,
-                                 weight: Int,
-                                 version: Int,
-                                 vin: List[TransactionResponseVin],
-                                 vout: List[TransactionResponseVout],
-                                 locktime: Long)
-      extends RPCResponse
-
-  sealed trait RPCRequest
-  case class BatchRequest[A](seq: Seq[A]) extends RPCRequest
-  case class FeeRequest(blocks: Int) extends RPCRequest
-  case class BlockRequest(hash: String) extends RPCRequest
-  case class BlockHashRequest(height: Long) extends RPCRequest
-  case class TransactionRequest(hash: String) extends RPCRequest
-  case class BestBlockHashRequest() extends RPCRequest
-  case class BlockHashByHeightRequest(height: Long) extends RPCRequest
+trait RPCEncoder[A] {
+  def apply(a: A): Json
 }
 
-object Transactions {
-  import io.circe.generic.auto._
-  import io.circe.parser._
+trait RPCDecoder[A] {
+  def apply(a: A): Json
+}
 
-  val GenesisTransactionHash = "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
+case class Config(
+    host: String,
+    user: String,
+    password: String,
+    port: Option[Int] = None,
+    zmqPort: Option[Int] = None
+)
 
-  val GenesisTransaction =
-    parse(Source.fromResource("bitcoinGenesisTransaction.json").mkString)
-      .flatMap { json =>
-        json.as[TransactionResponse]
-      }
-      .getOrElse(throw new Exception("Could not parse genesis"))
+sealed trait Blockchain
+case class Bitcoin(client: RPCClient) extends Blockchain
+case class Omni(client: RPCClient) extends Blockchain
+
+object BasicMethods {
+  trait GetBlockByHash[A <: Blockchain, B] {
+    def getBlockByHash(a: A, hash: String): IO[B]
+  }
+
+  trait GetBlockByHeight[A <: Blockchain, B] {
+    def getBlockByHeight(a: A, height: Long): IO[B]
+  }
+
+  trait GetBlockHash[A <: Blockchain] {
+    def getBlockHash(a: A, height: Long): IO[String]
+  }
+
+  trait GetBestBlockHash[A <: Blockchain] {
+    def getBestBlockHash(a: A): IO[String]
+  }
+
+  trait GetBestBlockHeight[A <: Blockchain] {
+    def getBestBlockHeight(a: A): IO[Long]
+  }
+
+  trait GetTransactions[A <: Blockchain, B] {
+    def getTransactions(a: A, hashes: Seq[String]): IO[B]
+  }
+
+  trait GetTransaction[A <: Blockchain, B] {
+    def getTransaction(a: A, hash: String): IO[B]
+  }
+
+  trait EstimateSmartFee[A <: Blockchain, B] {
+    def estimateSmartFee(a: A, height: Long): IO[B]
+  }
 }

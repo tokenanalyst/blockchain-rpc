@@ -1,3 +1,5 @@
+addCompilerPlugin("io.tryp" % "splain" % "0.5.0" cross CrossVersion.patch)
+
 lazy val commonSettings = Seq(
   organization := "io.tokenanalyst",
   version := "1.10.0",

@@ -17,8 +17,6 @@
 package io.tokenanalyst.bitcoinrpc
 
 import cats.effect.{ExitCode, IO, IOApp}
-import org.http4s.client.Client
-
 import scala.concurrent.ExecutionContext.global
 import scala.util.{Failure, Success}
 
@@ -32,25 +30,16 @@ object TestApp extends IOApp {
     }
   }
 
-  def loop(socket: ZeroMQ.Socket,
-           client: Client[IO])(implicit config: Config): IO[Unit] =
-    for {
-      msg <- IO(socket.nextBlock())
-      block <- BitcoinRPC.getBlock(client, msg)
-      _ <- IO(println(s"${block.height}: ${block.hash}"))
-      next <- loop(socket, client)
-    } yield next //).handleErrorWith(e => IO(println(e)))
-
   def run(args: List[String]): IO[ExitCode] = {
-    implicit val config = getConfig.get
+    val config = getConfig.get
     implicit val ec = global
-    BitcoinRPC
-      .openAll()
-      .use {
-        case (client, zmq) =>
-          for {
-            _ <- loop(zmq, client)
-          } yield ExitCode.Success
-      }
+
+    import bitcoin.Syntax._
+    RPCClient.bitcoin(config).use { bitcoin =>
+      for {
+        block <- bitcoin.getBlockByHash("0000000000000000000759de6ab39c2d8fb01e4481ba581761ddc1d50a57358d")
+        _ <- IO { println(block)}
+      } yield ExitCode(0)
+    }
   }
 }
