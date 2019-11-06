@@ -18,6 +18,7 @@ package io.tokenanalyst.bitcoinrpc
 
 import cats.effect.IO
 import io.circe.Json
+import io.tokenanalyst.bitcoinrpc.RPCClient.RPCClient
 
 trait RPCResponse
 trait RPCRequest
@@ -34,24 +35,35 @@ trait RPCDecoder[A] {
 
 case class Config(
     host: String,
-    user: String,
-    password: String,
-    port: Option[Int] = None,
-    zmqPort: Option[Int] = None
+    port: Option[Int],
+    username: Option[String],
+    password: Option[String],
+    zmqPort: Option[Int]
 )
 
 object EnvConfig {
-  implicit val config: Config =
-    (sys.env.get("PASSWORD"), sys.env.get("USER"), sys.env.get("HOST")) match {
-      case (Some(pass), Some(user), Some(host)) =>
-        Config(host, user, pass)
-      case _ => throw new Exception("Pass HOST, USER, PASSWORD.")
-    }
+  val PasswordEnv = "BITCOIN_RPC_PASSWORD"
+  val UsernameEnv = "BITCOIN_RPC_USERNAME"
+  val HostEnv = "BITCOIN_RPC_HOST"
+  val PortEnv = "BITCOIN_RPC_PORT"
+  val ZMQPortEnv = "BITCOIN_RPC_ZEROMQ_PORT"
+
+  implicit val config: Config = {
+    Seq(HostEnv, PortEnv, UsernameEnv, PasswordEnv, ZMQPortEnv)
+      .map(sys.env.get(_)) match {
+        case Seq(None, _,_,_,_) => throw new Exception("Pass at least BITCOIN_RPC_HOST.")
+        case Seq(Some(h), port, user, pass, zmqPort) =>
+          Config(h, port.map(_.toInt), user, pass, zmqPort.map(_.toInt))
+      }
+  }
 }
 
 sealed trait Blockchain
 case class Bitcoin(client: RPCClient) extends Blockchain
 case class Omni(client: RPCClient) extends Blockchain
+
+object OmniMethods {
+}
 
 object BasicMethods {
   trait GetNextBlockHash[A <: Blockchain] {

@@ -33,11 +33,17 @@ import scala.concurrent.duration._
 
 object RPCClient {
 
-  def bitcoin(host: String, username: String, password: String)(
+  def bitcoin(
+      host: String,
+      port: Option[Int] = None,
+      username: Option[String] = None,
+      password: Option[String] = None,
+      zmqPort: Option[Int] = None
+  )(
       implicit ec: ExecutionContext,
       cs: ContextShift[IO]
   ): Resource[IO, Bitcoin] = {
-    val config = Config(host, username, password)
+    val config = Config(host, port, username, password, zmqPort)
     for (client <- make(config)) yield Bitcoin(client)
   }
 
@@ -81,7 +87,7 @@ object RPCClient {
 class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config)
     extends Http4sClientDsl[IO] {
   val uri = Uri
-    .fromString(s"http://${config.host}:8332")
+    .fromString(s"http://${config.host}:${config.port.getOrElse(8332)}")
     .getOrElse(throw new Exception("Could not parse URL"))
 
   // is blocking
@@ -103,20 +109,19 @@ class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config)
 
   private def post[A <: RPCRequest: Encoder](
       request: A
-  ): IO[Request[IO]] = {
-    (for {
-      p <- Right(
-        POST(
-          request,
-          uri,
-          Authorization(
-            BasicCredentials
-              .apply(config.user, config.password)
-          ),
-          Accept(MediaType.application.json)
-        )
+  ): IO[Request[IO]] = (config.username, config.password) match {
+    case (Some(user), Some(pass)) =>
+      POST(
+        request,
+        uri,
+        Authorization(BasicCredentials(user, pass)),
+        Accept(MediaType.application.json)
       )
-    } yield p)
-      .getOrElse(throw new Exception("Could not parse URI"))
+    case _ =>
+      POST(
+        request,
+        uri,
+        Accept(MediaType.application.json)
+      )
   }
 }
