@@ -2,8 +2,8 @@ addCompilerPlugin("io.tryp" % "splain" % "0.5.0" cross CrossVersion.patch)
 
 lazy val commonSettings = Seq(
   organization := "io.tokenanalyst",
-  version := "1.10.0",
-  scalaVersion := "2.12.10",
+  version := "1.11.0",
+  scalaVersion := "2.13.1",
   description := "bitcoin-rpc")
 
 lazy val bitcoinrpc = (project in file(".")).
@@ -17,12 +17,7 @@ lazy val bitcoinrpc = (project in file(".")).
     libraryDependencies ++= http4s ++ json ++ zmq ++ cats
   )
 
-val workaround = {
-  sys.props += "packaging.type" -> "jar"
-  ()
-}
-
-val http4sVersion = "0.20.11"
+val http4sVersion = "0.21.0-M5"
 
 lazy val http4s = Seq(
   "org.http4s" %% "http4s-dsl" % http4sVersion,
@@ -32,9 +27,9 @@ lazy val http4s = Seq(
 
 lazy val json = Seq(
   "org.http4s" %% "http4s-circe" % http4sVersion,
-  "io.circe" %% "circe-generic" % "0.11.1",
-  "io.circe" %% "circe-literal" % "0.11.1",
-  "io.circe" %% "circe-parser" % "0.11.1"
+  "io.circe" %% "circe-generic" % "0.12.3",
+  "io.circe" %% "circe-literal" % "0.12.3",
+  "io.circe" %% "circe-parser" % "0.12.3"
 )
 
 lazy val zmq = Seq (

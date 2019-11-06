@@ -38,9 +38,8 @@ object Instances {
       override def getBlockByHash(
           a: Bitcoin,
           hash: String
-      ): IO[BlockResponse] = {
+      ): IO[BlockResponse] = 
         a.client.request[BlockRequest, BlockResponse](BlockRequest(hash))
-      }
     }
 
   implicit val getBlockHashInstance = new BasicMethods.GetBlockHash[Bitcoin] {
@@ -58,8 +57,8 @@ object Instances {
           height: Long
       ): IO[BlockResponse] =
         for {
-          hash <- getBlockHashInstance.getBlockHash(a, height)
-          data <- getBlockByHashInstance.getBlockByHash(a, hash)
+          hash <- Instances.getBlockHashInstance.getBlockHash(a, height)
+          data <- Instances.getBlockByHashInstance.getBlockByHash(a, hash)
         } yield data
     }
 
