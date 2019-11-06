@@ -17,7 +17,12 @@
 package io.tokenanalyst.bitcoinrpc.bitcoin
 
 import io.circe.generic.auto._
-import io.tokenanalyst.bitcoinrpc.{BasicMethods, Bitcoin}
+import io.tokenanalyst.bitcoinrpc.{
+  BasicMethods,
+  Bitcoin,
+  BatchRequest,
+  BatchResponse
+}
 import cats.effect.IO
 import Codecs._
 import io.tokenanalyst.bitcoinrpc.GenericRPCDecoders._
@@ -27,15 +32,18 @@ import scala.collection.mutable.ListBuffer
 
 object Instances {
 
-  implicit val getNextBlockHashInstance = 
-    new BasicMethods.GetNextBlockHash[Bitcoin] { 
-      override def getNextBlockHash(a: Bitcoin): IO[String] = 
+  implicit val getNextBlockHashInstance =
+    new BasicMethods.GetNextBlockHash[Bitcoin] {
+      override def getNextBlockHash(a: Bitcoin): IO[String] =
         a.client.nextBlockHash()
     }
 
   implicit val getBlockByHashInstance =
     new BasicMethods.GetBlockByHash[Bitcoin, BlockResponse] {
-      override def getBlockByHash(a: Bitcoin, hash: String): IO[BlockResponse] = {
+      override def getBlockByHash(
+          a: Bitcoin,
+          hash: String
+      ): IO[BlockResponse] = {
         a.client.request[BlockRequest, BlockResponse](BlockRequest(hash))
       }
     }
@@ -53,7 +61,8 @@ object Instances {
       override def getBlockByHeight(
           a: Bitcoin,
           height: Long
-      ): IO[BlockResponse] = for {
+      ): IO[BlockResponse] =
+        for {
           hash <- getBlockHashInstance.getBlockHash(a, height)
           data <- getBlockByHashInstance.getBlockByHash(a, hash)
         } yield data

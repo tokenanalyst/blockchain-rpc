@@ -16,5 +16,30 @@
   */
 package io.tokenanalyst.bitcoinrpc.omni
 
-object RPCEncoders {
+import io.circe.Json
+import io.tokenanalyst.bitcoinrpc.GenericRPCEncoders.requestFields
+import io.tokenanalyst.bitcoinrpc.omni.Protocol.{BlockTransactionsRequest, TransactionRequest}
+import io.tokenanalyst.bitcoinrpc.RPCEncoder
+
+object Codecs {
+
+  implicit val listTransactionsRequest = new RPCEncoder[BlockTransactionsRequest] {
+    final def apply(a: BlockTransactionsRequest): Json =
+      Json.obj(
+        requestFields(
+          "omni_listblocktransactions",
+          Array(Json.fromString(a.hash))
+        ): _*
+      )
+  }
+
+  implicit val getTransactionRequest = new RPCEncoder[TransactionRequest] {
+    final def apply(a: TransactionRequest): Json =
+      Json.obj(
+        requestFields(
+          "omni_gettransaction",
+          Array(Json.fromString(a.hash))
+        ): _*
+      )
+  }
 }

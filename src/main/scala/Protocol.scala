@@ -24,7 +24,6 @@ trait RPCRequest
 
 case class BatchResponse[A](seq: Seq[A]) extends RPCResponse
 case class BatchRequest[A](seq: Seq[A]) extends RPCRequest
-
 trait RPCEncoder[A] {
   def apply(a: A): Json
 }
@@ -41,8 +40,8 @@ case class Config(
     zmqPort: Option[Int] = None
 )
 
-object EnvConfig { 
-  implicit val config: Config = 
+object EnvConfig {
+  implicit val config: Config =
     (sys.env.get("PASSWORD"), sys.env.get("USER"), sys.env.get("HOST")) match {
       case (Some(pass), Some(user), Some(host)) =>
         Config(host, user, pass)
@@ -55,7 +54,7 @@ case class Bitcoin(client: RPCClient) extends Blockchain
 case class Omni(client: RPCClient) extends Blockchain
 
 object BasicMethods {
-  trait GetNextBlockHash[A <: Blockchain] { 
+  trait GetNextBlockHash[A <: Blockchain] {
     def getNextBlockHash(a: A): IO[String]
   }
 
