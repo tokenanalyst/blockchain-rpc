@@ -44,3 +44,4 @@ lazy val zmq = Seq (
 lazy val cats = Seq (
   "org.typelevel" %% "cats-effect" % "2.0.0"
 )
+
