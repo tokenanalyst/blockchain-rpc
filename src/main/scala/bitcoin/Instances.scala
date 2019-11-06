@@ -27,7 +27,7 @@ import scala.collection.mutable.ListBuffer
 
 object Instances {
 
-  implicit val getNextBlockHash = 
+  implicit val getNextBlockHashInstance = 
     new BasicMethods.GetNextBlockHash[Bitcoin] { 
       override def getNextBlockHash(a: Bitcoin): IO[String] = 
         a.client.nextBlockHash()
