@@ -62,6 +62,9 @@ sealed trait Blockchain
 case class Bitcoin(client: RPCClient) extends Blockchain
 case class Omni(client: RPCClient) extends Blockchain
 
+object OmniMethods { 
+}
+
 object BasicMethods {
   trait GetNextBlockHash[A <: Blockchain] { 
     def getNextBlockHash(a: A): IO[String]

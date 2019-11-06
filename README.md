@@ -39,7 +39,7 @@ object GetBlockHash extends IOApp {
 
 ## Example: Catch up from block zero
 
-This example makes use of the EnvConfig import, which automatically configures RPC via ENV flags exported in the shell. The environment flags for it are HOST, USER, PASSWORD.
+This example makes use of the EnvConfig import, which automatically configures RPC via ENV flags exported in the shell. The environment flags for it are BITCOIN_RPC_HOST, BITCOIN_RPC_USERNAME, BITCOIN_RPC_PASSWORD.
 
 ```scala
   import cats.effect.{ExitCode, IO, IOApp}
