@@ -14,30 +14,21 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc
+package io.tokenanalyst.bitcoinrpc.examples
 
 import cats.effect.{ExitCode, IO, IOApp}
 import scala.concurrent.ExecutionContext.global
-import scala.util.{Failure, Success}
 
-object TestApp extends IOApp {
+import io.tokenanalyst.bitcoinrpc.RPCClient
+import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
 
-  def getConfig = {
-    (sys.env.get("PASSWORD"), sys.env.get("USER"), sys.env.get("HOST")) match {
-      case (Some(pass), Some(user), Some(host)) =>
-        Success(Config(host, user, pass))
-      case _ => Failure(new Exception("Pass HOST, USER, PASSWORD."))
-    }
-  }
-
+object SubscribeToBlockUpdates extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
-    val config = getConfig.get
     implicit val ec = global
-
-    import bitcoin.Syntax._
-    RPCClient.bitcoin(config).use { bitcoin =>
+    RPCClient.bitcoin("127.0.0.1", "username", "password").use { bitcoin =>
       for {
-        block <- bitcoin.getBlockByHash("0000000000000000000759de6ab39c2d8fb01e4481ba581761ddc1d50a57358d")
+        hash <- bitcoin.getNextBlockHash()
+        block <- bitcoin.getBlockByHash(hash)
         _ <- IO { println(block)}
       } yield ExitCode(0)
     }

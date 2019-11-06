@@ -32,11 +32,22 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 object RPCClient {
-
-  def bitcoin(config: Config)(
+  
+  def bitcoin(host: String, username: String, password: String)(
     implicit ec: ExecutionContext,
     cs: ContextShift[IO]
-  ): Resource[IO, Bitcoin] = for(client <- make(config)) yield Bitcoin(client)
+  ): Resource[IO, Bitcoin] = { 
+    val config = Config(host, username, password)
+    for(client <- make(config)) yield Bitcoin(client)
+  }
+
+  def bitcoin(
+    implicit ec: ExecutionContext,
+    config: Config,
+    cs: ContextShift[IO]
+  ): Resource[IO, Bitcoin] = { 
+    for(client <- make(config)) yield Bitcoin(client)
+  }
 
   def make(config: Config)(
     implicit ec: ExecutionContext,
@@ -53,7 +64,9 @@ object RPCClient {
 
 class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config) extends Http4sClientDsl[IO] {
   val uri = Uri.fromString(s"http://${config.host}:8332").getOrElse(throw new Exception("Could not parse URL"))
-  val mq = zmq
+
+  // is blocking
+  def nextBlockHash(): IO[String] = zmq.nextBlock()
 
   def request[A <: RPCRequest: Encoder, B <: RPCResponse: Decoder](
     request: A

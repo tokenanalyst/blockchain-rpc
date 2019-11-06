@@ -5,6 +5,63 @@
 <br/>
 bitcoin-rpc is a typesafe bitcoind RPC client written in and to be used with Scala. Under the hood, it's using http4s, circe and cats-effect. It's in active development, but no official public release has been scheduled yet. We appreciate external contributions, please check issues for inspiration. 
 
+## Example: Simple using hardcoded config
+
+This is a simple example of how the RPCClient is generally used. We're using Cats Resources here which automatically deallocate any opened resources after use.
+
+```scala
+  import cats.effect.{ExitCode, IO, IOApp}
+  import scala.concurrent.ExecutionContext.global
+  
+  import io.tokenanalyst.bitcoinrpc.RPCClient
+  import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
+  
+  object GetBlockHash extends IOApp {
+    def run(args: List[String]): IO[ExitCode] = {
+      implicit val ec = global
+      RPCClient.bitcoin("127.0.0.1", "username", "password").use { bitcoin =>
+        for {
+          block <- bitcoin.getBlockByHash("0000000000000000000759de6ab39c2d8fb01e4481ba581761ddc1d50a57358d")
+          _ <- IO { println(block)}
+        } yield ExitCode(0)
+      }
+    }
+  }
+```
+
+## Example: Catch up from block zero
+
+This example makes use of the EnvConfig import, which automatically configures RPC via ENV flags exported in the shell. The environment flags for it are HOST, USER, PASSWORD.
+
+```scala
+  import cats.effect.{ExitCode, IO, IOApp}
+  import scala.concurrent.ExecutionContext.global
+ 
+  import io.tokenanalyst.bitcoinrpc.Bitcoin
+  import io.tokenanalyst.bitcoinrpc.RPCClient
+  import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
+  import io.tokenanalyst.bitcoinrpc.EnvConfig._
+  
+  object CatchupFromZero extends IOApp {
+
+    def loop(rpc: Bitcoin, current: Long = 0L, until: Long = 10L): IO[Unit] = 
+    for {
+        block <- rpc.getBlockByHeight(current)
+        _ <- IO { println(block) }  
+        l <- if(current + 1 < until) loop(rpc, current + 1, until) else IO.unit
+    } yield l
+
+    def run(args: List[String]): IO[ExitCode] = {
+      implicit val ec = global
+      RPCClient.bitcoin.use { rpc =>
+        for {
+            _ <- loop(rpc)
+        } yield ExitCode(0)
+      }
+    }
+  }
+```
+
 ## Supported methods
 
 | Bitcoind RPC methods  | description  |  bitcoin-rpc method |
@@ -15,35 +72,3 @@ bitcoin-rpc is a typesafe bitcoind RPC client written in and to be used with Sca
 | getblockhash, getblock  | Gets the block with transaction ids  |  getBlock(height: Long) |
 | getrawtransaction | Gets raw transaction data | getTransaction(hash: String) |
 | batch of getrawtransaction | Gets raw transaction data | getTransactions(hashes: Seq[String]) |
-
-## Example
-
-```
-  import cats.effect.{ExitCode, IO, IOApp}
-  import scala.concurrent.ExecutionContext.global
-  
-  object Main extends IOApp {
-
-    def run(args: List[String]): IO[ExitCode] = {
-    
-      implicit val config = Config("127.0.0.1","user","password")
-      implicit val ec = global
-      
-      // opening up resources for HTTP and ZeroMQ
-      BitcoinRPC.openAll().use {
-        case (http, zmq) =>
-          for {
-            
-            // retrieving a simple block by hash
-            block <- BitcoinRPC.getBlock(http, 
-            "00000000000000000012fb9247e97999280cc8c1aedde0e2f2e3e7383f909e20")
-            
-            // listening for new blocks
-            newBlockHash <- zmq.nextBlock()
-            
-            _ <- IO { println(block) }
-          } yield ExitCode(0)
-      }
-    }
-  }
-```

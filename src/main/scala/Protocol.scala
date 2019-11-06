@@ -41,11 +41,24 @@ case class Config(
     zmqPort: Option[Int] = None
 )
 
+object EnvConfig { 
+  implicit val config: Config = 
+    (sys.env.get("PASSWORD"), sys.env.get("USER"), sys.env.get("HOST")) match {
+      case (Some(pass), Some(user), Some(host)) =>
+        Config(host, user, pass)
+      case _ => throw new Exception("Pass HOST, USER, PASSWORD.")
+    }
+}
+
 sealed trait Blockchain
 case class Bitcoin(client: RPCClient) extends Blockchain
 case class Omni(client: RPCClient) extends Blockchain
 
 object BasicMethods {
+  trait GetNextBlockHash[A <: Blockchain] { 
+    def getNextBlockHash(a: A): IO[String]
+  }
+
   trait GetBlockByHash[A <: Blockchain, B] {
     def getBlockByHash(a: A, hash: String): IO[B]
   }
