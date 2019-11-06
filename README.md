@@ -21,7 +21,7 @@ This is a simple example of how the RPCClient is generally used. We're using Cat
       implicit val ec = global
       RPCClient.bitcoin("127.0.0.1", "username", "password").use { bitcoin =>
         for {
-          block <- bitcoin.getBlockByHash("0000000000000000000759de6ab39c2d8fb01e4481ba581761ddc1d50a57358d")
+          block <- bitcoin.getBlockByHash("0000000000000000000....a581761ddc1d50a57358d")
           _ <- IO { println(block)}
         } yield ExitCode(0)
       }
@@ -68,7 +68,9 @@ This example makes use of the EnvConfig import, which automatically configures R
 |---|---|---|
 | getblockhash  | Gets the block hash at a specific height  |  getBlockHash(height: Long) |
 | getbestblockhash  |  Gets the block tip hash | getBestBlockHash()  |
-| getblock  | Gets the block with transaction ids  |  getBlock(hash: String) |
-| getblockhash, getblock  | Gets the block with transaction ids  |  getBlock(height: Long) |
+| getblock  | Gets the block with transaction ids  | getBlockByHash(hash: String) |
+| getblockhash, getblock  | Gets the block with transaction ids  |  getBlockByHeight(height: Long) |
 | getrawtransaction | Gets raw transaction data | getTransaction(hash: String) |
 | batch of getrawtransaction | Gets raw transaction data | getTransactions(hashes: Seq[String]) |
+| estimatesmartfee | Estimates fee for include in block n | estimateSmartFee(height: Long) |
+| usage of ZeroMQ | Gets next block hash subscription | getNextBlockHash() |

@@ -40,7 +40,7 @@ object Syntax {
     def getBestBlockHash() =
       implicitly[GetBestBlockHash[Bitcoin]].getBestBlockHash(b)
 
-    def getBestBlockHeigh() =
+    def getBestBlockHeight() =
       implicitly[GetBestBlockHeight[Bitcoin]].getBestBlockHeight(b)
 
     def getTransactions(hashes: Seq[String]) =

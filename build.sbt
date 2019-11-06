@@ -14,7 +14,7 @@ lazy val bitcoinrpc = (project in file(".")).
     publishTo := Some(Resolver.url("TA-S3", url("s3://ivy-jar-repository-ta/"))(Resolver.ivyStylePatterns))
   ).
   settings(
-    libraryDependencies ++= http4s ++ json ++ zmq ++ log ++ cats
+    libraryDependencies ++= http4s ++ json ++ zmq ++ cats
   )
 
 val workaround = {
@@ -35,12 +35,6 @@ lazy val json = Seq(
   "io.circe" %% "circe-generic" % "0.11.1",
   "io.circe" %% "circe-literal" % "0.11.1",
   "io.circe" %% "circe-parser" % "0.11.1"
-)
-
-lazy val log = Seq(
-  "ch.qos.logback" % "logback-classic" % "1.2.3",
-  "net.logstash.logback" % "logstash-logback-encoder" % "4.11",
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
 )
 
 lazy val zmq = Seq (
