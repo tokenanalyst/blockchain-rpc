@@ -72,6 +72,16 @@ This example makes use of the EnvConfig import, which automatically configures R
   }
 ```
 
+## Environment Variables
+
+| variable  | description  | type |
+|---|---|---|
+| BITCOIN_RPC_HOST  | IP or hostname of full node | String |
+| BITCOIN_RPC_USERNAME  | RPC username | Optional String |
+| BITCOIN_RPC_PASSWORD  | RPC password | Optional String |
+| BITCOIN_RPC_PORT  | RPC port when not default | Optional Int |
+| BITCOIN_RPC_ZEROMQ_PORT  | ZeroMQ port when not default | Optional Int |
+
 ## Supported methods
 
 | Bitcoind RPC methods  | description  |  bitcoin-rpc method |
