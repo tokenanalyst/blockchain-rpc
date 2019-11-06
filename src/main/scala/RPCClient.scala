@@ -88,3 +88,5 @@ class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config) extends 
     .getOrElse(throw new Exception("Could not parse URI"))
   }
 }
+
+

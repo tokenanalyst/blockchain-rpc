@@ -22,6 +22,9 @@ import io.circe.Json
 trait RPCResponse
 trait RPCRequest
 
+case class BatchResponse[A](seq: Seq[A]) extends RPCResponse
+case class BatchRequest[A](seq: Seq[A]) extends RPCRequest
+
 trait RPCEncoder[A] {
   def apply(a: A): Json
 }
