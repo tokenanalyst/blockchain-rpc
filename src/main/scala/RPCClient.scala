@@ -17,7 +17,6 @@
 package io.tokenanalyst.bitcoinrpc
 
 import cats.effect.{ContextShift, IO, Resource}
-
 import io.circe.{Decoder, Encoder, Json}
 import org.http4s.circe.CirceEntityDecoder._
 import org.http4s.circe.CirceEntityEncoder._
@@ -55,11 +54,17 @@ object RPCClient {
     for (client <- make(config)) yield Bitcoin(client)
   }
 
-  def omni(host: String, username: String, password: String)(
+  def omni(
+      host: String,
+      port: Option[Int] = None,
+      username: Option[String] = None,
+      password: Option[String] = None,
+      zmqPort: Option[Int] = None
+  )(
       implicit ec: ExecutionContext,
       cs: ContextShift[IO]
   ): Resource[IO, Omni] = {
-    val config = Config(host, username, password)
+    val config = Config(host, port, username, password, zmqPort)
     for (client <- make(config)) yield Omni(client)
   }
 
@@ -86,6 +91,7 @@ object RPCClient {
 
 class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config)
     extends Http4sClientDsl[IO] {
+
   val uri = Uri
     .fromString(s"http://${config.host}:${config.port.getOrElse(8332)}")
     .getOrElse(throw new Exception("Could not parse URL"))
@@ -109,19 +115,21 @@ class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config)
 
   private def post[A <: RPCRequest: Encoder](
       request: A
-  ): IO[Request[IO]] = (config.username, config.password) match {
-    case (Some(user), Some(pass)) =>
-      POST(
-        request,
-        uri,
-        Authorization(BasicCredentials(user, pass)),
-        Accept(MediaType.application.json)
-      )
-    case _ =>
-      POST(
-        request,
-        uri,
-        Accept(MediaType.application.json)
-      )
+  ): IO[Request[IO]] = {
+    (config.username, config.password) match {
+      case (Some(user), Some(pass)) =>
+        POST(
+          request,
+          uri,
+          Authorization(BasicCredentials(user, pass)),
+          Accept(MediaType.application.json)
+        )
+      case _ =>
+        POST(
+          request,
+          uri,
+          Accept(MediaType.application.json)
+        )
+    }
   }
 }

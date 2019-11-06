@@ -16,20 +16,31 @@
   */
 package io.tokenanalyst.bitcoinrpc.omni
 
-import io.tokenanalyst.bitcoinrpc.BasicMethods._
+import io.tokenanalyst.bitcoinrpc.Omni
+import io.tokenanalyst.bitcoinrpc.OmniMethods._
 import io.tokenanalyst.bitcoinrpc.omni.Instances._
-import io.tokenanalyst.bitcoinrpc.omni.Protocol.TransactionResponse
-import io.tokenanalyst.bitcoinrpc.{BatchResponse, Omni}
 
 object Syntax {
-  implicit class OmniOps(a: Omni) {
+  implicit class OmniOps(omni: Omni) {
     def listBlockTransactions(height: Long) = {
-      implicitly[GetBlockByHeight[Omni, Seq[String]]].getBlockByHeight(a, height)
+      implicitly[ListBlockTransactions].listBlockTransactions(omni, height)
+    }
+
+    def getTransaction(hash: String) = {
+      implicitly[GetTransaction].getTransaction(omni, hash)
     }
 
     def getTransactions(hashes: Seq[String]) = {
-      implicitly[GetTransactions[Omni, BatchResponse[TransactionResponse]]]
-        .getTransactions(a, hashes)
+      implicitly[GetTransactions].getTransactions(omni, hashes)
     }
+
+    def getBestBlockHash() =
+      implicitly[GetBestBlockHash].getBestBlockHash(omni)
+
+    def getBestBlockHeight() =
+      implicitly[GetBestBlockHeight].getBestBlockHeight(omni)
+
+    def getBlockByHash(hash: String) =
+      implicitly[GetBlockByHash].getBlockByHash(omni, hash)
   }
 }

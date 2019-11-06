@@ -18,30 +18,48 @@ package io.tokenanalyst.bitcoinrpc.omni
 
 import cats.effect.IO
 import io.circe.generic.auto._
-import io.tokenanalyst.bitcoinrpc.BasicMethods.{GetBlockByHeight, GetTransactions}
-import io.tokenanalyst.bitcoinrpc.omni.Protocol.{BlockTransactionsRequest, TransactionRequest, TransactionResponse}
+import io.tokenanalyst.bitcoinrpc.Codecs._
+import io.tokenanalyst.bitcoinrpc.OmniMethods._
+import io.tokenanalyst.bitcoinrpc.omni.Codecs._
+import io.tokenanalyst.bitcoinrpc.omni.Protocol._
 import io.tokenanalyst.bitcoinrpc.{BatchRequest, BatchResponse, Omni}
 
 object Instances {
 
-  implicit val listBlockTransactions =
-    new GetBlockByHeight[Omni, Seq[String]] {
-      override def getBlockByHeight(a: Omni, height: Long): IO[Seq[String]] =
+  implicit val listBlockTransactionsInstance =
+    new ListBlockTransactions {
+      override def listBlockTransactions(
+          omni: Omni,
+          height: Long
+      ): IO[Seq[String]] =
         for {
-          json <- a.client.requestJson[BlockTransactionsRequest](
+          json <- omni.client.requestJson[BlockTransactionsRequest](
             BlockTransactionsRequest(height)
           )
         } yield json.asObject.get("result").get.asArray.get.map(_.asString.get)
     }
 
-  implicit val getTransactions =
-    new GetTransactions[Omni, BatchResponse[TransactionResponse]] {
+  implicit val getTransactionInstance = new GetTransaction {
+    override def getTransaction(
+        omni: Omni,
+        hash: String
+    ): IO[TransactionResponse] = {
+      for {
+        res <- omni.client.request[TransactionRequest, TransactionResponse](
+          TransactionRequest(hash)
+        )
+      } yield res
+    }
+  }
+
+  implicit val getTransactionsInstance =
+    new GetTransactions {
       override def getTransactions(
-          a: Omni,
+          omni: Omni,
           hashes: Seq[String]
       ): IO[BatchResponse[TransactionResponse]] =
         for {
-          res <- a.client
+          res <- omni.client
             .request[BatchRequest[TransactionRequest], BatchResponse[
               TransactionResponse
             ]](
@@ -50,5 +68,32 @@ object Instances {
               )
             )
         } yield res
+    }
+
+  implicit val getBestBlockHashInstance = new GetBestBlockHash {
+    override def getBestBlockHash(omni: Omni): IO[String] =
+      for {
+        json <- omni.client
+          .requestJson[BestBlockHashRequest](new BestBlockHashRequest)
+      } yield json.asObject.get("result").get.asString.get
+  }
+
+  implicit val getBlockByHashInstance =
+    new GetBlockByHash {
+      override def getBlockByHash(
+          a: Omni,
+          hash: String
+      ): IO[BlockResponse] = {
+        a.client.request[BlockRequest, BlockResponse](BlockRequest(hash))
+      }
+    }
+
+  implicit val getBestBlockHeightInstance =
+    new GetBestBlockHeight {
+      override def getBestBlockHeight(a: Omni): IO[Long] =
+        for {
+          hash <- getBestBlockHashInstance.getBestBlockHash(a)
+          block <- getBlockByHashInstance.getBlockByHash(a, hash)
+        } yield block.height
     }
 }

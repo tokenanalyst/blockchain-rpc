@@ -18,7 +18,7 @@ package io.tokenanalyst.bitcoinrpc
 
 import cats.effect.IO
 import io.circe.Json
-import io.tokenanalyst.bitcoinrpc.RPCClient.RPCClient
+import io.tokenanalyst.bitcoinrpc.omni.Protocol.{BlockResponse, TransactionResponse}
 
 trait RPCResponse
 trait RPCRequest
@@ -51,10 +51,11 @@ object EnvConfig {
   implicit val config: Config = {
     Seq(HostEnv, PortEnv, UsernameEnv, PasswordEnv, ZMQPortEnv)
       .map(sys.env.get(_)) match {
-        case Seq(None, _,_,_,_) => throw new Exception("Pass at least BITCOIN_RPC_HOST.")
-        case Seq(Some(h), port, user, pass, zmqPort) =>
-          Config(h, port.map(_.toInt), user, pass, zmqPort.map(_.toInt))
-      }
+      case Seq(None, _, _, _, _) =>
+        throw new Exception("Pass at least BITCOIN_RPC_HOST.")
+      case Seq(Some(h), port, user, pass, zmqPort) =>
+        Config(h, port.map(_.toInt), user, pass, zmqPort.map(_.toInt))
+    }
   }
 }
 
@@ -63,6 +64,32 @@ case class Bitcoin(client: RPCClient) extends Blockchain
 case class Omni(client: RPCClient) extends Blockchain
 
 object OmniMethods {
+  trait ListBlockTransactions {
+    def listBlockTransactions(omni: Omni, height: Long): IO[Seq[String]]
+  }
+
+  trait GetTransaction {
+    def getTransaction(omni: Omni, hash: String): IO[TransactionResponse]
+  }
+
+  trait GetTransactions {
+    def getTransactions(
+        omni: Omni,
+        hashes: Seq[String]
+    ): IO[BatchResponse[TransactionResponse]]
+  }
+
+  trait GetBestBlockHash {
+    def getBestBlockHash(omni: Omni): IO[String]
+  }
+
+  trait GetBlockByHash {
+    def getBlockByHash(omni: Omni, hash: String): IO[BlockResponse]
+  }
+
+  trait GetBestBlockHeight {
+    def getBestBlockHeight(omni: Omni): IO[Long]
+  }
 }
 
 object BasicMethods {

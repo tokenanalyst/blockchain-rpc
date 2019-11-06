@@ -17,20 +17,22 @@
 package io.tokenanalyst.bitcoinrpc.examples
 
 import cats.effect.{ExitCode, IO, IOApp}
-import scala.concurrent.ExecutionContext.global
-
-import io.tokenanalyst.bitcoinrpc.Omni
+import io.tokenanalyst.bitcoinrpc.EnvConfig._
 import io.tokenanalyst.bitcoinrpc.RPCClient
 import io.tokenanalyst.bitcoinrpc.omni.Syntax._
-import io.tokenanalyst.bitcoinrpc.EnvConfig._
+
+import scala.concurrent.ExecutionContext.global
 
 object OmniGetBlockTransactions extends IOApp {
   override def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
     RPCClient.omni.use { omni =>
       for {
-        txs <- omni.listBlockTransactions(500000)
-        _ <- IO {println(txs)}
+        bestBlockHeight <- omni.getBestBlockHeight()
+        _ <- IO(println(s"best block: $bestBlockHeight"))
+        txs <- omni.listBlockTransactions(bestBlockHeight)
+        values <- omni.getTransactions(txs)
+        _ <- IO {println(s"sending addresses: ${values.seq.map(_.sendingaddress)}")}
       } yield ExitCode.Success
     }
   }

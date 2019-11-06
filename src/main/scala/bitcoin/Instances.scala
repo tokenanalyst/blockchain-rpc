@@ -16,17 +16,12 @@
   */
 package io.tokenanalyst.bitcoinrpc.bitcoin
 
-import io.circe.generic.auto._
-import io.tokenanalyst.bitcoinrpc.{
-  BasicMethods,
-  Bitcoin,
-  BatchRequest,
-  BatchResponse
-}
 import cats.effect.IO
-import Codecs._
-import io.tokenanalyst.bitcoinrpc.GenericRPCDecoders._
-import Protocol._
+import io.circe.generic.auto._
+import io.tokenanalyst.bitcoinrpc.Codecs._
+import io.tokenanalyst.bitcoinrpc.bitcoin.Protocol._
+import io.tokenanalyst.bitcoinrpc.bitcoin.Codecs._
+import io.tokenanalyst.bitcoinrpc.{BasicMethods, BatchRequest, BatchResponse, Bitcoin}
 
 import scala.collection.mutable.ListBuffer
 

@@ -16,10 +16,10 @@
   */
 package io.tokenanalyst.bitcoinrpc.bitcoin
 
-import io.circe.{Encoder, Json}
-import io.tokenanalyst.bitcoinrpc.GenericRPCEncoders._
+import io.circe.Json
+import io.tokenanalyst.bitcoinrpc.Codecs._
+import io.tokenanalyst.bitcoinrpc.RPCEncoder
 import io.tokenanalyst.bitcoinrpc.bitcoin.Protocol._
-import io.tokenanalyst.bitcoinrpc.{RPCEncoder, RPCRequest}
 
 object Codecs {
 
@@ -63,11 +63,5 @@ object Codecs {
   implicit val blockRequest = new RPCEncoder[BlockRequest] {
     final def apply(a: BlockRequest): Json =
       Json.obj(requestFields("getblock", Array(Json.fromString(a.hash))): _*)
-  }
-
-  implicit def deriveCirceEncoder[A <: RPCRequest](
-      implicit e: RPCEncoder[A]
-  ) = new Encoder[A] {
-    def apply(a: A): Json = e.apply(a)
   }
 }
