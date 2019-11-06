@@ -32,26 +32,42 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 object RPCClient {
-  
+
   def bitcoin(host: String, username: String, password: String)(
-    implicit ec: ExecutionContext,
-    cs: ContextShift[IO]
-  ): Resource[IO, Bitcoin] = { 
+      implicit ec: ExecutionContext,
+      cs: ContextShift[IO]
+  ): Resource[IO, Bitcoin] = {
     val config = Config(host, username, password)
-    for(client <- make(config)) yield Bitcoin(client)
+    for (client <- make(config)) yield Bitcoin(client)
   }
 
   def bitcoin(
-    implicit ec: ExecutionContext,
-    config: Config,
-    cs: ContextShift[IO]
-  ): Resource[IO, Bitcoin] = { 
-    for(client <- make(config)) yield Bitcoin(client)
+      implicit ec: ExecutionContext,
+      config: Config,
+      cs: ContextShift[IO]
+  ): Resource[IO, Bitcoin] = {
+    for (client <- make(config)) yield Bitcoin(client)
+  }
+
+  def omni(host: String, username: String, password: String)(
+      implicit ec: ExecutionContext,
+      cs: ContextShift[IO]
+  ): Resource[IO, Omni] = {
+    val config = Config(host, username, password)
+    for (client <- make(config)) yield Omni(client)
+  }
+
+  def omni(
+      implicit ec: ExecutionContext,
+      config: Config,
+      cs: ContextShift[IO]
+  ): Resource[IO, Omni] = {
+    for (client <- make(config)) yield Omni(client)
   }
 
   def make(config: Config)(
-    implicit ec: ExecutionContext,
-    cs: ContextShift[IO]
+      implicit ec: ExecutionContext,
+      cs: ContextShift[IO]
   ): Resource[IO, RPCClient] = {
     for {
       client <- BlazeClientBuilder[IO](ec)
@@ -62,14 +78,17 @@ object RPCClient {
   }
 }
 
-class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config) extends Http4sClientDsl[IO] {
-  val uri = Uri.fromString(s"http://${config.host}:8332").getOrElse(throw new Exception("Could not parse URL"))
+class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config)
+    extends Http4sClientDsl[IO] {
+  val uri = Uri
+    .fromString(s"http://${config.host}:8332")
+    .getOrElse(throw new Exception("Could not parse URL"))
 
   // is blocking
   def nextBlockHash(): IO[String] = zmq.nextBlock()
 
   def request[A <: RPCRequest: Encoder, B <: RPCResponse: Decoder](
-    request: A
+      request: A
   ): IO[B] =
     for {
       req <- post(request)
@@ -83,7 +102,7 @@ class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config) extends 
     } yield res
 
   private def post[A <: RPCRequest: Encoder](
-    request: A
+      request: A
   ): IO[Request[IO]] = {
     (for {
       p <- Right(
@@ -98,8 +117,6 @@ class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config) extends 
         )
       )
     } yield p)
-    .getOrElse(throw new Exception("Could not parse URI"))
+      .getOrElse(throw new Exception("Could not parse URI"))
   }
 }
-
-

@@ -16,24 +16,20 @@
   */
 package io.tokenanalyst.bitcoinrpc.omni
 
-import io.circe.generic.auto._
 import cats.effect.IO
-import io.tokenanalyst.bitcoinrpc.BasicMethods.{GetBlockByHash, GetTransactions}
-import io.tokenanalyst.bitcoinrpc.omni.Protocol.{
-  BlockTransactionsRequest,
-  TransactionRequest,
-  TransactionResponse
-}
+import io.circe.generic.auto._
+import io.tokenanalyst.bitcoinrpc.BasicMethods.{GetBlockByHeight, GetTransactions}
+import io.tokenanalyst.bitcoinrpc.omni.Protocol.{BlockTransactionsRequest, TransactionRequest, TransactionResponse}
 import io.tokenanalyst.bitcoinrpc.{BatchRequest, BatchResponse, Omni}
 
 object Instances {
 
   implicit val listBlockTransactions =
-    new GetBlockByHash[Omni, Seq[String]] {
-      override def getBlockByHash(a: Omni, hash: String): IO[Seq[String]] =
+    new GetBlockByHeight[Omni, Seq[String]] {
+      override def getBlockByHeight(a: Omni, height: Long): IO[Seq[String]] =
         for {
           json <- a.client.requestJson[BlockTransactionsRequest](
-            BlockTransactionsRequest(hash)
+            BlockTransactionsRequest(height)
           )
         } yield json.asObject.get("result").get.asArray.get.map(_.asString.get)
     }

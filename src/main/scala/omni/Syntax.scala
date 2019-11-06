@@ -23,8 +23,8 @@ import io.tokenanalyst.bitcoinrpc.{BatchResponse, Omni}
 
 object Syntax {
   implicit class OmniOps(a: Omni) {
-    def listBlockTransactions(hash: String) = {
-      implicitly[GetBlockByHash[Omni, Seq[String]]].getBlockByHash(a, hash)
+    def listBlockTransactions(height: Long) = {
+      implicitly[GetBlockByHeight[Omni, Seq[String]]].getBlockByHeight(a, height)
     }
 
     def getTransactions(hashes: Seq[String]) = {

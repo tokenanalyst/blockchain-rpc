@@ -14,32 +14,31 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-  package io.tokenanalyst.bitcoinrpc.examples
+package io.tokenanalyst.bitcoinrpc.examples
 
-  import cats.effect.{ExitCode, IO, IOApp}
-  import scala.concurrent.ExecutionContext.global
- 
-  import io.tokenanalyst.bitcoinrpc.Bitcoin
-  import io.tokenanalyst.bitcoinrpc.RPCClient
-  import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
-  import io.tokenanalyst.bitcoinrpc.EnvConfig._
-  
-  object CatchupFromZero extends IOApp {
+import cats.effect.{ExitCode, IO, IOApp}
+import scala.concurrent.ExecutionContext.global
 
-    def loop(rpc: Bitcoin, current: Long = 0L, until: Long = 10L): IO[Unit] = 
+import io.tokenanalyst.bitcoinrpc.Bitcoin
+import io.tokenanalyst.bitcoinrpc.RPCClient
+import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
+import io.tokenanalyst.bitcoinrpc.EnvConfig._
+
+object CatchupFromZero extends IOApp {
+
+  def loop(rpc: Bitcoin, current: Long = 0L, until: Long = 10L): IO[Unit] =
     for {
-        block <- rpc.getBlockByHeight(current)
-        _ <- IO { println(block) }  
-        l <- if(current + 1 < until) loop(rpc, current + 1, until) else IO.unit
+      block <- rpc.getBlockByHeight(current)
+      _ <- IO { println(block) }
+      l <- if (current + 1 < until) loop(rpc, current + 1, until) else IO.unit
     } yield l
 
-    def run(args: List[String]): IO[ExitCode] = {
-      implicit val ec = global
-      RPCClient.bitcoin.use { rpc =>
-        for {
-            _ <- loop(rpc)
-        } yield ExitCode(0)
-      }
+  def run(args: List[String]): IO[ExitCode] = {
+    implicit val ec = global
+    RPCClient.bitcoin.use { rpc =>
+      for {
+        _ <- loop(rpc)
+      } yield ExitCode(0)
     }
   }
-  
+}

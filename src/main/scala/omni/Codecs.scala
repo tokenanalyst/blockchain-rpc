@@ -28,7 +28,7 @@ object Codecs {
       Json.obj(
         requestFields(
           "omni_listblocktransactions",
-          Array(Json.fromString(a.hash))
+          Array(Json.fromLong(a.height))
         ): _*
       )
   }

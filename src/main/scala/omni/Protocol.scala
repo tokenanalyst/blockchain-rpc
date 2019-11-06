@@ -35,7 +35,7 @@ object Protocol {
       referenceaddress: Option[String]
   ) extends RPCResponse
 
-  case class BlockTransactionsRequest(hash: String) extends RPCRequest
+  case class BlockTransactionsRequest(height: Long) extends RPCRequest
 
   case class TransactionRequest(hash: String) extends RPCRequest
 }
