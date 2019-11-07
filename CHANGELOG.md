@@ -1,3 +1,7 @@
+# 1.21
+
+* removed logback.xml from resources
+
 # 1.20
 
 * added omni methods
