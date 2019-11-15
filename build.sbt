@@ -15,11 +15,6 @@ lazy val bitcoinrpc = (project in file(".")).
     libraryDependencies ++= http4s ++ json ++ zmq ++ cats
   )
 
-val workaround = {
-  sys.props += "packaging.type" -> "jar"
-  ()
-}
-
 val http4sVersion = "0.20.11"
 
 lazy val http4s = Seq(
