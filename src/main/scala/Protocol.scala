@@ -18,7 +18,6 @@ package io.tokenanalyst.bitcoinrpc
 
 import cats.effect.IO
 import io.circe.Json
-import io.tokenanalyst.bitcoinrpc.omni.Protocol.{BlockResponse, TransactionResponse}
 
 trait RPCResponse
 trait RPCRequest
@@ -66,29 +65,6 @@ case class Omni(client: RPCClient) extends Blockchain
 object OmniMethods {
   trait ListBlockTransactions {
     def listBlockTransactions(omni: Omni, height: Long): IO[Seq[String]]
-  }
-
-  trait GetTransaction {
-    def getTransaction(omni: Omni, hash: String): IO[TransactionResponse]
-  }
-
-  trait GetTransactions {
-    def getTransactions(
-        omni: Omni,
-        hashes: Seq[String]
-    ): IO[BatchResponse[TransactionResponse]]
-  }
-
-  trait GetBestBlockHash {
-    def getBestBlockHash(omni: Omni): IO[String]
-  }
-
-  trait GetBlockByHash {
-    def getBlockByHash(omni: Omni, hash: String): IO[BlockResponse]
-  }
-
-  trait GetBestBlockHeight {
-    def getBestBlockHeight(omni: Omni): IO[Long]
   }
 }
 

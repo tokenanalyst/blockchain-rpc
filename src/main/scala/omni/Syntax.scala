@@ -16,31 +16,37 @@
   */
 package io.tokenanalyst.bitcoinrpc.omni
 
+import io.tokenanalyst.bitcoinrpc.BatchResponse
 import io.tokenanalyst.bitcoinrpc.Omni
+import io.tokenanalyst.bitcoinrpc.BasicMethods._
 import io.tokenanalyst.bitcoinrpc.OmniMethods._
 import io.tokenanalyst.bitcoinrpc.omni.Instances._
 
+import Protocol._
+
 object Syntax {
   implicit class OmniOps(omni: Omni) {
-    def listBlockTransactions(height: Long) = {
+    def listBlockTransactions(height: Long) = 
       implicitly[ListBlockTransactions].listBlockTransactions(omni, height)
-    }
 
-    def getTransaction(hash: String) = {
-      implicitly[GetTransaction].getTransaction(omni, hash)
-    }
+    def getTransaction(hash: String) = 
+      implicitly[GetTransaction[Omni, TransactionResponse]].getTransaction(omni, hash)
 
-    def getTransactions(hashes: Seq[String]) = {
-      implicitly[GetTransactions].getTransactions(omni, hashes)
-    }
+    def getTransactions(hashes: Seq[String]) = 
+      implicitly[GetTransactions[Omni, BatchResponse[TransactionResponse]]]
+      .getTransactions(omni, hashes)
+
+    def getBlockByHeight(height: Long) =
+      implicitly[GetBlockByHeight[Omni, BlockResponse]]
+        .getBlockByHeight(omni, height)
 
     def getBestBlockHash() =
-      implicitly[GetBestBlockHash].getBestBlockHash(omni)
+      implicitly[GetBestBlockHash[Omni]].getBestBlockHash(omni)
 
     def getBestBlockHeight() =
-      implicitly[GetBestBlockHeight].getBestBlockHeight(omni)
+      implicitly[GetBestBlockHeight[Omni]].getBestBlockHeight(omni)
 
     def getBlockByHash(hash: String) =
-      implicitly[GetBlockByHash].getBlockByHash(omni, hash)
+      implicitly[GetBlockByHash[Omni, BlockResponse]].getBlockByHash(omni, hash)
   }
 }
