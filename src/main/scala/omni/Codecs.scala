@@ -23,7 +23,8 @@ import io.tokenanalyst.bitcoinrpc.omni.Protocol.BlockRequest
 import io.tokenanalyst.bitcoinrpc.omni.Protocol.{
   BestBlockHashRequest,
   BlockTransactionsRequest,
-  TransactionRequest
+  TransactionRequest,
+  BlockHashRequest
 }
 
 object Codecs {
@@ -39,6 +40,13 @@ object Codecs {
         )
       }
     }
+
+  implicit val blockHashRequest = new RPCEncoder[BlockHashRequest] {
+    final def apply(a: BlockHashRequest): Json =
+      Json.obj(
+        requestFields("getblockhash", Array[Json](Json.fromLong(a.height))): _*
+      )
+  }
 
   implicit val getTransactionRequest = new RPCEncoder[TransactionRequest] {
     final def apply(a: TransactionRequest): Json =

@@ -18,23 +18,24 @@ package io.tokenanalyst.bitcoinrpc.bitcoin
 
 import cats.effect.IO
 import io.circe.generic.auto._
+import io.tokenanalyst.bitcoinrpc.BasicMethods._
 import io.tokenanalyst.bitcoinrpc.Codecs._
 import io.tokenanalyst.bitcoinrpc.bitcoin.Protocol._
 import io.tokenanalyst.bitcoinrpc.bitcoin.Codecs._
-import io.tokenanalyst.bitcoinrpc.{BasicMethods, BatchRequest, BatchResponse, Bitcoin}
+import io.tokenanalyst.bitcoinrpc.{BatchRequest, BatchResponse, Bitcoin}
 
 import scala.collection.mutable.ListBuffer
 
 object Instances {
 
   implicit val getNextBlockHashInstance =
-    new BasicMethods.GetNextBlockHash[Bitcoin] {
+    new GetNextBlockHash[Bitcoin] {
       override def getNextBlockHash(a: Bitcoin): IO[String] =
         a.client.nextBlockHash()
     }
 
   implicit val getBlockByHashInstance =
-    new BasicMethods.GetBlockByHash[Bitcoin, BlockResponse] {
+    new GetBlockByHash[Bitcoin, BlockResponse] {
       override def getBlockByHash(
           a: Bitcoin,
           hash: String
@@ -43,7 +44,7 @@ object Instances {
       }
     }
 
-  implicit val getBlockHashInstance = new BasicMethods.GetBlockHash[Bitcoin] {
+  implicit val getBlockHashInstance = new GetBlockHash[Bitcoin] {
     override def getBlockHash(a: Bitcoin, height: Long): IO[String] =
       for {
         json <- a.client
@@ -52,7 +53,7 @@ object Instances {
   }
 
   implicit val getBlockByHeightInstance =
-    new BasicMethods.GetBlockByHeight[Bitcoin, BlockResponse] {
+    new GetBlockByHeight[Bitcoin, BlockResponse] {
       override def getBlockByHeight(
           a: Bitcoin,
           height: Long
@@ -64,7 +65,7 @@ object Instances {
     }
 
   implicit val getBestBlockHashInstance =
-    new BasicMethods.GetBestBlockHash[Bitcoin] {
+    new GetBestBlockHash[Bitcoin] {
       override def getBestBlockHash(a: Bitcoin): IO[String] =
         for {
           json <- a.client
@@ -73,7 +74,7 @@ object Instances {
     }
 
   implicit val getBestBlockHeightInstance =
-    new BasicMethods.GetBestBlockHeight[Bitcoin] {
+    new GetBestBlockHeight[Bitcoin] {
       override def getBestBlockHeight(a: Bitcoin): IO[Long] =
         for {
           hash <- getBestBlockHashInstance.getBestBlockHash(a)
@@ -82,7 +83,7 @@ object Instances {
     }
 
   implicit val getTransactionsInstance =
-    new BasicMethods.GetTransactions[Bitcoin, BatchResponse[
+    new GetTransactions[Bitcoin, BatchResponse[
       TransactionResponse
     ]] {
       override def getTransactions(
@@ -123,7 +124,7 @@ object Instances {
     }
 
   implicit val getTransactionInstance =
-    new BasicMethods.GetTransaction[Bitcoin, TransactionResponse] {
+    new GetTransaction[Bitcoin, TransactionResponse] {
       override def getTransaction(
           a: Bitcoin,
           hash: String
@@ -138,7 +139,7 @@ object Instances {
     }
 
   implicit val estimateSmartFeeInstance =
-    new BasicMethods.EstimateSmartFee[Bitcoin, FeeResponse] {
+    new EstimateSmartFee[Bitcoin, FeeResponse] {
       override def estimateSmartFee(a: Bitcoin, height: Long): IO[FeeResponse] =
         a.client.request[FeeRequest, FeeResponse](FeeRequest(height))
     }

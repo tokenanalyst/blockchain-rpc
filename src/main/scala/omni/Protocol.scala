@@ -55,11 +55,9 @@ object Protocol {
   ) extends RPCResponse
 
   case class BlockTransactionsRequest(height: Long) extends RPCRequest
-
   case class TransactionRequest(hash: String) extends RPCRequest
-
   case class BestBlockHashRequest() extends RPCRequest
-
   case class BlockRequest(hash: String) extends RPCRequest
+  case class BlockHashRequest(height: Long) extends RPCRequest
 
 }

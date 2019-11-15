@@ -1,3 +1,8 @@
+# 1.22
+
+* added getNextBlockHash for Omni
+* added getBlockByHeight for Omni
+
 # 1.21
 
 * removed logback.xml from resources
