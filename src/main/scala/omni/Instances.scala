@@ -26,6 +26,11 @@ import io.tokenanalyst.bitcoinrpc.omni.Protocol._
 import io.tokenanalyst.bitcoinrpc.{BatchRequest, BatchResponse, Omni}
 
 object Instances {
+  implicit val getNextBlockHashInstance =
+    new GetNextBlockHash[Omni] {
+      override def getNextBlockHash(a: Omni): IO[String] =
+        a.client.nextBlockHash()
+    }
 
   implicit val listBlockTransactionsInstance =
     new ListBlockTransactions {

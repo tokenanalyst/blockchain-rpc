@@ -36,6 +36,9 @@ object Syntax {
       implicitly[GetTransactions[Omni, BatchResponse[TransactionResponse]]]
       .getTransactions(omni, hashes)
 
+    def getNextBlockHash() =
+      implicitly[GetNextBlockHash[Omni]].getNextBlockHash(omni)
+
     def getBlockByHeight(height: Long) =
       implicitly[GetBlockByHeight[Omni, BlockResponse]]
         .getBlockByHeight(omni, height)
