@@ -1,3 +1,7 @@
+# 2.1.0
+
+* changed env flag for hosts BITCOIN_RPC_HOST -> BITCOIN_RPC_HOSTS
+
 # 2.0.0
 
 * added feature to add multiple hosts as fallback (not getNextBlockHash yet)
