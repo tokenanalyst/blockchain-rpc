@@ -33,7 +33,7 @@ trait RPCDecoder[A] {
 }
 
 case class Config(
-    host: String,
+    hosts: Seq[String],
     port: Option[Int],
     username: Option[String],
     password: Option[String],
@@ -53,7 +53,7 @@ object EnvConfig {
       case Seq(None, _, _, _, _) =>
         throw new Exception("Pass at least BITCOIN_RPC_HOST.")
       case Seq(Some(h), port, user, pass, zmqPort) =>
-        Config(h, port.map(_.toInt), user, pass, zmqPort.map(_.toInt))
+        Config(h.split(","), port.map(_.toInt), user, pass, zmqPort.map(_.toInt))
     }
   }
 }

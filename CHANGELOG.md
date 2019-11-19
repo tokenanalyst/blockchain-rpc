@@ -1,3 +1,8 @@
+# 1.4.0
+
+* added feature to add multiple hosts as fallback (not getNextBlockHash yet)
+* interface changed for instantiating Bitcoin etc. provide sequence of fallbacks
+
 # 1.22
 
 * added getNextBlockHash for Omni
