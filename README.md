@@ -23,7 +23,7 @@ object GetBlockHash extends IOApp {
     implicit val ec = global
     RPCClient
       .bitcoin(
-        "127.0.0.1",
+        hosts = Seq("127.0.0.1"),
         username = Some("user"),
         password = Some("password")
       )
@@ -76,7 +76,7 @@ This example makes use of the EnvConfig import, which automatically configures R
 
 | variable  | description  | type |
 |---|---|---|
-| BITCOIN_RPC_HOST  | IP or hostname of full node | String |
+| BITCOIN_RPC_HOST  | Comma-seperated IP list or hostname of full nodes | String |
 | BITCOIN_RPC_USERNAME  | RPC username | Optional String |
 | BITCOIN_RPC_PASSWORD  | RPC password | Optional String |
 | BITCOIN_RPC_PORT  | RPC port when not default | Optional Int |
