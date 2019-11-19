@@ -27,13 +27,14 @@ import org.http4s.dsl.io._
 import org.http4s.headers.{Authorization, _}
 import org.http4s.{BasicCredentials, MediaType, Request, Uri}
 
+import java.net.SocketTimeoutException
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 object RPCClient {
 
   def bitcoin(
-      host: String,
+      hosts: Seq[String],
       port: Option[Int] = None,
       username: Option[String] = None,
       password: Option[String] = None,
@@ -42,7 +43,7 @@ object RPCClient {
       implicit ec: ExecutionContext,
       cs: ContextShift[IO]
   ): Resource[IO, Bitcoin] = {
-    val config = Config(host, port, username, password, zmqPort)
+    val config = Config(hosts, port, username, password, zmqPort)
     for (client <- make(config)) yield Bitcoin(client)
   }
 
@@ -55,7 +56,7 @@ object RPCClient {
   }
 
   def omni(
-      host: String,
+      hosts: Seq[String],
       port: Option[Int] = None,
       username: Option[String] = None,
       password: Option[String] = None,
@@ -64,7 +65,7 @@ object RPCClient {
       implicit ec: ExecutionContext,
       cs: ContextShift[IO]
   ): Resource[IO, Omni] = {
-    val config = Config(host, port, username, password, zmqPort)
+    val config = Config(hosts, port, username, password, zmqPort)
     for (client <- make(config)) yield Omni(client)
   }
 
@@ -82,9 +83,10 @@ object RPCClient {
   ): Resource[IO, RPCClient] = {
     for {
       client <- BlazeClientBuilder[IO](ec)
-        .withConnectTimeout(2.minutes)
+        .withConnectTimeout(5.seconds)
+        .withRequestTimeout(2.minutes)
         .resource
-      socket <- ZeroMQ.socket(config.host, config.zmqPort.getOrElse(28332))
+      socket <- ZeroMQ.socket(config.hosts.head, config.zmqPort.getOrElse(28332))
     } yield new RPCClient(client, socket, config)
   }
 }
@@ -92,30 +94,33 @@ object RPCClient {
 class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config)
     extends Http4sClientDsl[IO] {
 
-  val uri = Uri
-    .fromString(s"http://${config.host}:${config.port.getOrElse(8332)}")
-    .getOrElse(throw new Exception("Could not parse URL"))
-
   // is blocking
   def nextBlockHash(): IO[String] = zmq.nextBlock()
 
   def request[A <: RPCRequest: Encoder, B <: RPCResponse: Decoder](
       request: A
-  ): IO[B] =
+  ): IO[B] = retry(config.hosts) { host =>
     for {
-      req <- post(request)
+      req <- post(host, request)
       res <- client.expect[B](req)
     } yield res
+  }
 
   def requestJson[A <: RPCRequest: Encoder](request: A): IO[Json] =
-    for {
-      req <- post(request)
-      res <- client.expect[Json](req)
-    } yield res
+    retry(config.hosts) { host =>
+      for {
+        req <- post(host, request)
+        res <- client.expect[Json](req)
+      } yield res
+    }
 
   private def post[A <: RPCRequest: Encoder](
+      host: String,
       request: A
   ): IO[Request[IO]] = {
+    val uri = Uri
+    .fromString(s"http://${host}:${config.port.getOrElse(8332)}")
+    .getOrElse(throw new Exception("Could not parse URL"))
     (config.username, config.password) match {
       case (Some(user), Some(pass)) =>
         POST(
@@ -132,4 +137,16 @@ class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config)
         )
     }
   }
+
+  def retry[A](fallbacks: Seq[String], current: Int = 0, maxRetries: Int = 10)(
+      f: String => IO[A]
+  ): IO[A] =
+    f(fallbacks(current % fallbacks.size)).handleErrorWith {
+      case e: SocketTimeoutException =>
+        if (current <= maxRetries)
+          retry(fallbacks, current + 1, maxRetries)(f)
+        else
+          IO.raiseError(new Exception(s"Running out of retries for: ${e}"))
+      case e => IO.raiseError(e)
+    }
 }

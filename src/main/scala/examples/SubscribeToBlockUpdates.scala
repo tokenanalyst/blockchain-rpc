@@ -27,7 +27,7 @@ object SubscribeToBlockUpdates extends IOApp {
     implicit val ec = global
     RPCClient
       .bitcoin(
-        host = "127.0.0.1",
+        hosts = Seq("127.0.0.1"),
         username = Some("user"),
         password = Some("password")
       )

@@ -27,7 +27,7 @@ object GetBlockHash extends IOApp {
     implicit val ec = global
     RPCClient
       .bitcoin(
-        "127.0.0.1",
+        Seq("127.0.0.1"),
         username = Some("user"),
         password = Some("password")
       )
