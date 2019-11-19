@@ -118,7 +118,9 @@ class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config)
       host: String,
       request: A
   ): IO[Request[IO]] = {
-    val uri = getUriForHost(host)
+    val uri = Uri
+    .fromString(s"http://${host}:${config.port.getOrElse(8332)}")
+    .getOrElse(throw new Exception("Could not parse URL"))
     (config.username, config.password) match {
       case (Some(user), Some(pass)) =>
         POST(
@@ -135,11 +137,6 @@ class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config)
         )
     }
   }
-
-  def getUriForHost(host: String) =
-    Uri
-      .fromString(s"http://${host}:${config.port.getOrElse(8332)}")
-      .getOrElse(throw new Exception("Could not parse URL"))
 
   def retry[A](fallbacks: Seq[String], current: Int = 0, maxRetries: Int = 10)(
       f: String => IO[A]
