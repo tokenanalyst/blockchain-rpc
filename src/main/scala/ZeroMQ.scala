@@ -13,7 +13,6 @@ object ZeroMQ {
     val topic = zMsg.popString()
     val body = zMsg.popString()
     val seq = ByteBuffer.wrap(zMsg.pop().getData.reverse).getInt
-
     message(topic, body, seq)
   }
 
