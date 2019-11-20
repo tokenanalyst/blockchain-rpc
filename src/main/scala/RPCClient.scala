@@ -27,7 +27,7 @@ import org.http4s.dsl.io._
 import org.http4s.headers.{Authorization, _}
 import org.http4s.{BasicCredentials, MediaType, Request, Uri}
 
-import java.net.SocketTimeoutException
+import java.net.{ConnectException, SocketTimeoutException}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
@@ -86,7 +86,10 @@ object RPCClient {
         .withConnectTimeout(5.seconds)
         .withRequestTimeout(2.minutes)
         .resource
-      socket <- ZeroMQ.socket(config.hosts.head, config.zmqPort.getOrElse(28332))
+      socket <- ZeroMQ.socket(
+        config.hosts.head,
+        config.zmqPort.getOrElse(28332)
+      )
     } yield new RPCClient(client, socket, config)
   }
 }
@@ -119,8 +122,8 @@ class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config)
       request: A
   ): IO[Request[IO]] = {
     val uri = Uri
-    .fromString(s"http://${host}:${config.port.getOrElse(8332)}")
-    .getOrElse(throw new Exception("Could not parse URL"))
+      .fromString(s"http://${host}:${config.port.getOrElse(8332)}")
+      .getOrElse(throw new Exception("Could not parse URL"))
     (config.username, config.password) match {
       case (Some(user), Some(pass)) =>
         POST(
@@ -138,15 +141,19 @@ class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config)
     }
   }
 
-  def retry[A](fallbacks: Seq[String], current: Int = 0, maxRetries: Int = 10)(
+  def retry[A](fallbacks: Seq[String], current: Int = 0, max: Int = 10)(
       f: String => IO[A]
-  ): IO[A] =
-    f(fallbacks(current % fallbacks.size)).handleErrorWith {
-      case e: SocketTimeoutException =>
-        if (current <= maxRetries)
-          retry(fallbacks, current + 1, maxRetries)(f)
-        else
-          IO.raiseError(new Exception(s"Running out of retries for: ${e}"))
-      case e => IO.raiseError(e)
+  ): IO[A] = {
+    val handle = (e: Exception) => {
+      if (current <= max)
+        retry(fallbacks, current + 1, max)(f)
+      else
+        IO.raiseError(new Exception(s"Running out of retries for: ${e}"))
     }
+    f(fallbacks(current % fallbacks.size)).handleErrorWith {
+      case e: ConnectException       => handle(e)
+      case e: SocketTimeoutException => handle(e)
+      case e                         => IO.raiseError(e)
+    }
+  }
 }

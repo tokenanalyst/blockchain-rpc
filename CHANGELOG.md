@@ -1,3 +1,7 @@
+# 2.2.0
+
+* handle ConnectException with failover
+
 # 2.1.0
 
 * changed env flag for hosts BITCOIN_RPC_HOST -> BITCOIN_RPC_HOSTS
