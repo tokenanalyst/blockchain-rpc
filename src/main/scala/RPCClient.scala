@@ -38,21 +38,14 @@ object RPCClient {
       port: Option[Int] = None,
       username: Option[String] = None,
       password: Option[String] = None,
-      zmqPort: Option[Int] = None
+      zmqPort: Option[Int] = None,
+      onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit 
   )(
       implicit ec: ExecutionContext,
       cs: ContextShift[IO]
   ): Resource[IO, Bitcoin] = {
     val config = Config(hosts, port, username, password, zmqPort)
-    for (client <- make(config)) yield Bitcoin(client)
-  }
-
-  def bitcoin(
-      implicit ec: ExecutionContext,
-      config: Config,
-      cs: ContextShift[IO]
-  ): Resource[IO, Bitcoin] = {
-    for (client <- make(config)) yield Bitcoin(client)
+    for (client <- make(config, onErrorRetry)) yield Bitcoin(client)
   }
 
   def omni(
@@ -60,24 +53,17 @@ object RPCClient {
       port: Option[Int] = None,
       username: Option[String] = None,
       password: Option[String] = None,
-      zmqPort: Option[Int] = None
+      zmqPort: Option[Int] = None,
+      onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit 
   )(
       implicit ec: ExecutionContext,
       cs: ContextShift[IO]
   ): Resource[IO, Omni] = {
     val config = Config(hosts, port, username, password, zmqPort)
-    for (client <- make(config)) yield Omni(client)
+    for (client <- make(config, onErrorRetry)) yield Omni(client)
   }
 
-  def omni(
-      implicit ec: ExecutionContext,
-      config: Config,
-      cs: ContextShift[IO]
-  ): Resource[IO, Omni] = {
-    for (client <- make(config)) yield Omni(client)
-  }
-
-  def make(config: Config)(
+  def make(config: Config, onErrorRetry: (Int, Throwable) => IO[Unit])(
       implicit ec: ExecutionContext,
       cs: ContextShift[IO]
   ): Resource[IO, RPCClient] = {
@@ -90,12 +76,16 @@ object RPCClient {
         config.hosts.head,
         config.zmqPort.getOrElse(28332)
       )
-    } yield new RPCClient(client, socket, config)
+    } yield new RPCClient(client, socket, config, onErrorRetry)
   }
 }
 
-class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config)
-    extends Http4sClientDsl[IO] {
+class RPCClient(
+    client: Client[IO],
+    zmq: ZeroMQ.Socket,
+    config: Config,
+    onErrorRetry: (Int, Throwable) => IO[Unit]
+) extends Http4sClientDsl[IO] {
 
   // is blocking
   def nextBlockHash(): IO[String] = zmq.nextBlock()
@@ -144,16 +134,20 @@ class RPCClient(client: Client[IO], zmq: ZeroMQ.Socket, config: Config)
   def retry[A](fallbacks: Seq[String], current: Int = 0, max: Int = 10)(
       f: String => IO[A]
   ): IO[A] = {
+    val hostId = current % fallbacks.size
     val handle = (e: Exception) => {
-      if (current <= max)
-        retry(fallbacks, current + 1, max)(f)
+      if (current <= max) for {
+        _ <- onErrorRetry(hostId, e) 
+        r <- retry(fallbacks, current + 1, max)(f)
+      } yield r
       else
         IO.raiseError(new Exception(s"Running out of retries for: ${e}"))
     }
-    f(fallbacks(current % fallbacks.size)).handleErrorWith {
-      case e: ConnectException       => handle(e)
-      case e: SocketTimeoutException => handle(e)
-      case e                         => IO.raiseError(e)
+    f(fallbacks(hostId)).handleErrorWith {
+      case e: org.http4s.client.UnexpectedStatus => handle(e)
+      case e: ConnectException                   => handle(e)
+      case e: SocketTimeoutException             => handle(e)
+      case e                                     => IO.raiseError(e)
     }
   }
 }

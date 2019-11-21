@@ -19,17 +19,20 @@ package io.tokenanalyst.bitcoinrpc.examples
 import cats.effect.{ExitCode, IO, IOApp}
 import scala.concurrent.ExecutionContext.global
 
-import io.tokenanalyst.bitcoinrpc.RPCClient
+import io.tokenanalyst.bitcoinrpc.{RPCClient, Config}
 import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
 
 object GetBlockHash extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
+    implicit val config = Config.fromEnv
     RPCClient
       .bitcoin(
-        Seq("127.0.0.1"),
-        username = Some("user"),
-        password = Some("password")
+        config.hosts,
+        config.port,
+        config.username,
+        config.password, 
+        onErrorRetry = { (_, e: Throwable) => IO(println(e)) }
       )
       .use { bitcoin =>
         for {

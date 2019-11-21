@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package io.tokenanalyst.bitcoinrpc.examples
 
 import cats.effect.{ExitCode, IO, IOApp}
-import io.tokenanalyst.bitcoinrpc.EnvConfig._
-import io.tokenanalyst.bitcoinrpc.RPCClient
+import io.tokenanalyst.bitcoinrpc.{Config, RPCClient}
 import io.tokenanalyst.bitcoinrpc.omni.Syntax._
 
 import scala.concurrent.ExecutionContext.global
@@ -26,7 +26,13 @@ import scala.concurrent.ExecutionContext.global
 object OmniGetBlockTransactions extends IOApp {
   override def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
-    RPCClient.omni.use { omni =>
+    val config = Config.fromEnv
+    RPCClient.omni(
+      config.hosts,
+      config.port,
+      config.username,
+      config.password, 
+    ).use { omni =>
       for {
         bestBlockHeight <- omni.getBestBlockHeight()
         _ <- IO(println(s"best block: $bestBlockHeight"))
