@@ -20,9 +20,8 @@ import cats.effect.{ExitCode, IO, IOApp}
 import scala.concurrent.ExecutionContext.global
 
 import io.tokenanalyst.bitcoinrpc.Bitcoin
-import io.tokenanalyst.bitcoinrpc.RPCClient
+import io.tokenanalyst.bitcoinrpc.{RPCClient, Config}
 import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
-import io.tokenanalyst.bitcoinrpc.EnvConfig._
 
 object CatchupFromZero extends IOApp {
 
@@ -35,10 +34,13 @@ object CatchupFromZero extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
-    RPCClient.bitcoin.use { rpc =>
-      for {
-        _ <- loop(rpc)
-      } yield ExitCode(0)
-    }
+    implicit val config = Config.fromEnv
+    RPCClient
+      .bitcoin(config.hosts, config.port, config.username, config.password)
+      .use { rpc =>
+        for {
+          _ <- loop(rpc)
+        } yield ExitCode(0)
+      }
   }
 }

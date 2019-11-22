@@ -2,7 +2,6 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/202ed1ef51524b749560c0ffd78400f7)](https://www.codacy.com/manual/tokenanalyst/bitcoin-rpc?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tokenanalyst/bitcoin-rpc&amp;utm_campaign=Badge_Grade)
 <img src="https://typelevel.org/cats/img/cats-badge.svg" height="40px" align="right" alt="Cats friendly" /></a>
 
-
 bitcoin-rpc is a typesafe bitcoind RPC client written in and to be used with Scala. Under the hood, it's using http4s, circe and cats-effect. It's in active development, but no official public release has been scheduled yet. We appreciate external contributions, please check issues for inspiration. 
 
 For all examples, check: [src/main/scala/examples](https://github.com/tokenanalyst/bitcoin-rpc/tree/master/src/main/scala/examples).
@@ -23,14 +22,14 @@ object GetBlockHash extends IOApp {
     implicit val ec = global
     RPCClient
       .bitcoin(
-        hosts = Seq("127.0.0.1"),
-        username = Some("user"),
-        password = Some("password")
+        Seq(127.0.0.1),
+        username = "tokenanalyst",
+        password = "!@#$%^&*(2009"
       )
       .use { bitcoin =>
         for {
           block <- bitcoin.getBlockByHash(
-            "0000000000000000000...a581761ddc1d50a57358d"
+            "0000000000000000000759de6ab39c2d8fb01e4481ba581761ddc1d50a57358d"
           )
           _ <- IO { println(block) }
         } yield ExitCode(0)
@@ -44,32 +43,31 @@ object GetBlockHash extends IOApp {
 This example makes use of the EnvConfig import, which automatically configures RPC via ENV flags exported in the shell. The environment flags for it are BITCOIN_RPC_HOSTS, BITCOIN_RPC_USERNAME, BITCOIN_RPC_PASSWORD.
 
 ```scala
-  import cats.effect.{ExitCode, IO, IOApp}
-  import scala.concurrent.ExecutionContext.global
- 
-  import io.tokenanalyst.bitcoinrpc.Bitcoin
-  import io.tokenanalyst.bitcoinrpc.RPCClient
-  import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
-  import io.tokenanalyst.bitcoinrpc.EnvConfig._
-  
-  object CatchupFromZero extends IOApp {
+import io.tokenanalyst.bitcoinrpc.Bitcoin
+import io.tokenanalyst.bitcoinrpc.{RPCClient, Config}
+import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
 
-    def loop(rpc: Bitcoin, current: Long = 0L, until: Long = 10L): IO[Unit] = 
+object CatchupFromZero extends IOApp {
+
+  def loop(rpc: Bitcoin, current: Long = 0L, until: Long = 10L): IO[Unit] =
     for {
-        block <- rpc.getBlockByHeight(current)
-        _ <- IO { println(block) }  
-        l <- if(current + 1 < until) loop(rpc, current + 1, until) else IO.unit
+      block <- rpc.getBlockByHeight(current)
+      _ <- IO { println(block) }
+      l <- if (current + 1 < until) loop(rpc, current + 1, until) else IO.unit
     } yield l
 
-    def run(args: List[String]): IO[ExitCode] = {
-      implicit val ec = global
-      RPCClient.bitcoin.use { rpc =>
+  def run(args: List[String]): IO[ExitCode] = {
+    implicit val ec = global
+    implicit val config = Config.fromEnv
+    RPCClient
+      .bitcoin(config.hosts, config.port, config.username, config.password)
+      .use { rpc =>
         for {
-            _ <- loop(rpc)
+          _ <- loop(rpc)
         } yield ExitCode(0)
       }
-    }
   }
+}
 ```
 
 ## Environment Variables

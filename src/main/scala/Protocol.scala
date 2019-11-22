@@ -24,6 +24,7 @@ trait RPCRequest
 
 case class BatchResponse[A](seq: Seq[A]) extends RPCResponse
 case class BatchRequest[A](seq: Seq[A]) extends RPCRequest
+
 trait RPCEncoder[A] {
   def apply(a: A): Json
 }
@@ -40,14 +41,14 @@ case class Config(
     zmqPort: Option[Int]
 )
 
-object EnvConfig {
+object Config {
   val PasswordEnv = "BITCOIN_RPC_PASSWORD"
   val UsernameEnv = "BITCOIN_RPC_USERNAME"
   val HostEnv = "BITCOIN_RPC_HOSTS"
   val PortEnv = "BITCOIN_RPC_PORT"
   val ZMQPortEnv = "BITCOIN_RPC_ZEROMQ_PORT"
 
-  implicit val config: Config = {
+  val fromEnv: Config = {
     Seq(HostEnv, PortEnv, UsernameEnv, PasswordEnv, ZMQPortEnv)
       .map(sys.env.get(_)) match {
       case Seq(None, _, _, _, _) =>
