@@ -1,3 +1,8 @@
+# 2.3.0
+
+* removed implicit config
+* add optional onRetryError: (hostId, exception) => IO.unit callback
+
 # 2.2.0
 
 * handle ConnectException with failover
