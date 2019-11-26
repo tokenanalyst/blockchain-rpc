@@ -16,7 +16,7 @@
   */
 package io.tokenanalyst.bitcoinrpc
 
-import cats.effect.{ContextShift, IO, Resource}
+import cats.effect.{ContextShift, IO, Resource, Sync, Clock}
 import io.circe.{Decoder, Encoder, Json}
 import org.http4s.circe.CirceEntityDecoder._
 import org.http4s.circe.CirceEntityEncoder._
@@ -31,6 +31,10 @@ import java.net.{ConnectException, SocketTimeoutException}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
+import io.prometheus.client.CollectorRegistry
+import org.http4s.client.middleware.Metrics
+import org.http4s.metrics.prometheus.Prometheus
+
 object RPCClient {
 
   def bitcoin(
@@ -42,7 +46,8 @@ object RPCClient {
       onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit 
   )(
       implicit ec: ExecutionContext,
-      cs: ContextShift[IO]
+      cs: ContextShift[IO],
+      clock: Clock[IO]
   ): Resource[IO, Bitcoin] = {
     val config = Config(hosts, port, username, password, zmqPort)
     for (client <- make(config, onErrorRetry)) yield Bitcoin(client)
@@ -57,33 +62,48 @@ object RPCClient {
       onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit 
   )(
       implicit ec: ExecutionContext,
-      cs: ContextShift[IO]
+      cs: ContextShift[IO],
+      clock: Clock[IO]
   ): Resource[IO, Omni] = {
     val config = Config(hosts, port, username, password, zmqPort)
     for (client <- make(config, onErrorRetry)) yield Omni(client)
   }
 
+  def wrap(registry: CollectorRegistry, client: Client[IO])
+  (implicit c: Clock[IO], s: Sync[IO]):  Resource[IO, Client[IO]] = { 
+    val classifierFunc = (r: Request[IO]) => Some(r.method.toString.toLowerCase) 
+    Resource.make { for { 
+      ops <- Prometheus[IO](registry, "client")
+    } yield Metrics[IO](ops, classifierFunc)(client) 
+    }{ _ => IO.unit} 
+}
+
   def make(config: Config, onErrorRetry: (Int, Throwable) => IO[Unit])(
       implicit ec: ExecutionContext,
-      cs: ContextShift[IO]
-  ): Resource[IO, RPCClient] = {
-    for {
+      cs: ContextShift[IO],
+      sync: Sync[IO],
+      clock: Clock[IO]
+  ): Resource[IO, RPCClient] = for {
       client <- BlazeClientBuilder[IO](ec)
-        .withConnectTimeout(5.seconds)
-        .withRequestTimeout(2.minutes)
-        .resource
+      .withConnectTimeout(5.seconds)
+      .withRequestTimeout(2.minutes)
+      .resource
+      registry = CollectorRegistry.defaultRegistry
+      metered <- wrap(registry, client)
       socket <- ZeroMQ.socket(
         config.hosts.head,
         config.zmqPort.getOrElse(28332)
       )
-    } yield new RPCClient(client, socket, config, onErrorRetry)
-  }
+    } yield { 
+      new RPCClient(metered, socket, config, registry, onErrorRetry)
+    }
 }
 
-class RPCClient(
+case class RPCClient(
     client: Client[IO],
     zmq: ZeroMQ.Socket,
     config: Config,
+    metrics: CollectorRegistry,
     onErrorRetry: (Int, Throwable) => IO[Unit]
 ) extends Http4sClientDsl[IO] {
 
