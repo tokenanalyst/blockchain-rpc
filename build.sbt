@@ -9,11 +9,44 @@ lazy val bitcoinrpc = (project in file(".")).
   settings(
     assemblyJarName in assembly := "bitcoin-rpc.jar",
     publishMavenStyle := false,
-    publishTo := Some(Resolver.url("TA-S3", url("s3://ivy-jar-repository-ta/"))(Resolver.ivyStylePatterns))
+    publishTo := {
+      val nexus = "https://oss.sonatype.org/"
+      if (isSnapshot.value)
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      else
+        Some("releases" at nexus + "service/local/staging/deploy/maven2")
+    } 
   ).
   settings(
     libraryDependencies ++= http4s ++ json ++ zmq ++ cats
   )
+
+publishMavenStyle := true
+
+publishArtifact in Test := false
+
+pomIncludeRepository := { _ => false }
+
+pomExtra :=
+  <url>https://github.com/tokenanalyst/bitcoin-rpc</url>
+    <licenses>
+      <license>
+        <name>Apache License Version 2.0</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+    <developers>
+      <developer>
+        <id>jpzk</id>
+        <name>Jendrik Poloczek</name>
+        <url>https://www.madewithtea.com</url>
+      </developer>
+      <developer>
+        <id>CesarPantoja</id>
+        <name>Cesar Pantoja</name>
+      </developer>
+    </developers>
 
 val http4sVersion = "0.20.11"
 
