@@ -54,7 +54,13 @@ object Config {
       case Seq(None, _, _, _, _) =>
         throw new Exception("Pass at least BITCOIN_RPC_HOSTS.")
       case Seq(Some(h), port, user, pass, zmqPort) =>
-        Config(h.split(","), port.map(_.toInt), user, pass, zmqPort.map(_.toInt))
+        Config(
+          h.split(",").toIndexedSeq,
+          port.map(_.toInt),
+          user,
+          pass,
+          zmqPort.map(_.toInt)
+        )
     }
   }
 }

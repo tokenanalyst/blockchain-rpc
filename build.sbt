@@ -1,8 +1,10 @@
 lazy val commonSettings = Seq(
   organization := "io.tokenanalyst",
   version := "2.4.0",
-  scalaVersion := "2.12.10",
-  description := "bitcoin-rpc")
+  scalaVersion := "2.13.1",
+  crossScalaVersions := Seq("2.13.1", "2.12.10"),
+  organizationHomepage := Some(url("https://github.com/tokenanalyst/bitcoin-rpc")),
+  description := "JSON RPC client for Bitcoin, Litecoin and other blockchain full nodes")
 
 lazy val bitcoinrpc = (project in file(".")).
   settings(commonSettings: _*).
@@ -26,6 +28,13 @@ publishMavenStyle := true
 publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
+
+scmInfo := Some(
+  ScmInfo(
+    url("https://github.com/tokenanalyst/bitcoin-rpc"),
+    "scm:git@github.com:tokenanalyst/bitcoin-rpc.git"
+  )
+)
 
 pomExtra :=
   <url>https://github.com/tokenanalyst/bitcoin-rpc</url>
