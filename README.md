@@ -7,6 +7,8 @@ bitcoin-rpc is a typesafe bitcoind RPC client written in and to be used with Sca
 
 ## Add Dependency
 
+Simply add the following dependency to your project.
+
 ```
   libraryDependencies += "io.tokenanalyst" %% "bitcoin-rpc" % "2.4.0",
 ```
