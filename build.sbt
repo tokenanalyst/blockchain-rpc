@@ -1,6 +1,6 @@
 lazy val commonSettings = Seq(
   organization := "io.tokenanalyst",
-  version := "2.3.0",
+  version := "2.4.0",
   scalaVersion := "2.12.10",
   description := "bitcoin-rpc")
 
@@ -48,7 +48,8 @@ pomExtra :=
       </developer>
     </developers>
 
-val http4sVersion = "0.20.11"
+val http4sVersion = "0.21.0-M5"
+val circeVersion = "0.12.0-M4"
 
 lazy val http4s = Seq(
   "org.http4s" %% "http4s-dsl" % http4sVersion,
@@ -58,9 +59,9 @@ lazy val http4s = Seq(
 
 lazy val json = Seq(
   "org.http4s" %% "http4s-circe" % http4sVersion,
-  "io.circe" %% "circe-generic" % "0.11.1",
-  "io.circe" %% "circe-literal" % "0.11.1",
-  "io.circe" %% "circe-parser" % "0.11.1"
+  "io.circe" %% "circe-generic" % circeVersion,
+  "io.circe" %% "circe-literal" % circeVersion,
+  "io.circe" %% "circe-parser" % circeVersion 
 )
 
 lazy val zmq = Seq (
