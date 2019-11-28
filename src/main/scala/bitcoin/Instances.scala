@@ -102,7 +102,7 @@ object Instances {
           a.client.request[BatchRequest[TransactionRequest], BatchResponse[
             TransactionResponse
           ]](
-            BatchRequest[TransactionRequest](list.map(TransactionRequest.apply))
+            BatchRequest[TransactionRequest](list.map(TransactionRequest.apply).toSeq)
           )
 
         if (genesisTransactionIndex >= 0) {
@@ -116,7 +116,7 @@ object Instances {
                   Transactions.GenesisTransaction
                 )
             )
-          } yield BatchResponse(listResult)
+          } yield BatchResponse(listResult.toSeq)
         } else {
           result
         }
