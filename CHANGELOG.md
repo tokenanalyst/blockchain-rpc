@@ -1,3 +1,8 @@
+# 2.4.0
+
+* added Omni field confirmations
+* added Omni field invalidreason
+
 # 2.3.0
 
 * removed implicit config
