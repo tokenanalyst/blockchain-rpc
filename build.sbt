@@ -1,12 +1,12 @@
 lazy val commonSettings = Seq(
   organization := "io.tokenanalyst",
   version := "2.4.0",
-  scalaVersion := "2.13.1",
+  scalaVersion := "2.12.10",
   crossScalaVersions := Seq("2.13.1", "2.12.10"),
   organizationHomepage := Some(url("https://github.com/tokenanalyst/bitcoin-rpc")),
   description := "JSON RPC client for Bitcoin, Litecoin and other blockchain full nodes")
 
-lazy val bitcoinrpc = (project in file(".")).
+lazy val `bitcoin-rpc` = (project in file(".")).
   settings(commonSettings: _*).
   settings(
     assemblyJarName in assembly := "bitcoin-rpc.jar",
