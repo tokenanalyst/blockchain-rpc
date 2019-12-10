@@ -66,6 +66,7 @@ object Config {
 }
 
 sealed trait Blockchain
+case class Ethereum(client: RPCClient) extends Blockchain
 case class Bitcoin(client: RPCClient) extends Blockchain
 case class Omni(client: RPCClient) extends Blockchain
 
