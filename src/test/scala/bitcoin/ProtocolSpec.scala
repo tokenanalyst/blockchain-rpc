@@ -14,7 +14,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.test
+package io.tokenanalyst.bitcoinrpc.test.bitcoin
 
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -23,7 +23,7 @@ import io.tokenanalyst.bitcoinrpc.Codecs._
 import io.circe.generic.auto._
 import io.circe.parser.decode
 
-class BitcoinProtocolSpec extends FlatSpec with Matchers {
+class ProtocolSpec extends FlatSpec with Matchers {
 
   behavior of "Bitcoin protocol"
 
