@@ -95,7 +95,7 @@ object RPCClient {
   }
 }
 
-class RPCClient(
+class RPCClient (
     client: Client[IO],
     zmq: ZeroMQ.Socket,
     config: Config,
