@@ -1,3 +1,8 @@
+# 2.5.0
+
+* added Ethereum 
+* added Ethereum block and transactions codec and syntax
+
 # 2.4.0
 
 * added Omni field confirmations
