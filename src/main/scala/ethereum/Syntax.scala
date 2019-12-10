@@ -40,10 +40,7 @@ object Syntax {
     def getBestBlockHash() =
       implicitly[GetBestBlockHash[Ethereum]].getBestBlockHash(b)
 
-    def getBestBlockHeight() =
-      implicitly[GetBestBlockHeight[Ethereum]].getBestBlockHeight(b)
-
-    def getTransactions(hashes: Seq[String]) =
+      def getTransactions(hashes: Seq[String]) =
       implicitly[GetTransactions[Ethereum, BatchResponse[TransactionResponse]]]
         .getTransactions(b, hashes)
 

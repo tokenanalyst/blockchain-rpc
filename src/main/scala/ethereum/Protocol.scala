@@ -22,64 +22,30 @@ import scala.io.Source
 object Protocol {
   case class BlockHashResponse(hash: String) extends RPCResponse
   case class BlockResponse(
-      height: Long,
-      hash: String,
-      previousblockhash: Option[String],
-      nonce: Long,
-      strippedsize: Long,
-      merkleroot: String,
-      version: Int,
-      weight: Int,
-      difficulty: Double,
-      chainwork: String,
-      bits: String,
-      size: Long,
-      mediantime: Long,
-      time: Long,
-      nTx: Int,
-      tx: List[String]
-  ) extends RPCResponse
+    author: String,
+    difficulty: String,
+    extraData: String, 
+    gasLimit: String, 
+    gasUsed: String,
+    hash: String,
+    logsBloom: String,
+    miner: String,
+    mixHash: String,
+    nonce: String, 
+    number: String, 
+    parentHash: String,
+    receiptsRoot: String,
+    sealFields: List[String],
+    sha3Uncles: String,
+    size: String,
+    stateRoot: String,
+    timestamp: String,
+    totalDifficulty: String,
+    transactions: List[String],
+    transactionsRoot: String, 
+    uncles: List[String]) extends RPCResponse
 
-  case class TransactionResponseVin(
-      txid: Option[String],
-      vout: Option[Int],
-      scriptSig: Option[TransactionResponseScriptSig],
-      coinbase: Option[String],
-      sequence: Long
-  )
-
-  case class TransactionResponseScriptSig(asm: String, hex: String)
-
-  case class TransactionResponseScript(
-      asm: String,
-      hex: String,
-      reqSigs: Option[Int],
-      `type`: String,
-      addresses: Option[List[String]]
-  )
-
-  case class TransactionResponseVout(
-      value: Double,
-      n: Int,
-      scriptPubKey: TransactionResponseScript
-  )
-
-  case class TransactionResponse(
-      confirmations: Option[Int],
-      blockhash: String,
-      blocktime: Long,
-      hash: String,
-      hex: String,
-      txid: String,
-      time: Long,
-      vsize: Int,
-      size: Int,
-      weight: Int,
-      version: Int,
-      vin: List[TransactionResponseVin],
-      vout: List[TransactionResponseVout],
-      locktime: Long
-  ) extends RPCResponse
+  case class TransactionResponse() extends RPCResponse
 
   case class BlockRequest(hash: String) extends RPCRequest
   case class BlockHashRequest(height: Long) extends RPCRequest

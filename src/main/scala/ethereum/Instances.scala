@@ -73,15 +73,6 @@ object Instances {
         } yield json.asObject.get("result").get.asString.get
     }
 
-  implicit val getBestBlockHeightInstance =
-    new GetBestBlockHeight[Ethereum] {
-      override def getBestBlockHeight(a: Ethereum): IO[Long] =
-        for {
-          hash <- getBestBlockHashInstance.getBestBlockHash(a)
-          block <- getBlockByHashInstance.getBlockByHash(a, hash)
-        } yield block.height
-    }
-
   implicit val getTransactionsInstance =
     new GetTransactions[Ethereum, BatchResponse[
       TransactionResponse

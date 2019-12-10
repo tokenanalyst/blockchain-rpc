@@ -27,7 +27,7 @@ object Codecs {
     final def apply(a: TransactionRequest): Json =
       Json.obj(
         requestFields(
-          "getrawtransaction",
+          "eth_getTransactionByHash",
           Array(Json.fromString(a.hash), Json.fromInt(1))
         ): _*
       )
@@ -43,18 +43,18 @@ object Codecs {
 
   implicit val bestBlockHashRequest = new RPCEncoder[BestBlockHashRequest] {
     final def apply(a: BestBlockHashRequest): Json =
-      Json.obj(requestFields("getbestblockhash", Array[Json]()): _*)
+      Json.obj(requestFields("eth_blockNumber", Array[Json]()): _*)
   }
 
   implicit val blockHashRequest = new RPCEncoder[BlockHashRequest] {
     final def apply(a: BlockHashRequest): Json =
       Json.obj(
-        requestFields("getblockhash", Array[Json](Json.fromLong(a.height))): _*
+        requestFields("eth_getBlockByNumber", Array[Json](Json.fromLong(a.height))): _*
       )
   }
 
   implicit val blockRequest = new RPCEncoder[BlockRequest] {
     final def apply(a: BlockRequest): Json =
-      Json.obj(requestFields("getblock", Array(Json.fromString(a.hash))): _*)
+      Json.obj(requestFields("eth_getBlockByHash", Array(Json.fromString(a.hash))): _*)
   }
 }
