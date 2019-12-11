@@ -16,14 +16,15 @@
   */
 package io.tokenanalyst.bitcoinrpc.test.bitcoin
 
-import org.scalatest.{FlatSpec, Matchers}
-
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.flatspec.AnyFlatSpec
+import com.softwaremill.diffx.scalatest.DiffMatcher
 import io.tokenanalyst.bitcoinrpc.bitcoin.Protocol._
 import io.tokenanalyst.bitcoinrpc.Codecs._
 import io.circe.generic.auto._
 import io.circe.parser.decode
 
-class ProtocolSpec extends FlatSpec with Matchers {
+class ProtocolSpec extends AnyFlatSpec with Matchers with DiffMatcher {
 
   behavior of "Bitcoin protocol"
 
@@ -34,7 +35,7 @@ class ProtocolSpec extends FlatSpec with Matchers {
       """
     val decoded = decode[BlockResponse](response)
     decoded.isRight shouldEqual true
-    decoded.right.get shouldEqual BlockResponse(
+    decoded.right.get should matchTo(BlockResponse(
       607523,
       "00000000000000000009db93b0bd627158b665cd954cc274c056ad8b257c3f35",
       Some("0000000000000000000280301806aa6a1e74ff64139f2dd03c3ac30802739c7a"),
@@ -51,7 +52,7 @@ class ProtocolSpec extends FlatSpec with Matchers {
       1575992821,
       2273,
       List("26de2820d5e15884a18c24426c6fafa6f527cca0f67a0266aa9737690b0bf3bc")
-    )
+    ))
   }
 
   it should "decode TransactionResponse" in { 
@@ -61,7 +62,7 @@ class ProtocolSpec extends FlatSpec with Matchers {
     """
     val decoded = decode[TransactionResponse](response) 
     decoded.isRight shouldEqual true
-    decoded.right.get shouldEqual TransactionResponse(
+    decoded.right.get should matchTo(TransactionResponse(
      Some(1),
       "0000000000000000000e924f2fc7105362ce640d0865d10d314086c795d2cfde",
       1575996190L,
@@ -82,7 +83,6 @@ class ProtocolSpec extends FlatSpec with Matchers {
       List(TransactionResponseVout(0.00803580, 0, TransactionResponseScript("OP_HASH160 ab974139080e159ac8af9fc0d9e2ef4885a1339d OP_EQUAL",
       "a914ab974139080e159ac8af9fc0d9e2ef4885a1339d87", Some(1), "scripthash", Some(List("3HLJfiJLa5CnKQoAF3YeteidRjDMvY5upH"))))),
       0
-    )
-
+    ))
   }
 }

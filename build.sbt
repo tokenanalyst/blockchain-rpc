@@ -79,7 +79,8 @@ lazy val json = Seq(
   "io.circe" %% "circe-parser" % circeVersion
 )
 lazy val scalaTest = Seq(
-  "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
+  "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
+  "com.softwaremill.diffx" %% "diffx-scalatest" % "0.3.14" % "test"
 )
 lazy val zmq = Seq(
   "org.zeromq" % "jeromq" % "0.5.1"

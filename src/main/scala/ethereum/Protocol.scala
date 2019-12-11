@@ -45,7 +45,26 @@ object Protocol {
     transactionsRoot: String, 
     uncles: List[String]) extends RPCResponse
 
-  case class TransactionResponse() extends RPCResponse
+  case class TransactionResponse(
+    blockHash: String,
+    blockNumber: String,
+    chainId: String,
+    from: String,
+    gas: String,
+    gasPrice: String, 
+    hash: String,
+    input: String,
+    nonce: String,
+    publicKey: String,
+    r: String, 
+    raw: String, 
+    s: String, 
+    v: String,
+    standardV: String,
+    to: String, 
+    transactionIndex: String, 
+    value: String
+  ) extends RPCResponse
 
   case class BlockRequest(hash: String) extends RPCRequest
   case class BlockHashRequest(height: Long) extends RPCRequest
