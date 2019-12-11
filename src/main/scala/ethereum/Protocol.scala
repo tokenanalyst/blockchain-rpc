@@ -22,49 +22,67 @@ import scala.io.Source
 object Protocol {
   case class BlockHashResponse(hash: String) extends RPCResponse
   case class BlockResponse(
-    author: String,
-    difficulty: String,
-    extraData: String, 
-    gasLimit: String, 
-    gasUsed: String,
-    hash: String,
-    logsBloom: String,
-    miner: String,
-    mixHash: String,
-    nonce: String, 
-    number: String, 
-    parentHash: String,
-    receiptsRoot: String,
-    sealFields: List[String],
-    sha3Uncles: String,
-    size: String,
-    stateRoot: String,
-    timestamp: String,
-    totalDifficulty: String,
-    transactions: List[String],
-    transactionsRoot: String, 
-    uncles: List[String]) extends RPCResponse
+      author: String,
+      difficulty: String,
+      extraData: String,
+      gasLimit: String,
+      gasUsed: String,
+      hash: String,
+      logsBloom: String,
+      miner: String,
+      mixHash: String,
+      nonce: String,
+      number: String,
+      parentHash: String,
+      receiptsRoot: String,
+      sealFields: List[String],
+      sha3Uncles: String,
+      size: String,
+      stateRoot: String,
+      timestamp: String,
+      totalDifficulty: String,
+      transactions: List[String],
+      transactionsRoot: String,
+      uncles: List[String]
+  ) extends RPCResponse
 
   case class TransactionResponse(
-    blockHash: String,
-    blockNumber: String,
-    chainId: String,
-    from: String,
-    gas: String,
-    gasPrice: String, 
-    hash: String,
-    input: String,
-    nonce: String,
-    publicKey: String,
-    r: String, 
-    raw: String, 
-    s: String, 
-    v: String,
-    standardV: String,
-    to: String, 
-    transactionIndex: String, 
-    value: String
+      blockHash: String,
+      blockNumber: String,
+      chainId: String,
+      from: String,
+      gas: String,
+      gasPrice: String,
+      hash: String,
+      input: String,
+      nonce: String,
+      publicKey: String,
+      r: String,
+      raw: String,
+      s: String,
+      v: String,
+      standardV: String,
+      to: String,
+      transactionIndex: String,
+      value: String
   ) extends RPCResponse
+
+  case class ReceiptResponse(
+      blockHash: String,
+      blockNumber: String,
+      contractAddress: Option[String],
+      from: String,
+      to: Option[String],
+      cumulativeGasUsed: String,
+      gasUsed: String,
+      logs: List[LogResponse],
+      logsBloom: String,
+      status: Option[String],
+      transactionHash: String,
+      transactionIndex: String
+  ) extends RPCResponse
+
+  case class LogResponse()
 
   case class BlockRequest(hash: String) extends RPCRequest
   case class BlockHashRequest(height: Long) extends RPCRequest
