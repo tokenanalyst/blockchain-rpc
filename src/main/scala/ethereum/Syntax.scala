@@ -27,20 +27,18 @@ object Syntax {
     def getNextBlockHash() =
       implicitly[GetNextBlockHash[Ethereum]].getNextBlockHash(b)
 
-    def getBlockByHash(hash: String) =
-      implicitly[GetBlockByHash[Ethereum, BlockResponse]].getBlockByHash(b, hash)
-
     def getBlockByHeight(height: Long) =
       implicitly[GetBlockByHeight[Ethereum, BlockResponse]]
         .getBlockByHeight(b, height)
 
-    def getBlockHash(height: Long) =
-      implicitly[GetBlockHash[Ethereum]].getBlockHash(b, height)
+    def getBlockByHash(hash: String) =
+      implicitly[GetBlockByHash[Ethereum, BlockResponse]]
+        .getBlockByHash(b, hash)
 
     def getBestBlockHash() =
       implicitly[GetBestBlockHash[Ethereum]].getBestBlockHash(b)
 
-      def getTransactions(hashes: Seq[String]) =
+    def getTransactions(hashes: Seq[String]) =
       implicitly[GetTransactions[Ethereum, BatchResponse[TransactionResponse]]]
         .getTransactions(b, hashes)
 

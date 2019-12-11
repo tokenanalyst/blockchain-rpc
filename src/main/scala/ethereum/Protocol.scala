@@ -84,11 +84,10 @@ object Protocol {
 
   case class LogResponse()
 
-  case class BlockRequest(hash: String) extends RPCRequest
-  case class BlockHashRequest(height: Long) extends RPCRequest
+  case class BlockByHashRequest(hash: String) extends RPCRequest
+  case class BlockByHeightRequest(height: Long) extends RPCRequest
   case class TransactionRequest(hash: String) extends RPCRequest
   case class BestBlockHashRequest() extends RPCRequest
-  case class BlockHashByHeightRequest(height: Long) extends RPCRequest
 }
 
 object Transactions {

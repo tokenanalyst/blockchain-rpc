@@ -22,7 +22,7 @@ import scala.concurrent.ExecutionContext.global
 import io.tokenanalyst.bitcoinrpc.{RPCClient, Config}
 import io.tokenanalyst.bitcoinrpc.ethereum.Syntax._
 
-object GetEthereumBlockHash extends IOApp {
+object GetEthereumBlockByHash extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
     implicit val config = Config.fromEnv
@@ -31,13 +31,15 @@ object GetEthereumBlockHash extends IOApp {
         config.hosts,
         config.port,
         config.username,
-        config.password, 
-        onErrorRetry = { (_, e: Throwable) => IO(println(e)) }
+        config.password,
+        onErrorRetry = { (_, e: Throwable) =>
+          IO(println(e))
+        }
       )
       .use { ethereum =>
         for {
           block <- ethereum.getBlockByHash(
-            "3bad41c70c9efac92490e8a74ab816558bbdada0984f2bcfa4cb1522ddb3ca16"
+            "0x3bad41c70c9efac92490e8a74ab816558bbdada0984f2bcfa4cb1522ddb3ca16"
           )
           _ <- IO { println(block) }
         } yield ExitCode(0)

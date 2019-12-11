@@ -40,17 +40,9 @@ object Instances {
           a: Ethereum,
           hash: String
       ): IO[BlockResponse] = {
-        a.client.request[BlockRequest, BlockResponse](BlockRequest(hash))
+        a.client.request[BlockByHashRequest, BlockResponse](BlockByHashRequest(hash))
       }
     }
-
-  implicit val getBlockHashInstance = new GetBlockHash[Ethereum] {
-    override def getBlockHash(a: Ethereum, height: Long): IO[String] =
-      for {
-        json <- a.client
-          .requestJson[BlockHashRequest](BlockHashRequest(height))
-      } yield json.asObject.get("result").get.asString.get
-  }
 
   implicit val getBlockByHeightInstance =
     new GetBlockByHeight[Ethereum, BlockResponse] {
@@ -58,10 +50,7 @@ object Instances {
           a: Ethereum,
           height: Long
       ): IO[BlockResponse] =
-        for {
-          hash <- getBlockHashInstance.getBlockHash(a, height)
-          data <- getBlockByHashInstance.getBlockByHash(a, hash) 
-        } yield data
+      a.client.request[BlockByHeightRequest, BlockResponse](BlockByHeightRequest(height))
     }
 
   implicit val getBestBlockHashInstance =

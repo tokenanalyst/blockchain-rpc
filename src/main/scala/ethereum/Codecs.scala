@@ -33,28 +33,22 @@ object Codecs {
       )
   }
 
-  implicit val blockHashByHeightRequest =
-    new RPCEncoder[BlockHashByHeightRequest] {
-      override def apply(a: BlockHashByHeightRequest): Json =
-        Json.obj(
-          requestFields("getblockhash", Array(Json.fromLong(a.height))): _*
-        )
-    }
-
   implicit val bestBlockHashRequest = new RPCEncoder[BestBlockHashRequest] {
     final def apply(a: BestBlockHashRequest): Json =
       Json.obj(requestFields("eth_blockNumber", Array[Json]()): _*)
   }
 
-  implicit val blockHashRequest = new RPCEncoder[BlockHashRequest] {
-    final def apply(a: BlockHashRequest): Json =
+  implicit val blockByNumberRequest = new RPCEncoder[BlockByHeightRequest] {
+    final def apply(a: BlockByHeightRequest): Json =
       Json.obj(
-        requestFields("eth_getBlockByNumber", Array[Json](Json.fromLong(a.height))): _*
+        requestFields("eth_getBlockByNumber", Array[Json](Json.fromString(
+          "0x100"
+        ), Json.fromBoolean(false))): _*
       )
   }
 
-  implicit val blockRequest = new RPCEncoder[BlockRequest] {
-    final def apply(a: BlockRequest): Json =
-      Json.obj(requestFields("eth_getBlockByHash", Array(Json.fromString(a.hash))): _*)
+  implicit val blockByHashRequest = new RPCEncoder[BlockByHashRequest] {
+    final def apply(a: BlockByHashRequest): Json =
+      Json.obj(requestFields("eth_getBlockByHash", Array(Json.fromString(a.hash), Json.fromBoolean(false))): _*)
   }
 }
