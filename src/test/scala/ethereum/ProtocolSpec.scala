@@ -27,6 +27,13 @@ class ProtocolSpec extends FlatSpec with Matchers {
 
   behavior of "Ethereum protocol"
 
+  it should """decode TransactionResponse with Pre-byzantinium where the 
+    status field does not exist, exists from including 4370000""" in {
+  }
+
+  it should "decode TransactionResponse with Post-byzantinium" in {
+  }
+  
   it should "decode BlockResponse" in {
     val response =
       """
