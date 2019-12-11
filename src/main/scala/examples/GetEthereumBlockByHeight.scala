@@ -22,7 +22,7 @@ import scala.concurrent.ExecutionContext.global
 import io.tokenanalyst.bitcoinrpc.{RPCClient, Config}
 import io.tokenanalyst.bitcoinrpc.ethereum.Syntax._
 
-object GetEthereumBlockByNumber extends IOApp {
+object GetEthereumBlockByHeight extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
     implicit val config = Config.fromEnv
