@@ -23,7 +23,10 @@ lazy val `bitcoin-rpc` = (project in file("."))
     }
   )
   .settings(
-    libraryDependencies ++= http4s ++ json ++ zmq ++ cats ++ scalaTest
+    libraryDependencies ++= Seq(
+      "commons-codec" % "commons-codec" % "1.13",
+      "com.typesafe.akka" %% "akka-actor" % "2.4.17"
+    ) ++ http4s ++ json ++ zmq ++ cats ++ scalaTest
   )
 
 publishMavenStyle := true
