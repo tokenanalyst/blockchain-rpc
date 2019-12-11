@@ -20,7 +20,7 @@ import Methods._
 import io.tokenanalyst.bitcoinrpc.BasicMethods._
 import io.tokenanalyst.bitcoinrpc.ethereum.Instances._
 import io.tokenanalyst.bitcoinrpc.ethereum.Protocol._
-import io.tokenanalyst.bitcoinrpc.{BatchResponse, Ethereum}
+import io.tokenanalyst.bitcoinrpc.{Ethereum}
 
 object Syntax {
   implicit class EthereumOps(b: Ethereum) {
@@ -28,22 +28,18 @@ object Syntax {
     def getNextBlockHash() =
       implicitly[GetNextBlockHash[Ethereum]].getNextBlockHash(b)
 
-    def getBlockByHeight(height: Long) =
+    def getBlockByHeightRLP(height: Long) =
       implicitly[GetBlockByHeight[Ethereum, BlockResponse]]
         .getBlockByHeight(b, height)
 
-    def getBlockByHash(hash: String) =
+    def getBlockByHashRLP(hash: String) =
       implicitly[GetBlockByHash[Ethereum, BlockResponse]]
         .getBlockByHash(b, hash)
 
-    def getBestBlockHeight() =
+    def getBestBlockHeightRLP() =
       implicitly[GetBestBlockHeightRLP[Ethereum]].getBestBlockHeight(b)
 
-    def getTransactions(hashes: Seq[String]) =
-      implicitly[GetTransactions[Ethereum, BatchResponse[TransactionResponse]]]
-        .getTransactions(b, hashes)
-
-    def getTransaction(hash: String) =
+    def getTransactionRLP(hash: String) =
       implicitly[GetTransaction[Ethereum, TransactionResponse]]
         .getTransaction(b, hash)
   }

@@ -38,7 +38,7 @@ object GetEthereumBlockByHash extends IOApp {
       )
       .use { ethereum =>
         for {
-          block <- ethereum.getBlockByHash(
+          block <- ethereum.getBlockByHashRLP(
             "0x3bad41c70c9efac92490e8a74ab816558bbdada0984f2bcfa4cb1522ddb3ca16"
           )
           _ <- IO { println(block) }

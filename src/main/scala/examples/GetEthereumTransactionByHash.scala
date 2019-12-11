@@ -38,7 +38,7 @@ object GetEthereumTransactionByHash extends IOApp {
       )
       .use { ethereum =>
         for {
-          tx <- ethereum.getTransaction(
+          tx <- ethereum.getTransactionRLP(
             "0xb39353cffa29a043aff95cc664accb0cf7c52a94c9a4dfc1023c015bb854aa57"
           )
           _ <- IO { println(tx) }

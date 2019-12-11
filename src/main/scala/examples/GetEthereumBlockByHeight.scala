@@ -38,7 +38,7 @@ object GetEthereumBlockByHeight extends IOApp {
       )
       .use { ethereum =>
         for {
-          block <- ethereum.getBlockByHeight(
+          block <- ethereum.getBlockByHeightRLP(
             9089551
           )
           _ <- IO { println(block) }
