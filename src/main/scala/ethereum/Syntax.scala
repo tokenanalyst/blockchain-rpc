@@ -16,6 +16,7 @@
   */
 package io.tokenanalyst.bitcoinrpc.ethereum
 
+import Methods._
 import io.tokenanalyst.bitcoinrpc.BasicMethods._
 import io.tokenanalyst.bitcoinrpc.ethereum.Instances._
 import io.tokenanalyst.bitcoinrpc.ethereum.Protocol._
@@ -35,8 +36,8 @@ object Syntax {
       implicitly[GetBlockByHash[Ethereum, BlockResponse]]
         .getBlockByHash(b, hash)
 
-    def getBestBlockHash() =
-      implicitly[GetBestBlockHash[Ethereum]].getBestBlockHash(b)
+    def getBestBlockHeight() =
+      implicitly[GetBestBlockHeightRLP[Ethereum]].getBestBlockHeight(b)
 
     def getTransactions(hashes: Seq[String]) =
       implicitly[GetTransactions[Ethereum, BatchResponse[TransactionResponse]]]

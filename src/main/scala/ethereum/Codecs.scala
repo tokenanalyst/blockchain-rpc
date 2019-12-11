@@ -24,31 +24,41 @@ import io.tokenanalyst.bitcoinrpc.ethereum.Protocol._
 object Codecs {
 
   implicit val transactionRequest = new RPCEncoder[TransactionRequest] {
-    final def apply(a: TransactionRequest): Json =
-      Json.obj(
-        requestFields(
-          "eth_getTransactionByHash",
-          Array(Json.fromString(a.hash), Json.fromInt(1))
-        ): _*
-      )
+    final def apply(a: TransactionRequest): Json = Json.obj(
+      requestFields(
+        "eth_getTransactionByHash",
+        Array(Json.fromString(a.hash))
+      ): _*
+    )
   }
 
-  implicit val bestBlockHashRequest = new RPCEncoder[BestBlockHashRequest] {
-    final def apply(a: BestBlockHashRequest): Json =
+  implicit val bestBlockHeightRequest = new RPCEncoder[BestBlockHeightRequest] {
+    final def apply(a: BestBlockHeightRequest): Json =
       Json.obj(requestFields("eth_blockNumber", Array[Json]()): _*)
   }
 
   implicit val blockByNumberRequest = new RPCEncoder[BlockByHeightRequest] {
     final def apply(a: BlockByHeightRequest): Json =
       Json.obj(
-        requestFields("eth_getBlockByNumber", Array[Json](Json.fromString(
-          "0x100"
-        ), Json.fromBoolean(false))): _*
+        requestFields(
+          "eth_getBlockByNumber",
+          Array[Json](
+            Json.fromString(
+              "0x100"
+            ),
+            Json.fromBoolean(false)
+          )
+        ): _*
       )
   }
 
   implicit val blockByHashRequest = new RPCEncoder[BlockByHashRequest] {
     final def apply(a: BlockByHashRequest): Json =
-      Json.obj(requestFields("eth_getBlockByHash", Array(Json.fromString(a.hash), Json.fromBoolean(false))): _*)
+      Json.obj(
+        requestFields(
+          "eth_getBlockByHash",
+          Array(Json.fromString(a.hash), Json.fromBoolean(false))
+        ): _*
+      )
   }
 }
