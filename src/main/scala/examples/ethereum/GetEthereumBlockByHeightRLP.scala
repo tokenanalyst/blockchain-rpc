@@ -14,15 +14,15 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.examples
+package examples.ethereum
 
 import cats.effect.{ExitCode, IO, IOApp}
+import io.tokenanalyst.bitcoinrpc.ethereum.Syntax._
+import io.tokenanalyst.bitcoinrpc.{Config, RPCClient}
+
 import scala.concurrent.ExecutionContext.global
 
-import io.tokenanalyst.bitcoinrpc.{RPCClient, Config}
-import io.tokenanalyst.bitcoinrpc.ethereum.Syntax._
-
-object GetEthereumBlockByHeight extends IOApp {
+object GetEthereumBlockByHeightRLP extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
     implicit val config = Config.fromEnv
@@ -38,10 +38,10 @@ object GetEthereumBlockByHeight extends IOApp {
       )
       .use { ethereum =>
         for {
-          block <- ethereum.getBlockByHeight(
+          block <- ethereum.getBlockByHeightRLP(
             436
           )
-          _ <- IO { println(block.number) }
+          _ <- IO { println(block) }
         } yield ExitCode(0)
       }
   }

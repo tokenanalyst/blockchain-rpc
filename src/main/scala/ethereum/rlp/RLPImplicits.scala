@@ -81,6 +81,21 @@ object RLPImplicits {
     }
   }
 
+//  implicit val stringSeqEncDec = new RLPEncoder[Seq[String]]
+//    with RLPDecoder[Seq[String]] {
+//    override def encode(strings: Seq[String]): RLPEncodeable =
+//      RLPList(strings.map(stringEncDec.encode): _*)
+//
+//    override def decode(rlp: RLPEncodeable): Seq[String] = rlp match {
+//      case l: RLPList => l.items.map(item => item: String)
+//      case _          => throw new RuntimeException("Invalid String Seq Decoder")
+//    }
+//  }
+//
+//  implicit def stringSeqFromEncodeable(rlp: RLPEncodeable)(
+//    implicit dec: RLPDecoder[Seq[String]]
+//  ): Seq[String] = dec.decode(rlp)
+
   implicit val byteArrayEncDec = new RLPEncoder[Array[Byte]] with RLPDecoder[Array[Byte]] {
 
     override def encode(obj: Array[Byte]): RLPValue = RLPValue(obj)

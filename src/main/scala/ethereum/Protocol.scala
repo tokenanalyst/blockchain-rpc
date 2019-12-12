@@ -44,40 +44,40 @@ object Protocol {
       number: String,
       parentHash: String,
       receiptsRoot: String,
-      sealFields: List[String],
+      sealFields: Seq[String],
       sha3Uncles: String,
       size: String,
       stateRoot: String,
       timestamp: String,
       totalDifficulty: String,
-      transactions: List[String],
+      transactions: Seq[String],
       transactionsRoot: String,
-      uncles: List[String]
+      uncles: Seq[String]
   ) extends RPCResponse
 
   case class BlockResponse(
-      author: String,
-      difficulty: String,
-      extraData: String,
-      gasLimit: String,
-      gasUsed: String,
-      hash: String,
-      logsBloom: String,
-      miner: String,
-      mixHash: String,
-      nonce: String,
-      number: String,
-      parentHash: String,
-      receiptsRoot: String,
-      sealFields: List[String],
-      sha3Uncles: String,
-      size: String,
-      stateRoot: String,
-      timestamp: String,
-      totalDifficulty: String,
-      transactions: List[String],
-      transactionsRoot: String,
-      uncles: List[String]
+      author: Array[Byte], //???????
+      difficulty: BigInt,
+      extraData: Array[Byte],
+      gasLimit: Long,
+      gasUsed: Long,
+      hash: Array[Byte],
+      logsBloom: Array[Byte],
+      miner: Array[Byte],
+      mixHash: Array[Byte], ////?????
+      nonce: Array[Byte],
+      number: Long,
+      parentHash: Array[Byte],
+      receiptsRoot: Array[Byte],
+      sealFields: Seq[Array[Byte]], //?????
+      sha3Uncles: Array[Byte],
+      size: Long,
+      stateRoot: Array[Byte],
+      timestamp: BigInt,
+      totalDifficulty: BigInt,
+      transactions: Seq[Array[Byte]],
+      transactionsRoot: Array[Byte],
+      uncles: Seq[Array[Byte]]
   ) extends RPCResponse
 
   case class TransactionResponse(

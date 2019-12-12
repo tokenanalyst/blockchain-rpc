@@ -11,10 +11,9 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.language.implicitConversions
 import scala.util.Try
 
-class RLPSpec
-  extends AnyFunSuite {
+class RLPSpec extends AnyFunSuite {
 
-  test( "nextElementIndex of empty data" ) {
+  test("nextElementIndex of empty data") {
     val maybeIndex = Try { nextElementIndex(Array.emptyByteArray, 0) }
     assert(maybeIndex.isFailure)
   }
@@ -435,6 +434,14 @@ class RLPSpec
     }
   }
 
+  test("encode 436") {
+    val number: Long = 436
+    val encoded = encode[Long](number)
+    println(RLPValue(encoded).hexEncoding)
+    val decoded = decode[Long](encoded)
+    println(decoded)
+  }
+
   test("BigInt Encoding") {
     val expected = Array[Byte](0x80.toByte)
     val data = encode(BigInt(0))
@@ -534,14 +541,14 @@ class RLPSpec
     val expected = "c88363617483646f67"
     val data = RLP.encode(RLPList("cat", "dog"))
     assert(expected == Hex.encodeHex(data).mkString)
-    val dataObtained = decode[Seq[String]](data)(stringSeqEncDec)
+    val dataObtained = decode[Seq[String]](data)(seqEncDec())
     val obtained = dataObtained
     assert(Seq("cat", "dog") equals obtained)
 
     val expected2 = "cc83646f6783676f6483636174"
     val data2 = RLP.encode(RLPList("dog", "god", "cat"))
     assert(expected2 == Hex.encodeHex(data2).mkString)
-    val dataObtained2 = decode[Seq[String]](data2)(stringSeqEncDec)
+    val dataObtained2 = decode[Seq[String]](data2)(seqEncDec())
     val obtained2 = dataObtained2
     assert(Seq("dog", "god", "cat") equals obtained2)
   }
@@ -553,7 +560,7 @@ class RLPSpec
       "f83e83636174b8384c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e7365637465747572206164697069736963696e6720656c6974"
     val data = RLP.encode(RLPList(list.map(i => toEncodeable(i)): _*))
     assert(expected == Hex.encodeHex(data).mkString)
-    val dataObtained = decode[Seq[String]](data)(stringSeqEncDec)
+    val dataObtained = decode[Seq[String]](data)(seqEncDec())
     val obtained = dataObtained
     assert(list equals obtained)
   }
@@ -630,7 +637,7 @@ class RLPSpec
     val hex: String =
       "000080c180000000000000000000000042699b1104e93abf0008be55f912c2ff"
     val data = Hex.decodeHex(hex)
-    val decoded: Seq[Int] = decode[Seq[Int]](data.splitAt(3)._2)
+    val decoded: Seq[Int] = decode[Seq[Int]](data.splitAt(3)._2)(seqEncDec())
     assert(1 == decoded.length)
     assert(0 == decoded.head)
   }
@@ -644,15 +651,15 @@ class RLPSpec
     val data =
       Seq(RLP.encode(seq1), RLP.encode(seq2), RLP.encode(seq3)).reduce(_ ++ _)
 
-    val decoded1 = decode[Seq[String]](data)
+    val decoded1 = decode[Seq[String]](data)(seqEncDec())
     assert(decoded1 equals "cat" :: "dog" :: Nil)
 
     val secondItemIndex = nextElementIndex(data, 0)
-    val decoded2 = decode[Seq[Int]](data.drop(secondItemIndex))
+    val decoded2 = decode[Seq[Int]](data.drop(secondItemIndex))(seqEncDec())
     assert(decoded2 equals 23 :: 10 :: 1986 :: Nil)
 
     val thirdItemIndex = nextElementIndex(data, secondItemIndex)
-    val decoded3 = decode[Seq[String]](data.drop(thirdItemIndex))
+    val decoded3 = decode[Seq[String]](data.drop(thirdItemIndex))(seqEncDec())
     assert(
       decoded3 equals Seq(
         "cat",
@@ -671,34 +678,26 @@ class RLPSpec
       }
     }
 
-  implicit val stringSeqEncDec = new RLPEncoder[Seq[String]]
-  with RLPDecoder[Seq[String]] {
-    override def encode(strings: Seq[String]): RLPEncodeable =
-      RLPList(strings.map(stringEncDec.encode): _*)
-
-    override def decode(rlp: RLPEncodeable): Seq[String] = rlp match {
-      case l: RLPList => l.items.map(item => item: String)
-      case _          => throw new RuntimeException("Invalid String Seq Decoder")
-    }
-  }
+//  implicit val intSeqEncDec = new RLPEncoder[Seq[Int]]
+//  with RLPDecoder[Seq[Int]] {
+//    override def encode(ints: Seq[Int]): RLPEncodeable = ints: RLPList
+//
+//    override def decode(rlp: RLPEncodeable): Seq[Int] = rlp match {
+//      case l: RLPList => l.items.map(item => item: Int)
+//      case _          => throw new RuntimeException("Invalid Int Seq Decoder")
+//    }
+//  }
+//
+  implicit def intSeqFromEncodeable(rlp: RLPEncodeable)(
+      implicit dec: RLPDecoder[Seq[Int]]
+  ): Seq[Int] = dec.decode(rlp)
 
   implicit def stringSeqFromEncodeable(rlp: RLPEncodeable)(
       implicit dec: RLPDecoder[Seq[String]]
   ): Seq[String] = dec.decode(rlp)
 
-  implicit val intSeqEncDec = new RLPEncoder[Seq[Int]]
-  with RLPDecoder[Seq[Int]] {
-    override def encode(ints: Seq[Int]): RLPEncodeable = ints: RLPList
-
-    override def decode(rlp: RLPEncodeable): Seq[Int] = rlp match {
-      case l: RLPList => l.items.map(item => item: Int)
-      case _          => throw new RuntimeException("Invalid Int Seq Decoder")
-    }
-  }
-
-  implicit def intSeqFromEncodeable(rlp: RLPEncodeable)(
-      implicit dec: RLPDecoder[Seq[Int]]
-  ): Seq[Int] = dec.decode(rlp)
+  implicit val strSeqDec = seqEncDec[String]()
+  implicit val intSeqDec = seqEncDec[Int]()
 
   case class MultiList1(
       number: Int,
@@ -708,6 +707,9 @@ class RLPSpec
   )
 
   object MultiList1 {
+
+
+
     implicit val encDec = new RLPEncoder[MultiList1]
     with RLPDecoder[MultiList1] {
       override def encode(obj: MultiList1): RLPEncodeable = {
@@ -801,8 +803,8 @@ class RLPSpec
     stringEncDec.encode("d") -> "64",
     stringEncDec.encode("cat") -> "83636174",
     stringEncDec.encode("dog") -> "83646f67",
-    stringSeqEncDec.encode(Seq("cat", "dog")) -> "c88363617483646f67",
-    stringSeqEncDec
+    seqEncDec[String]().encode(Seq("cat", "dog")) -> "c88363617483646f67",
+    seqEncDec[String]()
       .encode(Seq("dog", "god", "cat")) -> "cc83646f6783676f6483636174",
     intEncDec.encode(1) -> "01",
     intEncDec.encode(10) -> "0a",

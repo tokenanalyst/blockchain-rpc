@@ -38,7 +38,7 @@ object GetEthereumBestBlock extends IOApp {
       )
       .use { ethereum =>
         for {
-          height <- ethereum.getBestBlockHeightRLP()
+          height <- ethereum.getBestBlockHeight()
           _ <- IO { println(height) }
         } yield ExitCode(0)
       }

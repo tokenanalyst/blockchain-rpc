@@ -98,7 +98,7 @@ object Instances {
                   Transactions.GenesisTransaction
                 )
             )
-          } yield BatchResponse(listResult.toSeq)
+          } yield BatchResponse(listResult)
         } else {
           result
         }

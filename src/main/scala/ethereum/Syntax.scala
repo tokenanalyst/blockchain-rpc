@@ -16,11 +16,15 @@
   */
 package io.tokenanalyst.bitcoinrpc.ethereum
 
-import Methods._
+import cats.effect.IO
 import io.tokenanalyst.bitcoinrpc.BasicMethods._
+import io.tokenanalyst.bitcoinrpc.Ethereum
 import io.tokenanalyst.bitcoinrpc.ethereum.Instances._
+import io.tokenanalyst.bitcoinrpc.ethereum.Methods._
 import io.tokenanalyst.bitcoinrpc.ethereum.Protocol._
-import io.tokenanalyst.bitcoinrpc.{Ethereum}
+import io.tokenanalyst.bitcoinrpc.ethereum.rlp.RLPImplicits._
+import io.tokenanalyst.bitcoinrpc.ethereum.rlp.RLPImplicitConversions._
+import io.tokenanalyst.bitcoinrpc.ethereum.rlp._
 
 object Syntax {
   implicit class EthereumOps(b: Ethereum) {
@@ -32,11 +36,44 @@ object Syntax {
       implicitly[GetBlockByHeight[Ethereum, BlockResponseRLP]]
         .getBlockByHeight(b, height)
 
+    def getBlockByHeight(height: Long) =
+      for {
+        blockRLP <- implicitly[GetBlockByHeight[Ethereum, BlockResponseRLP]]
+          .getBlockByHeight(b, height)
+        _ <- IO(println(blockRLP.number))
+        block <- IO(
+          BlockResponse(
+            author = decode[Array[Byte]](blockRLP.author),
+            difficulty = decode[BigInt](blockRLP.difficulty),
+            extraData = decode[Array[Byte]](blockRLP.extraData),
+            gasLimit = decode[Long](blockRLP.gasLimit),
+            gasUsed = decode[Long](blockRLP.gasUsed),
+            hash = decode[Array[Byte]](blockRLP.hash),
+            logsBloom = decode[Array[Byte]](blockRLP.logsBloom),
+            miner = decode[Array[Byte]](blockRLP.miner),
+            mixHash = decode[Array[Byte]](blockRLP.mixHash),
+            nonce = decode[Array[Byte]](blockRLP.nonce),
+            number = decode[Long](blockRLP.number),
+            parentHash = decode[Array[Byte]](blockRLP.parentHash),
+            receiptsRoot = decode[Array[Byte]](blockRLP.receiptsRoot),
+            sealFields = decode[Seq[Array[Byte]]](blockRLP.sealFields)(seqEncDec()),
+            sha3Uncles = decode[Array[Byte]](blockRLP.sha3Uncles),
+            size = decode[Long](blockRLP.size),
+            stateRoot = decode[Array[Byte]](blockRLP.stateRoot),
+            timestamp = decode[BigInt](blockRLP.timestamp),
+            totalDifficulty = decode[BigInt](blockRLP.totalDifficulty),
+            transactions = decode[Seq[Array[Byte]]](blockRLP.transactions)(seqEncDec()),
+            transactionsRoot = decode[Array[Byte]](blockRLP.transactionsRoot),
+            uncles = decode[Seq[Array[Byte]]](blockRLP.uncles)(seqEncDec())
+          )
+        )
+      } yield block
+
     def getBlockByHashRLP(hash: String) =
       implicitly[GetBlockByHash[Ethereum, BlockResponseRLP]]
         .getBlockByHash(b, hash)
 
-    def getBestBlockHeightRLP() =
+    def getBestBlockHeight() =
       implicitly[GetBestBlockHeightRLP[Ethereum]].getBestBlockHeight(b)
 
     def getTransactionRLP(hash: String) =
