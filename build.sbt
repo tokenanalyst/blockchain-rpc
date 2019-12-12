@@ -23,7 +23,10 @@ lazy val `bitcoin-rpc` = (project in file("."))
     }
   )
   .settings(
-    libraryDependencies ++= http4s ++ json ++ zmq ++ cats ++ scalaTest
+    libraryDependencies ++= Seq(
+      "commons-codec" % "commons-codec" % "1.13",
+      "com.typesafe.akka" %% "akka-actor" % "2.4.17"
+    ) ++ http4s ++ json ++ zmq ++ cats ++ scalaTest
   )
 
 publishMavenStyle := true
@@ -64,7 +67,7 @@ pomExtra :=
 
 val http4sVersion = "0.21.0-M5"
 val circeVersion = "0.12.0-M4"
-val scalaTestVersion = "3.0.8"
+val scalaTestVersion = "3.0.1"
 
 lazy val http4s = Seq(
   "org.http4s" %% "http4s-dsl" % http4sVersion,
@@ -80,7 +83,8 @@ lazy val json = Seq(
 )
 lazy val scalaTest = Seq(
   "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
-  "com.softwaremill.diffx" %% "diffx-scalatest" % "0.3.14" % "test"
+  "com.softwaremill.diffx" %% "diffx-scalatest" % "0.3.14" % "test",
+  "org.scalacheck" %% "scalacheck" % "1.13.4" % "test"
 )
 lazy val zmq = Seq(
   "org.zeromq" % "jeromq" % "0.5.1"

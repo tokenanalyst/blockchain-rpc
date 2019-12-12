@@ -21,7 +21,7 @@ import io.tokenanalyst.bitcoinrpc.Blockchain
 import io.tokenanalyst.bitcoinrpc.{RPCRequest, RPCResponse}
 import scala.io.Source
 
-object Methods  {
+object Methods {
   trait GetBestBlockHeightRLP[A <: Blockchain] {
     def getBestBlockHeight(a: A): IO[String]
   }
@@ -29,6 +29,32 @@ object Methods  {
 
 object Protocol {
   case class BlockHashResponse(hash: String) extends RPCResponse
+
+  case class BlockResponseRLP(
+      author: String,
+      difficulty: String,
+      extraData: String,
+      gasLimit: String,
+      gasUsed: String,
+      hash: String,
+      logsBloom: String,
+      miner: String,
+      mixHash: String,
+      nonce: String,
+      number: String,
+      parentHash: String,
+      receiptsRoot: String,
+      sealFields: List[String],
+      sha3Uncles: String,
+      size: String,
+      stateRoot: String,
+      timestamp: String,
+      totalDifficulty: String,
+      transactions: List[String],
+      transactionsRoot: String,
+      uncles: List[String]
+  ) extends RPCResponse
+
   case class BlockResponse(
       author: String,
       difficulty: String,

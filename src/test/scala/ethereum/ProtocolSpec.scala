@@ -29,7 +29,7 @@ class ProtocolSpec extends AnyFlatSpec with Matchers with DiffMatcher {
   behavior of "Ethereum protocol"
 
   it should """decode ReceiptResponse UA to UA Pre-byzantinium""" in {
-    val response = 
+    val response =
     """
     {
       "id": 1,
@@ -37,9 +37,9 @@ class ProtocolSpec extends AnyFlatSpec with Matchers with DiffMatcher {
       "result": {
         "blockHash": "0x67c0303244ae4beeec329e0c66198e8db8938a94d15a366c7514626528abfc8c",
         "blockNumber": "0x6914b0",
-        "contractAddress": null, 
+        "contractAddress": null,
         "from": "0xc931d93e97ab07fe42d923478ba2465f2",
-        "to": "0xc931d93e97ab07fe42d923478ba2465f2", 
+        "to": "0xc931d93e97ab07fe42d923478ba2465f2",
         "cumulativeGasUsed": "0x158e33",
         "gasUsed": "0xba2e6",
         "logs": [],
@@ -72,7 +72,7 @@ class ProtocolSpec extends AnyFlatSpec with Matchers with DiffMatcher {
   }
 
   it should """decode ReceiptResponse on contract Pre-byzantinium""" in {
-      val response = 
+      val response =
       """
       {
         "id": 1,
@@ -80,9 +80,9 @@ class ProtocolSpec extends AnyFlatSpec with Matchers with DiffMatcher {
         "result": {
           "blockHash": "0x67c0303244ae4beeec329e0c66198e8db8938a94d15a366c7514626528abfc8c",
           "blockNumber": "0x6914b0",
-          "contractAddress": "0x471a8bf3fd0dfbe20658a97155388cec674190bf", 
+          "contractAddress": "0x471a8bf3fd0dfbe20658a97155388cec674190bf",
           "from": "0xc931d93e97ab07fe42d923478ba2465f2",
-          "to": null, 
+          "to": null,
           "cumulativeGasUsed": "0x158e33",
           "gasUsed": "0xba2e6",
           "logs": [],
@@ -123,9 +123,9 @@ class ProtocolSpec extends AnyFlatSpec with Matchers with DiffMatcher {
         "result": {
           "blockHash": "0x67c0303244ae4beeec329e0c66198e8db8938a94d15a366c7514626528abfc8c",
           "blockNumber": "0x6914b0",
-          "contractAddress": null, 
+          "contractAddress": null,
           "from": "0xc931d93e97ab07fe42d923478ba2465f2",
-          "to": "0xc931d93e97ab07fe42d923478ba2465f2", 
+          "to": "0xc931d93e97ab07fe42d923478ba2465f2",
           "cumulativeGasUsed": "0x158e33",
           "gasUsed": "0xba2e6",
           "logs": [],
@@ -137,7 +137,7 @@ class ProtocolSpec extends AnyFlatSpec with Matchers with DiffMatcher {
         }
       }
       """
-  
+
       val decoded = decode[ReceiptResponse](response)
       decoded.isRight shouldEqual true
       decoded.right.get should matchTo(
@@ -168,9 +168,9 @@ class ProtocolSpec extends AnyFlatSpec with Matchers with DiffMatcher {
       "result": {
         "blockHash": "0x67c0303244ae4beeec329e0c66198e8db8938a94d15a366c7514626528abfc8c",
         "blockNumber": "0x6914b0",
-        "contractAddress": "0x471a8bf3fd0dfbe20658a97155388cec674190bf", 
+        "contractAddress": "0x471a8bf3fd0dfbe20658a97155388cec674190bf",
         "from": "0xc931d93e97ab07fe42d923478ba2465f2",
-        "to": null, 
+        "to": null,
         "cumulativeGasUsed": "0x158e33",
         "gasUsed": "0xba2e6",
         "logs": [],
@@ -240,10 +240,10 @@ class ProtocolSpec extends AnyFlatSpec with Matchers with DiffMatcher {
       """
         {"jsonrpc":"2.0","result":{"author":"0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c","difficulty":"0x89e4c5695f464","extraData":"0x5050594520737061726b706f6f6c2d6574682d636e2d687a32","gasLimit":"0x9879a1","gasUsed":"0x0","hash":"0xd5e3eff1778c4735fb2a51c5c4e92bec32f9363ba23285d6d94e62c26b7c0884","logsBloom":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","miner":"0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c","mixHash":"0x1c0540069d772ce8fe02415a5988ad5b90b389a13d1a0643087ea75487007aef","nonce":"0xdf2bd7300001a5e8","number":"0x865801","parentHash":"0x65144a20fd4d1b2faa86d90d35b9cfcc87b67f48b21ad439167d80429b719258","receiptsRoot":"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421","sealFields":["0xa01c0540069d772ce8fe02415a5988ad5b90b389a13d1a0643087ea75487007aef","0x88df2bd7300001a5e8"],"sha3Uncles":"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347","size":"0x21f","stateRoot":"0x4b909ee750967307134206db327f361b1877bffbdbd2c1100449dd4759c350c9","timestamp":"0x5db1e4c3","totalDifficulty":"0x2a7666ad70f09d1728f","transactions":[],"transactionsRoot":"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421","uncles":[]},"id":1}
         """
-    val decoded = decode[BlockResponse](response)
+    val decoded = decode[BlockResponseRLP](response)
     decoded.isRight shouldEqual true
     decoded.right.get should matchTo(
-      BlockResponse(
+      BlockResponseRLP(
         "0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c",
         "0x89e4c5695f464",
         "0x5050594520737061726b706f6f6c2d6574682d636e2d687a32",

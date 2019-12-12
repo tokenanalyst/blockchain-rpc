@@ -20,6 +20,7 @@ import io.circe.Json
 import io.tokenanalyst.bitcoinrpc.Codecs._
 import io.tokenanalyst.bitcoinrpc.RPCEncoder
 import io.tokenanalyst.bitcoinrpc.ethereum.Protocol._
+import io.tokenanalyst.bitcoinrpc.ethereum.rlp.RLPImplicits._
 
 object Codecs {
 
@@ -44,7 +45,7 @@ object Codecs {
           "eth_getBlockByNumber",
           Array[Json](
             Json.fromString(
-              "0x100"
+              bigIntEncDec.encode(BigInt(a.height)).hexEncoding
             ),
             Json.fromBoolean(false)
           )

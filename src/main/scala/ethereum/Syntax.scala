@@ -29,11 +29,11 @@ object Syntax {
       implicitly[GetNextBlockHash[Ethereum]].getNextBlockHash(b)
 
     def getBlockByHeightRLP(height: Long) =
-      implicitly[GetBlockByHeight[Ethereum, BlockResponse]]
+      implicitly[GetBlockByHeight[Ethereum, BlockResponseRLP]]
         .getBlockByHeight(b, height)
 
     def getBlockByHashRLP(hash: String) =
-      implicitly[GetBlockByHash[Ethereum, BlockResponse]]
+      implicitly[GetBlockByHash[Ethereum, BlockResponseRLP]]
         .getBlockByHash(b, hash)
 
     def getBestBlockHeightRLP() =
