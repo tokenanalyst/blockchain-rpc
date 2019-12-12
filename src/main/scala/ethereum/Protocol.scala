@@ -17,20 +17,36 @@
 package io.tokenanalyst.bitcoinrpc.ethereum
 
 import cats.effect.IO
-import io.tokenanalyst.bitcoinrpc.Blockchain
+import io.tokenanalyst.bitcoinrpc.Ethereum
 import io.tokenanalyst.bitcoinrpc.{RPCRequest, RPCResponse}
 import scala.io.Source
 
 object Methods {
-  trait GetBestBlockHeightRLP[A <: Blockchain] {
+  trait GetBestBlockHeightRLP[A <: Ethereum] {
     def getBestBlockHeight(a: A): IO[String]
+  }
+
+  trait GetBlockWithTransactionsByHash[A <: Ethereum, B] {
+    def getBlockWithTransactionsByHash(a: A, hash: String): IO[B]
+  }
+
+  trait GetBlockWithTransactionsByHeight[A <: Ethereum, B] {
+    def getBlockWithTransactionsByHeight(a: A, height: Long): IO[B]
+  }
+
+  trait GetReceipt[A <: Ethereum, B] {
+    def getReceipt(a: A, hash: String): IO[B]
   }
 }
 
 object Protocol {
-  case class BlockHashResponse(hash: String) extends RPCResponse
 
-  case class BlockResponseRLP(
+  type BlockWithTransactionsRLPResponse =
+    GenericBlockRLPResponse[TransactionRLPResponse]
+
+  type BlockRLPResponse = GenericBlockRLPResponse[String]
+
+  case class GenericBlockRLPResponse[A](
       author: String,
       difficulty: String,
       extraData: String,
@@ -44,18 +60,18 @@ object Protocol {
       number: String,
       parentHash: String,
       receiptsRoot: String,
-      sealFields: Seq[String],
+      sealFields: List[String],
       sha3Uncles: String,
       size: String,
       stateRoot: String,
       timestamp: String,
       totalDifficulty: String,
-      transactions: Seq[String],
+      transactions: List[A],
       transactionsRoot: String,
-      uncles: Seq[String]
+      uncles: List[String]
   ) extends RPCResponse
 
-  case class BlockResponse(
+  case class GenericBlockResponse[A](
       author: Array[Byte], //???????
       difficulty: BigInt,
       extraData: Array[Byte],
@@ -75,12 +91,12 @@ object Protocol {
       stateRoot: Array[Byte],
       timestamp: BigInt,
       totalDifficulty: BigInt,
-      transactions: Seq[Array[Byte]],
+      transactions: Seq[A],
       transactionsRoot: Array[Byte],
       uncles: Seq[Array[Byte]]
   ) extends RPCResponse
 
-  case class TransactionResponse(
+  case class TransactionRLPResponse(
       blockHash: String,
       blockNumber: String,
       chainId: String,
@@ -101,7 +117,7 @@ object Protocol {
       value: String
   ) extends RPCResponse
 
-  case class ReceiptResponse(
+  case class ReceiptRLPResponse(
       blockHash: String,
       blockNumber: String,
       contractAddress: Option[String],
@@ -118,8 +134,11 @@ object Protocol {
 
   case class LogResponse()
 
-  case class BlockByHashRequest(hash: String) extends RPCRequest
-  case class BlockByHeightRequest(height: Long) extends RPCRequest
+  case class BlockByHashRequest(hash: String, withTransactions: Boolean)
+      extends RPCRequest
+  case class BlockByHeightRequest(height: Long, withTransactions: Boolean)
+      extends RPCRequest
+  case class ReceiptRequest(hash: String) extends RPCRequest
   case class TransactionRequest(hash: String) extends RPCRequest
   case class BestBlockHeightRequest() extends RPCRequest
 }
@@ -135,7 +154,7 @@ object Transactions {
   lazy val GenesisTransaction =
     parse(Source.fromResource("bitcoinGenesisTransaction.json").mkString)
       .flatMap { json =>
-        json.as[TransactionResponse]
+        json.as[TransactionRLPResponse]
       }
       .getOrElse(throw new Exception("Could not parse genesis"))
 }

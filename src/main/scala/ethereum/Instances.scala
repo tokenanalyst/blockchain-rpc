@@ -30,29 +30,65 @@ import Methods._
 
 object Instances {
 
+  implicit val getReceiptInstance = 
+    new GetReceipt[Ethereum, ReceiptRLPResponse] { 
+      override def getReceipt(a: Ethereum, hash: String): IO[ReceiptRLPResponse] = {
+        a.client.request[ReceiptRequest, ReceiptRLPResponse](
+          ReceiptRequest(hash)
+        )
+      }
+    }
+
+  implicit val getBlockWithTransactionsByHashInstance =
+    new GetBlockByHash[Ethereum, BlockWithTransactionsRLPResponse] {
+      override def getBlockByHash(
+          a: Ethereum,
+          hash: String
+      ): IO[BlockWithTransactionsRLPResponse] = {
+        a.client.request[BlockByHashRequest, BlockWithTransactionsRLPResponse](
+          BlockByHashRequest(hash, true)
+        )
+      }
+    }
+
+  implicit val getBlockByHashInstance =
+    new GetBlockByHash[Ethereum, BlockRLPResponse] {
+      override def getBlockByHash(
+          a: Ethereum,
+          hash: String
+      ): IO[BlockRLPResponse] = {
+        a.client.request[BlockByHashRequest, BlockRLPResponse](
+          BlockByHashRequest(hash, false)
+        )
+      }
+    }
+
+  implicit val getBlockWithTransactionsByHeightInstance =
+    new GetBlockByHeight[Ethereum, BlockWithTransactionsRLPResponse] {
+      override def getBlockByHeight(
+          a: Ethereum,
+          height: Long
+      ): IO[BlockWithTransactionsRLPResponse] =
+        a.client.request[BlockByHeightRequest, BlockWithTransactionsRLPResponse](
+          BlockByHeightRequest(height, true)
+        )
+    }
+
+  implicit val getBlockByHeightInstance =
+    new GetBlockByHeight[Ethereum, BlockRLPResponse] {
+      override def getBlockByHeight(
+          a: Ethereum,
+          height: Long
+      ): IO[BlockRLPResponse] =
+        a.client.request[BlockByHeightRequest, BlockRLPResponse](
+          BlockByHeightRequest(height, false)
+        )
+    }
+
   implicit val getNextBlockHashInstance =
     new GetNextBlockHash[Ethereum] {
       override def getNextBlockHash(a: Ethereum): IO[String] =
         a.client.nextBlockHash()
-    }
-
-  implicit val getBlockByHashInstance =
-    new GetBlockByHash[Ethereum, BlockResponseRLP] {
-      override def getBlockByHash(
-          a: Ethereum,
-          hash: String
-      ): IO[BlockResponseRLP] = {
-        a.client.request[BlockByHashRequest, BlockResponseRLP](BlockByHashRequest(hash))
-      }
-    }
-
-  implicit val getBlockByHeightInstance =
-    new GetBlockByHeight[Ethereum, BlockResponseRLP] {
-      override def getBlockByHeight(
-          a: Ethereum,
-          height: Long
-      ): IO[BlockResponseRLP] =
-      a.client.request[BlockByHeightRequest, BlockResponseRLP](BlockByHeightRequest(height))
     }
 
   implicit val getBestBlockHeightInstance =
@@ -66,12 +102,12 @@ object Instances {
 
   implicit val getTransactionsInstance =
     new GetTransactions[Ethereum, BatchResponse[
-      TransactionResponse
+      TransactionRLPResponse
     ]] {
       override def getTransactions(
           a: Ethereum,
           hashes: Seq[String]
-      ): IO[BatchResponse[TransactionResponse]] = {
+      ): IO[BatchResponse[TransactionRLPResponse]] = {
         val list = ListBuffer(hashes: _*)
         val genesisTransactionIndex =
           list.indexOf(Transactions.GenesisTransactionHash)
@@ -82,9 +118,11 @@ object Instances {
 
         val result =
           a.client.request[BatchRequest[TransactionRequest], BatchResponse[
-            TransactionResponse
+            TransactionRLPResponse
           ]](
-            BatchRequest[TransactionRequest](list.map(TransactionRequest.apply).toSeq)
+            BatchRequest[TransactionRequest](
+              list.map(TransactionRequest.apply).toSeq
+            )
           )
 
         if (genesisTransactionIndex >= 0) {
@@ -106,13 +144,13 @@ object Instances {
     }
 
   implicit val getTransactionInstance =
-    new GetTransaction[Ethereum, TransactionResponse] {
+    new GetTransaction[Ethereum, TransactionRLPResponse] {
       override def getTransaction(
           a: Ethereum,
           hash: String
-      ): IO[TransactionResponse] =
+      ): IO[TransactionRLPResponse] =
         if (hash != Transactions.GenesisTransactionHash) {
-          a.client.request[TransactionRequest, TransactionResponse](
+          a.client.request[TransactionRequest, TransactionRLPResponse](
             TransactionRequest(hash)
           )
         } else {
