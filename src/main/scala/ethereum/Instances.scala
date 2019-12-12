@@ -31,9 +31,9 @@ import Methods._
 object Instances {
 
   implicit val getReceiptInstance = 
-    new GetReceipt[Ethereum, ReceiptResponse] { 
-      override def getReceipt(a: Ethereum, hash: String): IO[ReceiptResponse] = {
-        a.client.request[ReceiptRequest, ReceiptResponse](
+    new GetReceipt[Ethereum, ReceiptRLPResponse] { 
+      override def getReceipt(a: Ethereum, hash: String): IO[ReceiptRLPResponse] = {
+        a.client.request[ReceiptRequest, ReceiptRLPResponse](
           ReceiptRequest(hash)
         )
       }
@@ -102,12 +102,12 @@ object Instances {
 
   implicit val getTransactionsInstance =
     new GetTransactions[Ethereum, BatchResponse[
-      TransactionResponse
+      TransactionRLPResponse
     ]] {
       override def getTransactions(
           a: Ethereum,
           hashes: Seq[String]
-      ): IO[BatchResponse[TransactionResponse]] = {
+      ): IO[BatchResponse[TransactionRLPResponse]] = {
         val list = ListBuffer(hashes: _*)
         val genesisTransactionIndex =
           list.indexOf(Transactions.GenesisTransactionHash)
@@ -118,7 +118,7 @@ object Instances {
 
         val result =
           a.client.request[BatchRequest[TransactionRequest], BatchResponse[
-            TransactionResponse
+            TransactionRLPResponse
           ]](
             BatchRequest[TransactionRequest](
               list.map(TransactionRequest.apply).toSeq
@@ -144,13 +144,13 @@ object Instances {
     }
 
   implicit val getTransactionInstance =
-    new GetTransaction[Ethereum, TransactionResponse] {
+    new GetTransaction[Ethereum, TransactionRLPResponse] {
       override def getTransaction(
           a: Ethereum,
           hash: String
-      ): IO[TransactionResponse] =
+      ): IO[TransactionRLPResponse] =
         if (hash != Transactions.GenesisTransactionHash) {
-          a.client.request[TransactionRequest, TransactionResponse](
+          a.client.request[TransactionRequest, TransactionRLPResponse](
             TransactionRequest(hash)
           )
         } else {

@@ -37,7 +37,7 @@ object Syntax {
         .getBlockByHash(b, hash)
 
     def getReceiptByHash(hash: String) = 
-      implicitly[GetReceipt[Ethereum, ReceiptResponse]].getReceipt(b, hash)
+      implicitly[GetReceipt[Ethereum, ReceiptRLPResponse]].getReceipt(b, hash)
 
     def getBlockByHeightRLP(height: Long) =
       implicitly[GetBlockByHeight[Ethereum, BlockRLPResponse]]
@@ -51,7 +51,7 @@ object Syntax {
       implicitly[GetBestBlockHeightRLP[Ethereum]].getBestBlockHeight(b)
 
     def getTransactionRLP(hash: String) =
-      implicitly[GetTransaction[Ethereum, TransactionResponse]]
+      implicitly[GetTransaction[Ethereum, TransactionRLPResponse]]
         .getTransaction(b, hash)
   }
 }

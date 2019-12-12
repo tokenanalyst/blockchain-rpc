@@ -41,7 +41,7 @@ object Methods {
 
 object Protocol {
   type BlockWithTransactionsRLPResponse =
-    GenericBlockRLPResponse[TransactionResponse]
+    GenericBlockRLPResponse[TransactionRLPResponse]
   type BlockRLPResponse = GenericBlockRLPResponse[String]
 
   case class GenericBlockRLPResponse[A](
@@ -69,7 +69,7 @@ object Protocol {
       uncles: List[String]
   ) extends RPCResponse
 
-  case class TransactionResponse(
+  case class TransactionRLPResponse(
       blockHash: String,
       blockNumber: String,
       chainId: String,
@@ -90,7 +90,7 @@ object Protocol {
       value: String
   ) extends RPCResponse
 
-  case class ReceiptResponse(
+  case class ReceiptRLPResponse(
       blockHash: String,
       blockNumber: String,
       contractAddress: Option[String],
@@ -127,7 +127,7 @@ object Transactions {
   lazy val GenesisTransaction =
     parse(Source.fromResource("bitcoinGenesisTransaction.json").mkString)
       .flatMap { json =>
-        json.as[TransactionResponse]
+        json.as[TransactionRLPResponse]
       }
       .getOrElse(throw new Exception("Could not parse genesis"))
 }
