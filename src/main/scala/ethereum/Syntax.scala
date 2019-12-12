@@ -28,12 +28,20 @@ object Syntax {
     def getNextBlockHash() =
       implicitly[GetNextBlockHash[Ethereum]].getNextBlockHash(b)
 
+    def getBlockWithTransactionsByHeightRLP(height: Long) =
+      implicitly[GetBlockByHeight[Ethereum, BlockWithTransactionsRLPResponse]]
+        .getBlockByHeight(b, height)
+
+    def getBlockWithTransactionsByHashRLP(hash: String) =
+      implicitly[GetBlockByHash[Ethereum, BlockWithTransactionsRLPResponse]]
+        .getBlockByHash(b, hash)
+
     def getBlockByHeightRLP(height: Long) =
-      implicitly[GetBlockByHeight[Ethereum, BlockResponseRLP]]
+      implicitly[GetBlockByHeight[Ethereum, BlockRLPResponse]]
         .getBlockByHeight(b, height)
 
     def getBlockByHashRLP(hash: String) =
-      implicitly[GetBlockByHash[Ethereum, BlockResponseRLP]]
+      implicitly[GetBlockByHash[Ethereum, BlockRLPResponse]]
         .getBlockByHash(b, hash)
 
     def getBestBlockHeightRLP() =

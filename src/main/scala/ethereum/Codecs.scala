@@ -38,7 +38,7 @@ object Codecs {
       Json.obj(requestFields("eth_blockNumber", Array[Json]()): _*)
   }
 
-  implicit val blockByNumberRequest = new RPCEncoder[BlockByHeightRequest] {
+  implicit val blockByHeightRequest = new RPCEncoder[BlockByHeightRequest] {
     final def apply(a: BlockByHeightRequest): Json =
       Json.obj(
         requestFields(
@@ -47,18 +47,18 @@ object Codecs {
             Json.fromString(
               bigIntEncDec.encode(BigInt(a.height)).hexEncoding
             ),
-            Json.fromBoolean(false)
+            Json.fromBoolean(a.withTransactions)
           )
         ): _*
       )
   }
-
+ 
   implicit val blockByHashRequest = new RPCEncoder[BlockByHashRequest] {
     final def apply(a: BlockByHashRequest): Json =
       Json.obj(
         requestFields(
           "eth_getBlockByHash",
-          Array(Json.fromString(a.hash), Json.fromBoolean(false))
+          Array(Json.fromString(a.hash), Json.fromBoolean(a.withTransactions))
         ): _*
       )
   }

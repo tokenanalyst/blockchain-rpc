@@ -25,12 +25,21 @@ object Methods {
   trait GetBestBlockHeightRLP[A <: Blockchain] {
     def getBestBlockHeight(a: A): IO[String]
   }
+
+  trait GetBlockWithTransactionsByHashRLP[A <: Blockchain] {
+    def getBlockWithTransactionsByHash(a: A): IO[String]
+  }
+
+  trait GetBlockWithTransactionsByHeightRLP[A <: Blockchain] {
+    def getBlockWithTransactionsByHeight(a: A): IO[String]
+  }
 }
 
 object Protocol {
-  case class BlockHashResponse(hash: String) extends RPCResponse
+  type BlockWithTransactionsRLPResponse= GenericBlockRLPResponse[TransactionResponse]
+  type BlockRLPResponse = GenericBlockRLPResponse[String]
 
-  case class BlockResponseRLP(
+  case class GenericBlockRLPResponse[A](
       author: String,
       difficulty: String,
       extraData: String,
@@ -50,32 +59,7 @@ object Protocol {
       stateRoot: String,
       timestamp: String,
       totalDifficulty: String,
-      transactions: List[String],
-      transactionsRoot: String,
-      uncles: List[String]
-  ) extends RPCResponse
-
-  case class BlockResponse(
-      author: String,
-      difficulty: String,
-      extraData: String,
-      gasLimit: String,
-      gasUsed: String,
-      hash: String,
-      logsBloom: String,
-      miner: String,
-      mixHash: String,
-      nonce: String,
-      number: String,
-      parentHash: String,
-      receiptsRoot: String,
-      sealFields: List[String],
-      sha3Uncles: String,
-      size: String,
-      stateRoot: String,
-      timestamp: String,
-      totalDifficulty: String,
-      transactions: List[String],
+      transactions: List[A],
       transactionsRoot: String,
       uncles: List[String]
   ) extends RPCResponse
@@ -118,8 +102,11 @@ object Protocol {
 
   case class LogResponse()
 
-  case class BlockByHashRequest(hash: String) extends RPCRequest
-  case class BlockByHeightRequest(height: Long) extends RPCRequest
+  case class BlockByHashRequest(hash: String, withTransactions: Boolean)
+      extends RPCRequest
+  case class BlockByHeightRequest(height: Long, withTransactions: Boolean)
+      extends RPCRequest
+
   case class TransactionRequest(hash: String) extends RPCRequest
   case class BestBlockHeightRequest() extends RPCRequest
 }
