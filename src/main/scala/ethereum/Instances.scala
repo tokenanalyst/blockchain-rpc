@@ -26,6 +26,8 @@ import io.tokenanalyst.bitcoinrpc.{BatchRequest, BatchResponse, Ethereum}
 
 import scala.collection.mutable.ListBuffer
 
+import Methods._
+
 object Instances {
 
   implicit val getNextBlockHashInstance =
@@ -40,17 +42,9 @@ object Instances {
           a: Ethereum,
           hash: String
       ): IO[BlockResponseRLP] = {
-        a.client.request[BlockRequest, BlockResponseRLP](BlockRequest(hash))
+        a.client.request[BlockByHashRequest, BlockResponseRLP](BlockByHashRequest(hash))
       }
     }
-
-  implicit val getBlockHashInstance = new GetBlockHash[Ethereum] {
-    override def getBlockHash(a: Ethereum, height: Long): IO[String] =
-      for {
-        json <- a.client
-          .requestJson[BlockHashRequest](BlockHashRequest(height))
-      } yield json.asObject.get("result").get.asString.get
-  }
 
   implicit val getBlockByHeightInstance =
     new GetBlockByHeight[Ethereum, BlockResponseRLP] {
@@ -58,18 +52,15 @@ object Instances {
           a: Ethereum,
           height: Long
       ): IO[BlockResponseRLP] =
-        for {
-          hash <- getBlockHashInstance.getBlockHash(a, height)
-          data <- getBlockByHashInstance.getBlockByHash(a, hash)
-        } yield data
+      a.client.request[BlockByHeightRequest, BlockResponseRLP](BlockByHeightRequest(height))
     }
 
-  implicit val getBestBlockHashInstance =
-    new GetBestBlockHash[Ethereum] {
-      override def getBestBlockHash(a: Ethereum): IO[String] =
+  implicit val getBestBlockHeightInstance =
+    new GetBestBlockHeightRLP[Ethereum] {
+      override def getBestBlockHeight(a: Ethereum): IO[String] =
         for {
           json <- a.client
-            .requestJson[BestBlockHashRequest](new BestBlockHashRequest)
+            .requestJson[BestBlockHeightRequest](new BestBlockHeightRequest)
         } yield json.asObject.get("result").get.asString.get
     }
 

@@ -16,11 +16,20 @@
   */
 package io.tokenanalyst.bitcoinrpc.ethereum
 
+import cats.effect.IO
+import io.tokenanalyst.bitcoinrpc.Blockchain
 import io.tokenanalyst.bitcoinrpc.{RPCRequest, RPCResponse}
 import scala.io.Source
 
+object Methods {
+  trait GetBestBlockHeightRLP[A <: Blockchain] {
+    def getBestBlockHeight(a: A): IO[String]
+  }
+}
+
 object Protocol {
   case class BlockHashResponse(hash: String) extends RPCResponse
+
   case class BlockResponseRLP(
       author: String,
       difficulty: String,
@@ -109,11 +118,10 @@ object Protocol {
 
   case class LogResponse()
 
-  case class BlockRequest(hash: String) extends RPCRequest
-  case class BlockHashRequest(height: Long) extends RPCRequest
+  case class BlockByHashRequest(hash: String) extends RPCRequest
+  case class BlockByHeightRequest(height: Long) extends RPCRequest
   case class TransactionRequest(hash: String) extends RPCRequest
-  case class BestBlockHashRequest() extends RPCRequest
-  case class BlockHashByHeightRequest(height: Long) extends RPCRequest
+  case class BestBlockHeightRequest() extends RPCRequest
 }
 
 object Transactions {

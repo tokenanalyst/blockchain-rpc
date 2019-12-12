@@ -24,37 +24,41 @@ import io.tokenanalyst.bitcoinrpc.ethereum.Protocol._
 object Codecs {
 
   implicit val transactionRequest = new RPCEncoder[TransactionRequest] {
-    final def apply(a: TransactionRequest): Json =
+    final def apply(a: TransactionRequest): Json = Json.obj(
+      requestFields(
+        "eth_getTransactionByHash",
+        Array(Json.fromString(a.hash))
+      ): _*
+    )
+  }
+
+  implicit val bestBlockHeightRequest = new RPCEncoder[BestBlockHeightRequest] {
+    final def apply(a: BestBlockHeightRequest): Json =
+      Json.obj(requestFields("eth_blockNumber", Array[Json]()): _*)
+  }
+
+  implicit val blockByNumberRequest = new RPCEncoder[BlockByHeightRequest] {
+    final def apply(a: BlockByHeightRequest): Json =
       Json.obj(
         requestFields(
-          "eth_getTransactionByHash",
-          Array(Json.fromString(a.hash), Json.fromInt(1))
+          "eth_getBlockByNumber",
+          Array[Json](
+            Json.fromString(
+              "0x100"
+            ),
+            Json.fromBoolean(false)
+          )
         ): _*
       )
   }
 
-  implicit val blockHashByHeightRequest =
-    new RPCEncoder[BlockHashByHeightRequest] {
-      override def apply(a: BlockHashByHeightRequest): Json =
-        Json.obj(
-          requestFields("getblockhash", Array(Json.fromLong(a.height))): _*
-        )
-    }
-
-  implicit val bestBlockHashRequest = new RPCEncoder[BestBlockHashRequest] {
-    final def apply(a: BestBlockHashRequest): Json =
-      Json.obj(requestFields("eth_blockNumber", Array[Json]()): _*)
-  }
-
-  implicit val blockHashRequest = new RPCEncoder[BlockHashRequest] {
-    final def apply(a: BlockHashRequest): Json =
+  implicit val blockByHashRequest = new RPCEncoder[BlockByHashRequest] {
+    final def apply(a: BlockByHashRequest): Json =
       Json.obj(
-        requestFields("eth_getBlockByNumber", Array[Json](Json.fromLong(a.height))): _*
+        requestFields(
+          "eth_getBlockByHash",
+          Array(Json.fromString(a.hash), Json.fromBoolean(false))
+        ): _*
       )
-  }
-
-  implicit val blockRequest = new RPCEncoder[BlockRequest] {
-    final def apply(a: BlockRequest): Json =
-      Json.obj(requestFields("eth_getBlockByHash", Array(Json.fromString(a.hash))): _*)
   }
 }
