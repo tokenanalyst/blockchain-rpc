@@ -11,6 +11,7 @@ case class RLPList(items: RLPEncodeable*) extends RLPEncodeable
 
 case class RLPValue(bytes: Array[Byte]) extends RLPEncodeable {
   override def toString: String = s"RLPValue(${Hex.encodeHex(bytes).mkString})"
+  def hexEncoding: String = s"0x${Hex.encodeHex(bytes).mkString}"
 }
 
 trait RLPEncoder[T] {
