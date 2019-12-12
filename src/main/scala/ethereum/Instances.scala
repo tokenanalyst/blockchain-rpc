@@ -30,6 +30,15 @@ import Methods._
 
 object Instances {
 
+  implicit val getReceiptInstance = 
+    new GetReceipt[Ethereum, ReceiptResponse] { 
+      override def getReceipt(a: Ethereum, hash: String): IO[ReceiptResponse] = {
+        a.client.request[ReceiptRequest, ReceiptResponse](
+          ReceiptRequest(hash)
+        )
+      }
+    }
+
   implicit val getBlockWithTransactionsByHashInstance =
     new GetBlockByHash[Ethereum, BlockWithTransactionsRLPResponse] {
       override def getBlockByHash(

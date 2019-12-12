@@ -24,6 +24,15 @@ import io.tokenanalyst.bitcoinrpc.ethereum.rlp.RLPImplicits._
 
 object Codecs {
 
+  implicit val receiptRequest = new RPCEncoder[ReceiptRequest] { 
+    final def apply(a: ReceiptRequest): Json = Json.obj(
+      requestFields(
+        "eth_getTransactionReceipt",
+        Array(Json.fromString(a.hash))
+      ): _*
+    )
+  }
+
   implicit val transactionRequest = new RPCEncoder[TransactionRequest] {
     final def apply(a: TransactionRequest): Json = Json.obj(
       requestFields(

@@ -17,26 +17,31 @@
 package io.tokenanalyst.bitcoinrpc.ethereum
 
 import cats.effect.IO
-import io.tokenanalyst.bitcoinrpc.Blockchain
+import io.tokenanalyst.bitcoinrpc.Ethereum
 import io.tokenanalyst.bitcoinrpc.{RPCRequest, RPCResponse}
 import scala.io.Source
 
 object Methods {
-  trait GetBestBlockHeightRLP[A <: Blockchain] {
+  trait GetBestBlockHeightRLP[A <: Ethereum] {
     def getBestBlockHeight(a: A): IO[String]
   }
 
-  trait GetBlockWithTransactionsByHashRLP[A <: Blockchain] {
-    def getBlockWithTransactionsByHash(a: A): IO[String]
+  trait GetBlockWithTransactionsByHash[A <: Ethereum, B] {
+    def getBlockWithTransactionsByHash(a: A, hash: String): IO[B]
   }
 
-  trait GetBlockWithTransactionsByHeightRLP[A <: Blockchain] {
-    def getBlockWithTransactionsByHeight(a: A): IO[String]
+  trait GetBlockWithTransactionsByHeight[A <: Ethereum, B] {
+    def getBlockWithTransactionsByHeight(a: A, height: Long): IO[B]
+  }
+
+  trait GetReceipt[A <: Ethereum, B] { 
+    def getReceipt(a: A, hash: String): IO[B]
   }
 }
 
 object Protocol {
-  type BlockWithTransactionsRLPResponse= GenericBlockRLPResponse[TransactionResponse]
+  type BlockWithTransactionsRLPResponse =
+    GenericBlockRLPResponse[TransactionResponse]
   type BlockRLPResponse = GenericBlockRLPResponse[String]
 
   case class GenericBlockRLPResponse[A](
@@ -106,7 +111,7 @@ object Protocol {
       extends RPCRequest
   case class BlockByHeightRequest(height: Long, withTransactions: Boolean)
       extends RPCRequest
-
+  case class ReceiptRequest(hash: String) extends RPCRequest
   case class TransactionRequest(hash: String) extends RPCRequest
   case class BestBlockHeightRequest() extends RPCRequest
 }

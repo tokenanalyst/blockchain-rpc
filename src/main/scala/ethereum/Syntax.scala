@@ -36,6 +36,9 @@ object Syntax {
       implicitly[GetBlockByHash[Ethereum, BlockWithTransactionsRLPResponse]]
         .getBlockByHash(b, hash)
 
+    def getReceiptByHash(hash: String) = 
+      implicitly[GetReceipt[Ethereum, ReceiptResponse]].getReceipt(b, hash)
+
     def getBlockByHeightRLP(height: Long) =
       implicitly[GetBlockByHeight[Ethereum, BlockRLPResponse]]
         .getBlockByHeight(b, height)
