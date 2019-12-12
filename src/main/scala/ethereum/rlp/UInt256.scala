@@ -45,9 +45,9 @@ object UInt256 {
 
   implicit def uint256ToBigInt(uint: UInt256): BigInt = uint.toBigInt
 
-  implicit def byte2UInt256(b: Byte): UInt256 = UInt256(b)
+  implicit def byte2UInt256(b: Byte): UInt256 = UInt256(b.longValue())
 
-  implicit def int2UInt256(i: Int): UInt256 = UInt256(i)
+  implicit def int2UInt256(i: Int): UInt256 = UInt256(i.longValue())
 
   implicit def long2UInt256(l: Long): UInt256 = UInt256(l)
 
@@ -91,7 +91,7 @@ class UInt256 private (private val n: BigInt) extends Ordered[UInt256] {
   def byteSize: Int = if (isZero) 0 else (n.bitLength - 1) / 8 + 1
 
   def getByte(that: UInt256): UInt256 =
-    if (that.n > 31) Zero else UInt256(bytes(that.n.toInt).toInt & 0xff)
+    if (that.n > 31) Zero else UInt256(bytes(that.n.toInt).toLong & 0xff)
 
 
 

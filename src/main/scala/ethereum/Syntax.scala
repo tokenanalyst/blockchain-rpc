@@ -28,10 +28,10 @@ object Syntax {
       implicitly[GetNextBlockHash[Ethereum]].getNextBlockHash(b)
 
     def getBlockByHash(hash: String) =
-      implicitly[GetBlockByHash[Ethereum, BlockResponse]].getBlockByHash(b, hash)
+      implicitly[GetBlockByHash[Ethereum, BlockResponseRLP]].getBlockByHash(b, hash)
 
     def getBlockByHeight(height: Long) =
-      implicitly[GetBlockByHeight[Ethereum, BlockResponse]]
+      implicitly[GetBlockByHeight[Ethereum, BlockResponseRLP]]
         .getBlockByHeight(b, height)
 
     def getBlockHash(height: Long) =

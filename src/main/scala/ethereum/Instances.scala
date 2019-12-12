@@ -35,12 +35,12 @@ object Instances {
     }
 
   implicit val getBlockByHashInstance =
-    new GetBlockByHash[Ethereum, BlockResponse] {
+    new GetBlockByHash[Ethereum, BlockResponseRLP] {
       override def getBlockByHash(
           a: Ethereum,
           hash: String
-      ): IO[BlockResponse] = {
-        a.client.request[BlockRequest, BlockResponse](BlockRequest(hash))
+      ): IO[BlockResponseRLP] = {
+        a.client.request[BlockRequest, BlockResponseRLP](BlockRequest(hash))
       }
     }
 
@@ -53,14 +53,14 @@ object Instances {
   }
 
   implicit val getBlockByHeightInstance =
-    new GetBlockByHeight[Ethereum, BlockResponse] {
+    new GetBlockByHeight[Ethereum, BlockResponseRLP] {
       override def getBlockByHeight(
           a: Ethereum,
           height: Long
-      ): IO[BlockResponse] =
+      ): IO[BlockResponseRLP] =
         for {
           hash <- getBlockHashInstance.getBlockHash(a, height)
-          data <- getBlockByHashInstance.getBlockByHash(a, hash) 
+          data <- getBlockByHashInstance.getBlockByHash(a, hash)
         } yield data
     }
 

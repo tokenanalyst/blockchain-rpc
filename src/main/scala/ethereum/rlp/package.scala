@@ -1,27 +1,6 @@
 package io.tokenanalyst.bitcoinrpc.ethereum
 
-import akka.util.ByteString
-import org.apache.commons.codec.binary.Hex
-
 package object rlp {
-
-  case class RLPException(message: String) extends RuntimeException(message)
-
-  sealed trait RLPEncodeable
-
-  case class RLPList(items: RLPEncodeable*) extends RLPEncodeable
-
-  case class RLPValue(bytes: Array[Byte]) extends RLPEncodeable {
-    override def toString: String = s"RLPValue(${Hex.encodeHex(bytes).mkString})"
-  }
-
-  trait RLPEncoder[T] {
-    def encode(obj: T): RLPEncodeable
-  }
-
-  trait RLPDecoder[T] {
-    def decode(rlp: RLPEncodeable): T
-  }
 
   def encode[T](input: T)(implicit enc: RLPEncoder[T]): Array[Byte] = RLP.encode(enc.encode(input))
 
@@ -44,11 +23,4 @@ package object rlp {
     * @throws RLPException if there is any error
     */
   def nextElementIndex(data: Array[Byte], pos: Int): Int = RLP.getItemBounds(data, pos).end + 1
-
-  trait RLPSerializable {
-    def toRLPEncodable: RLPEncodeable
-    def toBytes(implicit di: DummyImplicit): ByteString = ByteString(toBytes: Array[Byte])
-    def toBytes: Array[Byte] = encode(this.toRLPEncodable)
-  }
-
 }

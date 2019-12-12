@@ -1,9 +1,7 @@
 package io.tokenanalyst.bitcoinrpc.ethereum.rlp
 
 import akka.util.ByteString
-import io.tokenanalyst.bitcoinrpc.ethereum.rlp.UInt256
 import io.tokenanalyst.bitcoinrpc.ethereum.rlp.RLP._
-import io.tokenanalyst.bitcoinrpc.ethereum.rlp.{RLPEncodeable, RLPException, RLPSerializable, RLPValue}
 
 
 object UInt256RLPImplicits {

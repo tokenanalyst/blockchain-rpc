@@ -4,7 +4,6 @@ import java.nio.ByteBuffer
 
 import scala.annotation.{switch, tailrec}
 import scala.collection.immutable.Queue
-import io.tokenanalyst.bitcoinrpc.ethereum.rlp._
 
 /**
   * Recursive Length Prefix (RLP) encoding.
@@ -169,7 +168,7 @@ private[rlp] object RLP {
     */
   private[rlp] def bigEndianMinLengthToInt(bytes: Array[Byte]): Int = {
     (bytes.length: @switch) match {
-      case 0 => 0: Short
+      case 0 => 0
       case 1 => bytes(0) & 0xFF
       case 2 => ((bytes(0) & 0xFF) << 8) + (bytes(1) & 0xFF)
       case 3 => ((bytes(0) & 0xFF) << 16) + ((bytes(1) & 0xFF) << 8) + (bytes(2) & 0xFF)
