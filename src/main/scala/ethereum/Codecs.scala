@@ -20,11 +20,10 @@ import io.circe.Json
 import io.tokenanalyst.bitcoinrpc.Codecs._
 import io.tokenanalyst.bitcoinrpc.RPCEncoder
 import io.tokenanalyst.bitcoinrpc.ethereum.Protocol._
-import io.tokenanalyst.bitcoinrpc.ethereum.rlp.RLPImplicits._
 
 object Codecs {
 
-  implicit val receiptRequest = new RPCEncoder[ReceiptRequest] { 
+  implicit val receiptRequest = new RPCEncoder[ReceiptRequest] {
     final def apply(a: ReceiptRequest): Json = Json.obj(
       requestFields(
         "eth_getTransactionReceipt",
@@ -54,14 +53,14 @@ object Codecs {
           "eth_getBlockByNumber",
           Array[Json](
             Json.fromString(
-              bigIntEncDec.encode(BigInt(a.height)).hexEncoding
+              hexTools.toHexString(a.height)
             ),
             Json.fromBoolean(a.withTransactions)
           )
         ): _*
       )
   }
- 
+
   implicit val blockByHashRequest = new RPCEncoder[BlockByHashRequest] {
     final def apply(a: BlockByHashRequest): Json =
       Json.obj(

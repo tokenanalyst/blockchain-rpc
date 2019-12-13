@@ -20,67 +20,82 @@ import cats.effect.IO
 import io.circe.generic.auto._
 import io.tokenanalyst.bitcoinrpc.BasicMethods._
 import io.tokenanalyst.bitcoinrpc.Codecs._
-import io.tokenanalyst.bitcoinrpc.ethereum.Protocol._
 import io.tokenanalyst.bitcoinrpc.ethereum.Codecs._
+import io.tokenanalyst.bitcoinrpc.ethereum.Methods._
+import io.tokenanalyst.bitcoinrpc.ethereum.Protocol._
 import io.tokenanalyst.bitcoinrpc.{BatchRequest, BatchResponse, Ethereum}
-
-import scala.collection.mutable.ListBuffer
-
-import Methods._
 
 object Instances {
 
-  implicit val getReceiptInstance = 
-    new GetReceipt[Ethereum, ReceiptRLPResponse] { 
-      override def getReceipt(a: Ethereum, hash: String): IO[ReceiptRLPResponse] = {
-        a.client.request[ReceiptRequest, ReceiptRLPResponse](
+  implicit val getReceiptInstance =
+    new GetReceipt[Ethereum, ReceiptResponse] {
+      override def getReceipt(
+          a: Ethereum,
+          hash: String
+      ): IO[ReceiptResponse] = {
+        a.client.request[ReceiptRequest, ReceiptResponse](
           ReceiptRequest(hash)
         )
       }
     }
 
+  implicit val getReceiptsInstance =
+    new GetReceipts[Ethereum, BatchResponse[ReceiptResponse]] {
+      override def getReceipts(
+          a: Ethereum,
+          hashes: Seq[String]
+      ): IO[BatchResponse[ReceiptResponse]] = {
+        a.client.request[
+          BatchRequest[ReceiptRequest],
+          BatchResponse[ReceiptResponse]
+        ](
+          BatchRequest[ReceiptRequest](hashes.map(ReceiptRequest.apply))
+        )
+      }
+    }
+
   implicit val getBlockWithTransactionsByHashInstance =
-    new GetBlockByHash[Ethereum, BlockWithTransactionsRLPResponse] {
+    new GetBlockByHash[Ethereum, BlockWithTransactionsResponse] {
       override def getBlockByHash(
           a: Ethereum,
           hash: String
-      ): IO[BlockWithTransactionsRLPResponse] = {
-        a.client.request[BlockByHashRequest, BlockWithTransactionsRLPResponse](
+      ): IO[BlockWithTransactionsResponse] = {
+        a.client.request[BlockByHashRequest, BlockWithTransactionsResponse](
           BlockByHashRequest(hash, true)
         )
       }
     }
 
   implicit val getBlockByHashInstance =
-    new GetBlockByHash[Ethereum, BlockRLPResponse] {
+    new GetBlockByHash[Ethereum, BlockResponse] {
       override def getBlockByHash(
           a: Ethereum,
           hash: String
-      ): IO[BlockRLPResponse] = {
-        a.client.request[BlockByHashRequest, BlockRLPResponse](
+      ): IO[BlockResponse] = {
+        a.client.request[BlockByHashRequest, BlockResponse](
           BlockByHashRequest(hash, false)
         )
       }
     }
 
   implicit val getBlockWithTransactionsByHeightInstance =
-    new GetBlockByHeight[Ethereum, BlockWithTransactionsRLPResponse] {
+    new GetBlockByHeight[Ethereum, BlockWithTransactionsResponse] {
       override def getBlockByHeight(
           a: Ethereum,
           height: Long
-      ): IO[BlockWithTransactionsRLPResponse] =
-        a.client.request[BlockByHeightRequest, BlockWithTransactionsRLPResponse](
+      ): IO[BlockWithTransactionsResponse] =
+        a.client.request[BlockByHeightRequest, BlockWithTransactionsResponse](
           BlockByHeightRequest(height, true)
         )
     }
 
   implicit val getBlockByHeightInstance =
-    new GetBlockByHeight[Ethereum, BlockRLPResponse] {
+    new GetBlockByHeight[Ethereum, BlockResponse] {
       override def getBlockByHeight(
           a: Ethereum,
           height: Long
-      ): IO[BlockRLPResponse] =
-        a.client.request[BlockByHeightRequest, BlockRLPResponse](
+      ): IO[BlockResponse] =
+        a.client.request[BlockByHeightRequest, BlockResponse](
           BlockByHeightRequest(height, false)
         )
     }
@@ -92,69 +107,40 @@ object Instances {
     }
 
   implicit val getBestBlockHeightInstance =
-    new GetBestBlockHeightRLP[Ethereum] {
-      override def getBestBlockHeight(a: Ethereum): IO[String] =
+    new GetBestBlockHeight[Ethereum] {
+      override def getBestBlockHeight(a: Ethereum): IO[Long] =
         for {
           json <- a.client
             .requestJson[BestBlockHeightRequest](new BestBlockHeightRequest)
-        } yield json.asObject.get("result").get.asString.get
+        } yield hexTools
+          .parseQuantity(json.asObject.get("result").get.asString.get)
+          .longValue()
     }
 
   implicit val getTransactionsInstance =
     new GetTransactions[Ethereum, BatchResponse[
-      TransactionRLPResponse
+      TransactionResponse
     ]] {
       override def getTransactions(
           a: Ethereum,
           hashes: Seq[String]
-      ): IO[BatchResponse[TransactionRLPResponse]] = {
-        val list = ListBuffer(hashes: _*)
-        val genesisTransactionIndex =
-          list.indexOf(Transactions.GenesisTransactionHash)
-
-        if (genesisTransactionIndex >= 0) {
-          list.remove(genesisTransactionIndex)
-        }
-
-        val result =
-          a.client.request[BatchRequest[TransactionRequest], BatchResponse[
-            TransactionRLPResponse
-          ]](
-            BatchRequest[TransactionRequest](
-              list.map(TransactionRequest.apply).toSeq
-            )
-          )
-
-        if (genesisTransactionIndex >= 0) {
-          for {
-            batcResponse <- result
-            listResult <- IO(ListBuffer(batcResponse.seq: _*))
-            _ <- IO(
-              listResult
-                .insert(
-                  genesisTransactionIndex,
-                  Transactions.GenesisTransaction
-                )
-            )
-          } yield BatchResponse(listResult)
-        } else {
-          result
-        }
-      }
+      ): IO[BatchResponse[TransactionResponse]] =
+        a.client.request[
+          BatchRequest[TransactionRequest],
+          BatchResponse[TransactionResponse]
+        ](
+          BatchRequest[TransactionRequest](hashes.map(TransactionRequest.apply))
+        )
     }
 
   implicit val getTransactionInstance =
-    new GetTransaction[Ethereum, TransactionRLPResponse] {
+    new GetTransaction[Ethereum, TransactionResponse] {
       override def getTransaction(
           a: Ethereum,
           hash: String
-      ): IO[TransactionRLPResponse] =
-        if (hash != Transactions.GenesisTransactionHash) {
-          a.client.request[TransactionRequest, TransactionRLPResponse](
-            TransactionRequest(hash)
-          )
-        } else {
-          IO(Transactions.GenesisTransaction)
-        }
+      ): IO[TransactionResponse] =
+        a.client.request[TransactionRequest, TransactionResponse](
+          TransactionRequest(hash)
+        )
     }
 }

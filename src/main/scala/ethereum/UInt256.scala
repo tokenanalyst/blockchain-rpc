@@ -1,4 +1,4 @@
-package io.tokenanalyst.bitcoinrpc.ethereum.rlp
+package io.tokenanalyst.bitcoinrpc.ethereum
 
 import akka.util.ByteString
 
@@ -20,7 +20,6 @@ object UInt256 {
   val One: UInt256 = new UInt256(1)
 
   val Two: UInt256 = new UInt256(2)
-
 
   def apply(bytes: ByteString): UInt256 = {
     require(bytes.length <= Size, s"Input byte array cannot be longer than $Size: ${bytes.length}")
@@ -92,8 +91,6 @@ class UInt256 private (private val n: BigInt) extends Ordered[UInt256] {
 
   def getByte(that: UInt256): UInt256 =
     if (that.n > 31) Zero else UInt256(bytes(that.n.toInt).toLong & 0xff)
-
-
 
   // standard arithmetic (note the use of new instead of apply where result is guaranteed to be within bounds)
   def &(that: UInt256): UInt256 = new UInt256(this.n & that.n)
@@ -186,8 +183,6 @@ class UInt256 private (private val n: BigInt) extends Ordered[UInt256] {
     val extraZero = if (hex.length % 2 == 0) "" else "0"
     s"0x$extraZero$hex"
   }
-
-
 
   // conversions
   def toBigInt: BigInt = n
