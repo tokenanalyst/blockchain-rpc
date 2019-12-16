@@ -13,6 +13,27 @@ Simply add the following dependency to your project.
   libraryDependencies += "io.tokenanalyst" %% "blockchain-rpc" % "2.5.0",
 ```
 
+Jump to [examples](https://github.com/tokenanalyst/blockchain-rpc/tree/ethereum#example-fetch-bitcoin-block) for usage. 
+
+## Supported Bitcoin methods
+
+| Bitcoind RPC methods  | description  |  bitcoin-rpc method |
+|---|---|---|
+| getblockhash  | Gets the block hash at a specific height  |  getBlockHash(height: Long) |
+| getbestblockhash  |  Gets the block tip hash | getBestBlockHash()  |
+| getblock  | Gets the block with transaction ids  | getBlockByHash(hash: String) |
+| getblockhash, getblock  | Gets the block with transaction ids  |  getBlockByHeight(height: Long) |
+| getrawtransaction | Gets raw transaction data | getTransaction(hash: String) |
+| batch of getrawtransaction | Gets raw transaction data | getTransactions(hashes: Seq[String]) |
+| estimatesmartfee | Estimates fee for include in block n | estimateSmartFee(height: Long) |
+| usage of ZeroMQ | Gets next block hash subscription | getNextBlockHash() |
+
+## Supported Ethereum methods
+
+| Ethereum RPC methods  | description  |  ethereum-rpc method |
+|---|---|---|
+|  |   |  |
+
 ## Example: Fetch Bitcoin Block 
 
 This is a simple example of how the RPCClient is generally used. We're using Cats Resources here which automatically deallocate any opened resources after use.
@@ -86,16 +107,3 @@ object CatchupFromZero extends IOApp {
 | BLOCKCHAIN_RPC_PASSWORD  | RPC password | Optional String |
 | BLOCKCHAIN_RPC_PORT  | RPC port when not default | Optional Int |
 | BLOCKCHAIN_RPC_ZEROMQ_PORT  | ZeroMQ port when not default | Optional Int |
-
-## Supported Bitcoin methods
-
-| Bitcoind RPC methods  | description  |  bitcoin-rpc method |
-|---|---|---|
-| getblockhash  | Gets the block hash at a specific height  |  getBlockHash(height: Long) |
-| getbestblockhash  |  Gets the block tip hash | getBestBlockHash()  |
-| getblock  | Gets the block with transaction ids  | getBlockByHash(hash: String) |
-| getblockhash, getblock  | Gets the block with transaction ids  |  getBlockByHeight(height: Long) |
-| getrawtransaction | Gets raw transaction data | getTransaction(hash: String) |
-| batch of getrawtransaction | Gets raw transaction data | getTransactions(hashes: Seq[String]) |
-| estimatesmartfee | Estimates fee for include in block n | estimateSmartFee(height: Long) |
-| usage of ZeroMQ | Gets next block hash subscription | getNextBlockHash() |
