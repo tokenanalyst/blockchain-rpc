@@ -17,14 +17,9 @@
 package io.tokenanalyst.bitcoinrpc.ethereum
 
 import cats.effect.IO
-import io.tokenanalyst.bitcoinrpc.Ethereum
-import io.tokenanalyst.bitcoinrpc.{RPCRequest, RPCResponse}
-import scala.io.Source
+import io.tokenanalyst.bitcoinrpc.{Ethereum, RPCRequest, RPCResponse}
 
 object Methods {
-  trait GetBestBlockHeightRLP[A <: Ethereum] {
-    def getBestBlockHeight(a: A): IO[String]
-  }
 
   trait GetBlockWithTransactionsByHash[A <: Ethereum, B] {
     def getBlockWithTransactionsByHash(a: A, hash: String): IO[B]
@@ -34,17 +29,23 @@ object Methods {
     def getBlockWithTransactionsByHeight(a: A, height: Long): IO[B]
   }
 
-  trait GetReceipt[A <: Ethereum, B] { 
+  trait GetReceipt[A <: Ethereum, B] {
     def getReceipt(a: A, hash: String): IO[B]
+  }
+
+  trait GetReceipts[A <: Ethereum, B] {
+    def getReceipts(a: A, hashes: Seq[String]): IO[B]
   }
 }
 
 object Protocol {
-  type BlockWithTransactionsRLPResponse =
-    GenericBlockRLPResponse[TransactionRLPResponse]
-  type BlockRLPResponse = GenericBlockRLPResponse[String]
 
-  case class GenericBlockRLPResponse[A](
+  type BlockWithTransactionsResponse =
+    GenericBlockResponse[TransactionResponse]
+
+  type BlockResponse = GenericBlockResponse[String]
+
+  case class GenericBlockResponse[A](
       author: String,
       difficulty: String,
       extraData: String,
@@ -69,10 +70,10 @@ object Protocol {
       uncles: List[String]
   ) extends RPCResponse
 
-  case class TransactionRLPResponse(
+  case class TransactionResponse(
       blockHash: String,
       blockNumber: String,
-      chainId: String,
+      chainId: Option[String],
       from: String,
       gas: String,
       gasPrice: String,
@@ -87,17 +88,19 @@ object Protocol {
       standardV: String,
       to: String,
       transactionIndex: String,
-      value: String
+      value: String,
+      condition: Option[String],
+      creates: Option[String]
   ) extends RPCResponse
 
-  case class ReceiptRLPResponse(
+  case class ReceiptResponse(
       blockHash: String,
       blockNumber: String,
       contractAddress: Option[String],
-      from: String,
+      from: Option[String],
       to: Option[String],
       cumulativeGasUsed: String,
-      gasUsed: String,
+      gasUsed: Option[String],
       logs: List[LogResponse],
       logsBloom: String,
       status: Option[String],
@@ -105,7 +108,19 @@ object Protocol {
       transactionIndex: String
   ) extends RPCResponse
 
-  case class LogResponse()
+  case class LogResponse(
+      removed: Boolean,
+      logIndex: Option[String],
+      transactionIndex: Option[String],
+      transactionHash: Option[String],
+      blockHash: Option[String],
+      blockNumber: Option[String],
+      address: String,
+      data: String,
+      topics: List[String],
+      transactionLogIndex: Option[String],
+      `type`: String
+  )
 
   case class BlockByHashRequest(hash: String, withTransactions: Boolean)
       extends RPCRequest
@@ -114,20 +129,4 @@ object Protocol {
   case class ReceiptRequest(hash: String) extends RPCRequest
   case class TransactionRequest(hash: String) extends RPCRequest
   case class BestBlockHeightRequest() extends RPCRequest
-}
-
-object Transactions {
-  import io.circe.generic.auto._
-  import io.circe.parser._
-  import Protocol._
-
-  lazy val GenesisTransactionHash =
-    "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
-
-  lazy val GenesisTransaction =
-    parse(Source.fromResource("bitcoinGenesisTransaction.json").mkString)
-      .flatMap { json =>
-        json.as[TransactionRLPResponse]
-      }
-      .getOrElse(throw new Exception("Could not parse genesis"))
 }

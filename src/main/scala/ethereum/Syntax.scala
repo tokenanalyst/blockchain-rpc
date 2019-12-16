@@ -16,11 +16,11 @@
   */
 package io.tokenanalyst.bitcoinrpc.ethereum
 
-import Methods._
 import io.tokenanalyst.bitcoinrpc.BasicMethods._
+import io.tokenanalyst.bitcoinrpc.{BatchResponse, Ethereum}
 import io.tokenanalyst.bitcoinrpc.ethereum.Instances._
-import io.tokenanalyst.bitcoinrpc.ethereum.Protocol._
-import io.tokenanalyst.bitcoinrpc.{Ethereum}
+import io.tokenanalyst.bitcoinrpc.ethereum.Methods._
+import io.tokenanalyst.bitcoinrpc.ethereum.Protocol.{BlockResponse, _}
 
 object Syntax {
   implicit class EthereumOps(b: Ethereum) {
@@ -28,30 +28,34 @@ object Syntax {
     def getNextBlockHash() =
       implicitly[GetNextBlockHash[Ethereum]].getNextBlockHash(b)
 
-    def getBlockWithTransactionsByHeightRLP(height: Long) =
-      implicitly[GetBlockByHeight[Ethereum, BlockWithTransactionsRLPResponse]]
+    def getBlockWithTransactionsByHeight(height: Long) =
+      implicitly[GetBlockByHeight[Ethereum, BlockWithTransactionsResponse]]
         .getBlockByHeight(b, height)
 
-    def getBlockWithTransactionsByHashRLP(hash: String) =
-      implicitly[GetBlockByHash[Ethereum, BlockWithTransactionsRLPResponse]]
+    def getBlockWithTransactionsByHash(hash: String) =
+      implicitly[GetBlockByHash[Ethereum, BlockWithTransactionsResponse]]
         .getBlockByHash(b, hash)
 
-    def getReceiptByHash(hash: String) = 
-      implicitly[GetReceipt[Ethereum, ReceiptRLPResponse]].getReceipt(b, hash)
+    def getReceiptByHash(hash: String) =
+      implicitly[GetReceipt[Ethereum, ReceiptResponse]].getReceipt(b, hash)
 
-    def getBlockByHeightRLP(height: Long) =
-      implicitly[GetBlockByHeight[Ethereum, BlockRLPResponse]]
+    def getReceiptsByHash(hashes: Seq[String]) =
+      implicitly[GetReceipts[Ethereum, BatchResponse[ReceiptResponse]]]
+        .getReceipts(b, hashes)
+
+    def getBlockByHeight(height: Long) =
+      implicitly[GetBlockByHeight[Ethereum, BlockResponse]]
         .getBlockByHeight(b, height)
 
-    def getBlockByHashRLP(hash: String) =
-      implicitly[GetBlockByHash[Ethereum, BlockRLPResponse]]
+    def getBlockByHash(hash: String) =
+      implicitly[GetBlockByHash[Ethereum, BlockResponse]]
         .getBlockByHash(b, hash)
 
-    def getBestBlockHeightRLP() =
-      implicitly[GetBestBlockHeightRLP[Ethereum]].getBestBlockHeight(b)
+    def getBestBlockHeight() =
+      implicitly[GetBestBlockHeight[Ethereum]].getBestBlockHeight(b)
 
-    def getTransactionRLP(hash: String) =
-      implicitly[GetTransaction[Ethereum, TransactionRLPResponse]]
+    def getTransaction(hash: String) =
+      implicitly[GetTransaction[Ethereum, TransactionResponse]]
         .getTransaction(b, hash)
   }
 }

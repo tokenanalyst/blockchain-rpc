@@ -18,11 +18,27 @@ package io.tokenanalyst.bitcoinrpc.examples.ethereum
 
 import cats.effect.{ExitCode, IO, IOApp}
 import io.tokenanalyst.bitcoinrpc.ethereum.Syntax._
-import io.tokenanalyst.bitcoinrpc.{Config, RPCClient}
+import io.tokenanalyst.bitcoinrpc.ethereum.HexTools
+import io.tokenanalyst.bitcoinrpc.{Config, Ethereum, RPCClient}
 
 import scala.concurrent.ExecutionContext.global
 
-object GetEthereumTransactionByHash extends IOApp {
+object CatchupFromZero extends IOApp {
+
+  def getReceipts(rpc: Ethereum, txs: Seq[String]) =
+    for {
+      receipts <- rpc.getReceiptsByHash(txs)
+      _ <- IO(println(s"${receipts.seq.size} receipts"))
+    } yield ()
+
+  def loop(rpc: Ethereum, current: Long = 0L, until: Long = 1000000L): IO[Unit] =
+    for {
+      block <- rpc.getBlockWithTransactionsByHeight(current)
+      _ <- IO { println(s"block ${HexTools.parseQuantity(block.number)} - ${block.hash}: ${block.transactions.size} transactions") }
+      _ <- if(block.transactions.nonEmpty) getReceipts(rpc, block.transactions.map(_.hash)) else IO.unit
+      l <- if (current + 1 < until) loop(rpc, current + 1, until) else IO.unit
+    } yield l
+
   def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
     implicit val config = Config.fromEnv
@@ -38,10 +54,7 @@ object GetEthereumTransactionByHash extends IOApp {
       )
       .use { ethereum =>
         for {
-          tx <- ethereum.getTransaction(
-            "0xe9e91f1ee4b56c0df2e9f06c2b8c27c6076195a88a7b8537ba8313d80e6f124e"
-          )
-          _ <- IO { println(tx) }
+          _ <- loop(ethereum)
         } yield ExitCode(0)
       }
   }

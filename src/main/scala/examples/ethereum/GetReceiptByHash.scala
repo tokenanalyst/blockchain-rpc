@@ -22,7 +22,7 @@ import io.tokenanalyst.bitcoinrpc.{Config, RPCClient}
 
 import scala.concurrent.ExecutionContext.global
 
-object GetEthereumTransactionByHash extends IOApp {
+object GetReceiptByHash extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
     implicit val config = Config.fromEnv
@@ -38,8 +38,8 @@ object GetEthereumTransactionByHash extends IOApp {
       )
       .use { ethereum =>
         for {
-          tx <- ethereum.getTransaction(
-            "0xe9e91f1ee4b56c0df2e9f06c2b8c27c6076195a88a7b8537ba8313d80e6f124e"
+          tx <- ethereum.getReceiptByHash(
+            "0x218b632d932371478d1ae5a01620ebab1a2030f9dad6f8fba4a044ea6335a57e"
           )
           _ <- IO { println(tx) }
         } yield ExitCode(0)

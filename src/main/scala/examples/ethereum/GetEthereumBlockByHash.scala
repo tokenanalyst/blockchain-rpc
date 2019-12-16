@@ -14,7 +14,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.examples
+package io.tokenanalyst.bitcoinrpc.examples.ethereum
 
 import cats.effect.{ExitCode, IO, IOApp}
 import scala.concurrent.ExecutionContext.global
@@ -38,7 +38,7 @@ object GetEthereumBlockByHash extends IOApp {
       )
       .use { ethereum =>
         for {
-          block <- ethereum.getBlockByHashRLP(
+          block <- ethereum.getBlockByHash(
             "0x3bad41c70c9efac92490e8a74ab816558bbdada0984f2bcfa4cb1522ddb3ca16"
           )
           _ <- IO { println(block) }
