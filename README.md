@@ -13,35 +13,6 @@ Simply add the following dependency to your project.
   libraryDependencies += "io.tokenanalyst" %% "blockchain-rpc" % "2.5.0",
 ```
 
-Jump to [examples](https://github.com/tokenanalyst/blockchain-rpc/tree/ethereum#example-fetch-bitcoin-block) for usage. 
-
-## Supported Bitcoin methods
-
-| blockchain-rpc method  | description  |  bitcoin rpc method |
-|---|---|---|
-| getBlockHash(height: Long)  | Gets the block hash at a specific height  | getblockhash  |
-| getBestBlockHash()  |  Gets the block tip hash | getbestblockhash  |
-| getBlockByHash(hash: String)  | Gets the block with transaction ids  | getblock |
-| getBlockByHeight(height: Long) | Gets the block with transaction ids  |  getblockhash, getblock |
-| getTransaction(hash: String) | Gets raw transaction data | getrawtransaction |
-| getTransactions(hashes: Seq[String])  | Gets raw transaction data | batch of getrawtransaction  |
-| estimateSmartFee(height: Long) | Estimates fee for include in block n | estimatesmartfee |
-| getNextBlockHash()  | Gets next block hash subscription | usage of ZeroMQ |
-
-## Supported Ethereum methods
-
-| blockchain-rpc method | description  |  ethereum rpc method |
-|---|---|---|
-| getBlockByHeight(long: Height) | Get a block by height | |
-| getBlockByHash(hash: String) |Get a block by hash | | 
-| getBestBlockHeight | Get the best block height | | 
-| getTransaction(hash: String) |Get a transaction by hash| |
-| getBlockWithTransactionsByHeight |  Get a block with transactions by height |  |
-| getBlockWithTransactionsByHash |Get a block with transactions by hash | |
-| getReceiptByHash(hash: String) | Get a transaction receipt by hash | |
-| getReceiptsByHash(hashes: Seq[String]) |Get transaction receipts by hashes | | 
-
-
 ## Example: Fetch Bitcoin Block 
 
 This is a simple example of how the RPCClient is generally used. We're using Cats Resources here which automatically deallocate any opened resources after use.
@@ -105,6 +76,33 @@ object CatchupFromZero extends IOApp {
   }
 }
 ```
+
+## Supported Bitcoin methods
+
+| blockchain-rpc method  | description  |  bitcoin rpc method |
+|---|---|---|
+| getBlockHash(height: Long)  | Gets the block hash at a specific height  | getblockhash  |
+| getBestBlockHash()  |  Gets the block tip hash | getbestblockhash  |
+| getBlockByHash(hash: String)  | Gets the block with transaction ids  | getblock |
+| getBlockByHeight(height: Long) | Gets the block with transaction ids  |  getblockhash, getblock |
+| getTransaction(hash: String) | Gets raw transaction data | getrawtransaction |
+| getTransactions(hashes: Seq[String])  | Gets raw transaction data | batch of getrawtransaction  |
+| estimateSmartFee(height: Long) | Estimates fee for include in block n | estimatesmartfee |
+| getNextBlockHash()  | Gets next block hash subscription | usage of ZeroMQ |
+
+## Supported Ethereum methods
+
+| blockchain-rpc method | description  |  ethereum rpc method |
+|---|---|---|
+| getBlockByHeight(long: Height) | Get a block by height | |
+| getBlockByHash(hash: String) |Get a block by hash | | 
+| getBestBlockHeight | Get the best block height | | 
+| getTransaction(hash: String) |Get a transaction by hash| |
+| getBlockWithTransactionsByHeight |  Get a block with transactions by height |  |
+| getBlockWithTransactionsByHash |Get a block with transactions by hash | |
+| getReceiptByHash(hash: String) | Get a transaction receipt by hash | |
+| getReceiptsByHash(hashes: Seq[String]) |Get transaction receipts by hashes | | 
+
 
 ## Environment Variables
 
