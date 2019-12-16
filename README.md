@@ -17,7 +17,7 @@ Jump to [examples](https://github.com/tokenanalyst/blockchain-rpc/tree/ethereum#
 
 ## Supported Bitcoin methods
 
-| Bitcoind RPC methods  | description  |  bitcoin-rpc method |
+| blockchain-rpc method  | description  |  bitcoin rpc method |
 |---|---|---|
 | getBlockHash(height: Long)  | Gets the block hash at a specific height  | getblockhash  |
 | getBestBlockHash()  |  Gets the block tip hash | getbestblockhash  |
@@ -36,8 +36,8 @@ Jump to [examples](https://github.com/tokenanalyst/blockchain-rpc/tree/ethereum#
 | getBlockByHash(hash: String) |Get a block by hash | | 
 | getBestBlockHeight | Get the best block height | | 
 | getTransaction(hash: String) |Get a transaction by hash| |
-| getBlockWithTransactionsByHeight |   |  |
-| getBlockWithTransactionsByHash | | |
+| getBlockWithTransactionsByHeight |  Get a block with transactions by height |  |
+| getBlockWithTransactionsByHash |Get a block with transactions by hash | |
 | getReceiptByHash(hash: String) | Get a transaction receipt by hash | |
 | getReceiptsByHash(hashes: Seq[String]) |Get transaction receipts by hashes | | 
 
