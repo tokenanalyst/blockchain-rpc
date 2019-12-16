@@ -14,9 +14,9 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.bitcoin
+package io.tokenanalyst.blockchainrpc.bitcoin
 
-import io.tokenanalyst.bitcoinrpc.{RPCRequest, RPCResponse}
+import io.tokenanalyst.blockchainrpc.{RPCRequest, RPCResponse}
 import scala.io.Source
 
 object Protocol {

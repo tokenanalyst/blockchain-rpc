@@ -14,12 +14,13 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.ethereum
+package io.tokenanalyst.blockchainrpc.ethereum
 
 import io.circe.Json
-import io.tokenanalyst.bitcoinrpc.Codecs._
-import io.tokenanalyst.bitcoinrpc.RPCEncoder
-import io.tokenanalyst.bitcoinrpc.ethereum.Protocol._
+import io.tokenanalyst.blockchainrpc.Codecs._
+import io.tokenanalyst.blockchainrpc.RPCEncoder
+import io.tokenanalyst.blockchainrpc.ethereum.Protocol._
+import io.tokenanalyst.blockchainrpc.RPCEncoder
 
 object Codecs {
 

@@ -14,13 +14,13 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.test.ethereum
+package io.tokenanalyst.blockchainrpc.test.ethereum
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
 import com.softwaremill.diffx.scalatest.DiffMatcher
-import io.tokenanalyst.bitcoinrpc.ethereum.Protocol.{BlockResponse, _}
-import io.tokenanalyst.bitcoinrpc.Codecs._
+import io.tokenanalyst.blockchainrpc.ethereum.Protocol.{BlockResponse, _}
+import io.tokenanalyst.blockchainrpc.Codecs._
 import io.circe.generic.auto._
 import io.circe.parser.decode
 

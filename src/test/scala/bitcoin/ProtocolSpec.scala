@@ -14,13 +14,13 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.test.bitcoin
+package io.tokenanalyst.blockchainrpc.test.bitcoin
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
 import com.softwaremill.diffx.scalatest.DiffMatcher
-import io.tokenanalyst.bitcoinrpc.bitcoin.Protocol._
-import io.tokenanalyst.bitcoinrpc.Codecs._
+import io.tokenanalyst.blockchainrpc.bitcoin.Protocol._
+import io.tokenanalyst.blockchainrpc.Codecs._
 import io.circe.generic.auto._
 import io.circe.parser.decode
 
@@ -55,12 +55,12 @@ class ProtocolSpec extends AnyFlatSpec with Matchers with DiffMatcher {
     ))
   }
 
-  it should "decode TransactionResponse" in { 
-    val response = 
+  it should "decode TransactionResponse" in {
+    val response =
     """
     {"result":{"txid":"3246fa6d081b32223a4097052b15594acc00372a9ce293b29f92086e19655888","hash":"20ed27407730078e01478e375910cd92ec4c99c0e1763a893df877e36a63f24f","version":1,"size":193,"vsize":111,"weight":442,"locktime":0,"vin":[{"txid":"eee52abb8ef949f0eaba5b331b4aa6de13601b00a93d99ed0cc75189be3d2a24","vout":1,"scriptSig":{"asm":"","hex":""},"txinwitness":["3045022100dc5b8d3643750a3b96defa6e452b268d25bdcaba9d75e3614aaa8f59c285bd3902206b44833a75111ce4bd487be86972def80db4ef8c2865e8b1c19cda5f9f7ee09101","035d6e3719f26bcc5381eca4e5c33ff3f9fd5b4e84450f863abbd83a584ccdc204"],"sequence":4294967295}],"vout":[{"value":0.00803580,"n":0,"scriptPubKey":{"asm":"OP_HASH160 ab974139080e159ac8af9fc0d9e2ef4885a1339d OP_EQUAL","hex":"a914ab974139080e159ac8af9fc0d9e2ef4885a1339d87","reqSigs":1,"type":"scripthash","addresses":["3HLJfiJLa5CnKQoAF3YeteidRjDMvY5upH"]}}],"hex":"01000000000101242a3dbe8951c70ced993da9001b6013dea64a1b335bbaeaf049f98ebb2ae5ee0100000000ffffffff01fc420c000000000017a914ab974139080e159ac8af9fc0d9e2ef4885a1339d8702483045022100dc5b8d3643750a3b96defa6e452b268d25bdcaba9d75e3614aaa8f59c285bd3902206b44833a75111ce4bd487be86972def80db4ef8c2865e8b1c19cda5f9f7ee0910121035d6e3719f26bcc5381eca4e5c33ff3f9fd5b4e84450f863abbd83a584ccdc20400000000","blockhash":"0000000000000000000e924f2fc7105362ce640d0865d10d314086c795d2cfde","confirmations":1,"time":1575996190,"blocktime":1575996190},"error":null,"id":"curltest"}
     """
-    val decoded = decode[TransactionResponse](response) 
+    val decoded = decode[TransactionResponse](response)
     decoded.isRight shouldEqual true
     decoded.right.get should matchTo(TransactionResponse(
      Some(1),

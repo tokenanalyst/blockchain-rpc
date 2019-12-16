@@ -14,7 +14,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc
+package io.tokenanalyst.blockchainrpc
 
 import cats.effect.IO
 import io.circe.Json
@@ -42,17 +42,17 @@ case class Config(
 )
 
 object Config {
-  val PasswordEnv = "BITCOIN_RPC_PASSWORD"
-  val UsernameEnv = "BITCOIN_RPC_USERNAME"
-  val HostEnv = "BITCOIN_RPC_HOSTS"
-  val PortEnv = "BITCOIN_RPC_PORT"
-  val ZMQPortEnv = "BITCOIN_RPC_ZEROMQ_PORT"
+  val PasswordEnv = "BLOCKCHAIN_RPC_PASSWORD"
+  val UsernameEnv = "BLOCKCHAIN_RPC_USERNAME"
+  val HostEnv = "BLOCKCHAIN_RPC_HOSTS"
+  val PortEnv = "BLOCKCHAIN_RPC_PORT"
+  val ZMQPortEnv = "BLOCKCHAIN_RPC_ZEROMQ_PORT"
 
   val fromEnv: Config = {
     Seq(HostEnv, PortEnv, UsernameEnv, PasswordEnv, ZMQPortEnv)
       .map(sys.env.get(_)) match {
       case Seq(None, _, _, _, _) =>
-        throw new Exception("Pass at least BITCOIN_RPC_HOSTS.")
+        throw new Exception("Pass at least BLOCKCHAIN_RPC_HOSTS.")
       case Seq(Some(h), port, user, pass, zmqPort) =>
         Config(
           h.split(",").toIndexedSeq,

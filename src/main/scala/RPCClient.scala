@@ -14,7 +14,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc
+package io.tokenanalyst.blockchainrpc
 
 import cats.effect.{ContextShift, IO, Resource}
 import io.circe.{Decoder, Encoder, Json}

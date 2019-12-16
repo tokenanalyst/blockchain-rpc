@@ -1,4 +1,4 @@
-package io.tokenanalyst.bitcoinrpc.ethereum
+package io.tokenanalyst.blockchainrpc.ethereum
 
 import org.apache.commons.codec.binary.Hex
 

@@ -14,13 +14,13 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.ethereum
+package io.tokenanalyst.blockchainrpc.ethereum
 
-import io.tokenanalyst.bitcoinrpc.BasicMethods._
-import io.tokenanalyst.bitcoinrpc.{BatchResponse, Ethereum}
-import io.tokenanalyst.bitcoinrpc.ethereum.Instances._
-import io.tokenanalyst.bitcoinrpc.ethereum.Methods._
-import io.tokenanalyst.bitcoinrpc.ethereum.Protocol.{BlockResponse, _}
+import io.tokenanalyst.blockchainrpc.BasicMethods._
+import io.tokenanalyst.blockchainrpc.{BatchResponse, Ethereum}
+import io.tokenanalyst.blockchainrpc.ethereum.Instances._
+import io.tokenanalyst.blockchainrpc.ethereum.Methods._
+import io.tokenanalyst.blockchainrpc.ethereum.Protocol.{BlockResponse, _}
 
 object Syntax {
   implicit class EthereumOps(b: Ethereum) {

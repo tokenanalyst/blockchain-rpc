@@ -14,12 +14,12 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.examples.ethereum
+package io.tokenanalyst.blockchainrpc.examples.ethereum
 
 import cats.effect.{ExitCode, IO, IOApp}
-import io.tokenanalyst.bitcoinrpc.ethereum.Syntax._
-import io.tokenanalyst.bitcoinrpc.ethereum.HexTools
-import io.tokenanalyst.bitcoinrpc.{Config, Ethereum, RPCClient}
+import io.tokenanalyst.blockchainrpc.ethereum.Syntax._
+import io.tokenanalyst.blockchainrpc.ethereum.HexTools
+import io.tokenanalyst.blockchainrpc.{Config, Ethereum, RPCClient}
 
 import scala.concurrent.ExecutionContext.global
 

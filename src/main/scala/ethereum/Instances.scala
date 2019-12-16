@@ -14,16 +14,16 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.ethereum
+package io.tokenanalyst.blockchainrpc.ethereum
 
 import cats.effect.IO
 import io.circe.generic.auto._
-import io.tokenanalyst.bitcoinrpc.BasicMethods._
-import io.tokenanalyst.bitcoinrpc.Codecs._
-import io.tokenanalyst.bitcoinrpc.ethereum.Codecs._
-import io.tokenanalyst.bitcoinrpc.ethereum.Methods._
-import io.tokenanalyst.bitcoinrpc.ethereum.Protocol._
-import io.tokenanalyst.bitcoinrpc.{BatchRequest, BatchResponse, Ethereum}
+import io.tokenanalyst.blockchainrpc.BasicMethods._
+import io.tokenanalyst.blockchainrpc.Codecs._
+import io.tokenanalyst.blockchainrpc.ethereum.Codecs._
+import io.tokenanalyst.blockchainrpc.ethereum.Methods._
+import io.tokenanalyst.blockchainrpc.ethereum.Protocol._
+import io.tokenanalyst.blockchainrpc.{BatchRequest, BatchResponse, Ethereum}
 
 object Instances {
 

@@ -14,10 +14,10 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.ethereum
+package io.tokenanalyst.blockchainrpc.ethereum
 
 import cats.effect.IO
-import io.tokenanalyst.bitcoinrpc.{Ethereum, RPCRequest, RPCResponse}
+import io.tokenanalyst.blockchainrpc.{Ethereum, RPCRequest, RPCResponse}
 
 object Methods {
 
