@@ -1,7 +1,7 @@
 # blockchain-rpc
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/202ed1ef51524b749560c0ffd78400f7)](https://www.codacy.com/manual/tokenanalyst/bitcoin-rpc?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tokenanalyst/bitcoin-rpc&amp;utm_campaign=Badge_Grade)
-[![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt) [![GitHub stars](https://img.shields.io/github/stars/tokenanalyst/bitcoin-rpc.svg?style=flat)](https://github.com/tokenanalyst/bitcoin-rpc/stargazers) 
-[![Maven Central](https://img.shields.io/maven-central/v/io.tokenanalyst/bitcoin-rpc_2.13.svg)](https://search.maven.org/search?q=io.tokenanalyst%20bitcoin-rpc) <img src="https://typelevel.org/cats/img/cats-badge.svg" height="40px" align="right" alt="Cats friendly" /></a>
+[![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt) [![GitHub stars](https://img.shields.io/github/stars/tokenanalyst/blockchain-rpc.svg?style=flat)](https://github.com/tokenanalyst/bitcoin-rpc/stargazers) 
+[![Maven Central](https://img.shields.io/maven-central/v/io.tokenanalyst/blockchain-rpc_2.13.svg)](https://search.maven.org/search?q=io.tokenanalyst%20bitcoin-rpc) <img src="https://typelevel.org/cats/img/cats-badge.svg" height="40px" align="right" alt="Cats friendly" /></a>
 
 blockchain-rpc is a typesafe RPC client for **Bitcoin**, **Ethereum** and **Omni** written in and to be used with Scala 2.12 or 2.13. Under the hood, it's using http4s, circe and cats-effect. We appreciate external contributions, please check issues for inspiration. For all examples, check: [src/main/scala/examples](https://github.com/tokenanalyst/bitcoin-rpc/tree/master/src/main/scala/examples).
 
@@ -21,8 +21,8 @@ This is a simple example of how the RPCClient is generally used. We're using Cat
 import cats.effect.{ExitCode, IO, IOApp}
 import scala.concurrent.ExecutionContext.global
 
-import io.tokenanalyst.bitcoinrpc.RPCClient
-import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
+import io.tokenanalyst.blockchainrpc.RPCClient
+import io.tokenanalyst.blockchainrpc.bitcoin.Syntax._
 
 object GetBlockHash extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
@@ -47,12 +47,12 @@ object GetBlockHash extends IOApp {
 
 ## Example: Catch up from block zero
 
-This example makes use of the EnvConfig import, which automatically configures RPC via ENV flags exported in the shell. The environment flags for it are BITCOIN_RPC_HOSTS, BITCOIN_RPC_USERNAME, BITCOIN_RPC_PASSWORD.
+This example makes use of the EnvConfig import, which automatically configures RPC via ENV flags exported in the shell. The environment flags for it are BLOCKCHAIN_RPC_HOSTS, BLOCKCHAIN_RPC_USERNAME, BLOCKCHAIN_RPC_PASSWORD.
 
 ```scala
-import io.tokenanalyst.bitcoinrpc.Bitcoin
-import io.tokenanalyst.bitcoinrpc.{RPCClient, Config}
-import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
+import io.tokenanalyst.blockchainrpc.Bitcoin
+import io.tokenanalyst.blockchainrpc.{RPCClient, Config}
+import io.tokenanalyst.blockchainrpc.bitcoin.Syntax._
 
 object CatchupFromZero extends IOApp {
 
@@ -81,11 +81,11 @@ object CatchupFromZero extends IOApp {
 
 | variable  | description  | type |
 |---|---|---|
-| BITCOIN_RPC_HOSTS  | Comma-seperated IP list or hostname of full nodes | String |
-| BITCOIN_RPC_USERNAME  | RPC username | Optional String |
-| BITCOIN_RPC_PASSWORD  | RPC password | Optional String |
-| BITCOIN_RPC_PORT  | RPC port when not default | Optional Int |
-| BITCOIN_RPC_ZEROMQ_PORT  | ZeroMQ port when not default | Optional Int |
+| BLOCKCHAIN_RPC_HOSTS  | Comma-seperated IP list or hostname of full nodes | String |
+| BLOCKCHAIN_RPC_USERNAME  | RPC username | Optional String |
+| BLOCKCHAIN_RPC_PASSWORD  | RPC password | Optional String |
+| BLOCKCHAIN_RPC_PORT  | RPC port when not default | Optional Int |
+| BLOCKCHAIN_RPC_ZEROMQ_PORT  | ZeroMQ port when not default | Optional Int |
 
 ## Supported Bitcoin methods
 
