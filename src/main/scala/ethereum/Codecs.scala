@@ -53,7 +53,7 @@ object Codecs {
           "eth_getBlockByNumber",
           Array[Json](
             Json.fromString(
-              hexTools.toHexString(a.height)
+              HexTools.toHexString(a.height)
             ),
             Json.fromBoolean(a.withTransactions)
           )

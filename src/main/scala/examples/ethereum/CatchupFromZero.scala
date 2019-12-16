@@ -18,7 +18,7 @@ package io.tokenanalyst.bitcoinrpc.examples.ethereum
 
 import cats.effect.{ExitCode, IO, IOApp}
 import io.tokenanalyst.bitcoinrpc.ethereum.Syntax._
-import io.tokenanalyst.bitcoinrpc.ethereum.hexTools
+import io.tokenanalyst.bitcoinrpc.ethereum.HexTools
 import io.tokenanalyst.bitcoinrpc.{Config, Ethereum, RPCClient}
 
 import scala.concurrent.ExecutionContext.global
@@ -34,7 +34,7 @@ object CatchupFromZero extends IOApp {
   def loop(rpc: Ethereum, current: Long = 0L, until: Long = 1000000L): IO[Unit] =
     for {
       block <- rpc.getBlockWithTransactionsByHeight(current)
-      _ <- IO { println(s"block ${hexTools.parseQuantity(block.number)} - ${block.hash}: ${block.transactions.size} transactions") }
+      _ <- IO { println(s"block ${HexTools.parseQuantity(block.number)} - ${block.hash}: ${block.transactions.size} transactions") }
       _ <- if(block.transactions.nonEmpty) getReceipts(rpc, block.transactions.map(_.hash)) else IO.unit
       l <- if (current + 1 < until) loop(rpc, current + 1, until) else IO.unit
     } yield l

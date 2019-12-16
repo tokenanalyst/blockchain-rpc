@@ -112,7 +112,7 @@ object Instances {
         for {
           json <- a.client
             .requestJson[BestBlockHeightRequest](new BestBlockHeightRequest)
-        } yield hexTools
+        } yield HexTools
           .parseQuantity(json.asObject.get("result").get.asString.get)
           .longValue()
     }
