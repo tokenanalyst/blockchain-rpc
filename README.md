@@ -30,9 +30,16 @@ Jump to [examples](https://github.com/tokenanalyst/blockchain-rpc/tree/ethereum#
 
 ## Supported Ethereum methods
 
-| Ethereum RPC methods  | description  |  ethereum-rpc method |
+| blockchain-rpc method | description  |   |
 |---|---|---|
-|  |   |  |
+| getBlockWithTransactionsByHeight |   |  |
+| getBlockWithTransactionsByHash | | |
+| getReceiptByHash | | |
+| getReceiptsByHash | | | 
+| getBlockByHeight | | |
+| getBlockByHash | | | 
+| getBestBlockHeight | | | 
+| getTransaction | | |
 
 ## Example: Fetch Bitcoin Block 
 
