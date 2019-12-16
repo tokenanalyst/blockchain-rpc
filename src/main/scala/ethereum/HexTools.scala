@@ -19,7 +19,3 @@ object HexTools {
   def toHexString(in: Long) = UInt256(in).toHexString
 
 }
-
-
-
-
