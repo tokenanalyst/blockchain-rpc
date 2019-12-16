@@ -48,6 +48,21 @@ object RPCClient {
     for (client <- make(config, onErrorRetry)) yield Bitcoin(client)
   }
 
+  def ethereum(
+      hosts: Seq[String],
+      port: Option[Int] = None,
+      username: Option[String] = None,
+      password: Option[String] = None,
+      zmqPort: Option[Int] = None,
+      onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit
+  )(
+      implicit ec: ExecutionContext,
+      cs: ContextShift[IO]
+  ): Resource[IO, Ethereum] = {
+    val config = Config(hosts, port, username, password, zmqPort)
+    for (client <- make(config, onErrorRetry)) yield Ethereum(client)
+  }
+
   def omni(
       hosts: Seq[String],
       port: Option[Int] = None,
@@ -80,7 +95,7 @@ object RPCClient {
   }
 }
 
-class RPCClient(
+class RPCClient (
     client: Client[IO],
     zmq: ZeroMQ.Socket,
     config: Config,

@@ -14,28 +14,32 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.blockchainrpc.examples
+package io.tokenanalyst.blockchainrpc.examples.bitcoin
 
 import cats.effect.{ExitCode, IO, IOApp}
 import scala.concurrent.ExecutionContext.global
 
-import io.tokenanalyst.blockchainrpc.RPCClient
+import io.tokenanalyst.blockchainrpc.Bitcoin
+import io.tokenanalyst.blockchainrpc.{RPCClient, Config}
 import io.tokenanalyst.blockchainrpc.bitcoin.Syntax._
 
-object SubscribeToBlockUpdates extends IOApp {
+object CatchupFromZero extends IOApp {
+
+  def loop(rpc: Bitcoin, current: Long = 0L, until: Long = 10L): IO[Unit] =
+    for {
+      block <- rpc.getBlockByHeight(current)
+      _ <- IO { println(block) }
+      l <- if (current + 1 < until) loop(rpc, current + 1, until) else IO.unit
+    } yield l
+
   def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
+    implicit val config = Config.fromEnv
     RPCClient
-      .bitcoin(
-        hosts = Seq("127.0.0.1"),
-        username = Some("user"),
-        password = Some("password")
-      )
-      .use { bitcoin =>
+      .bitcoin(config.hosts, config.port, config.username, config.password)
+      .use { rpc =>
         for {
-          hash <- bitcoin.getNextBlockHash()
-          block <- bitcoin.getBlockByHash(hash)
-          _ <- IO { println(block) }
+          _ <- loop(rpc)
         } yield ExitCode(0)
       }
   }
