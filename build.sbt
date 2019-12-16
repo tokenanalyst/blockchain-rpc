@@ -24,7 +24,8 @@ lazy val `bitcoin-rpc` = (project in file("."))
   )
   .settings(
     libraryDependencies ++= Seq(
-      "commons-codec" % "commons-codec" % "1.13"
+      "commons-codec" % "commons-codec" % "1.13",
+      "com.typesafe.akka" %% "akka-actor" % "2.6.1"
     ) ++ http4s ++ json ++ zmq ++ cats ++ scalaTest
   )
 
