@@ -19,14 +19,14 @@ Jump to [examples](https://github.com/tokenanalyst/blockchain-rpc/tree/ethereum#
 
 | Bitcoind RPC methods  | description  |  bitcoin-rpc method |
 |---|---|---|
-| getblockhash  | Gets the block hash at a specific height  |  getBlockHash(height: Long) |
-| getbestblockhash  |  Gets the block tip hash | getBestBlockHash()  |
-| getblock  | Gets the block with transaction ids  | getBlockByHash(hash: String) |
-| getblockhash, getblock  | Gets the block with transaction ids  |  getBlockByHeight(height: Long) |
-| getrawtransaction | Gets raw transaction data | getTransaction(hash: String) |
-| batch of getrawtransaction | Gets raw transaction data | getTransactions(hashes: Seq[String]) |
-| estimatesmartfee | Estimates fee for include in block n | estimateSmartFee(height: Long) |
-| usage of ZeroMQ | Gets next block hash subscription | getNextBlockHash() |
+| getBlockHash(height: Long)  | Gets the block hash at a specific height  | getblockhash  |
+| getBestBlockHash()  |  Gets the block tip hash | getbestblockhash  |
+| getBlockByHash(hash: String)  | Gets the block with transaction ids  | getblock |
+| getBlockByHeight(height: Long) | Gets the block with transaction ids  |  getblockhash, getblock |
+| getTransaction(hash: String) | Gets raw transaction data | getrawtransaction |
+| getTransactions(hashes: Seq[String])  | Gets raw transaction data | batch of getrawtransaction  |
+| estimateSmartFee(height: Long) | Estimates fee for include in block n | estimatesmartfee |
+| getNextBlockHash()  | Gets next block hash subscription | usage of ZeroMQ |
 
 ## Supported Ethereum methods
 
