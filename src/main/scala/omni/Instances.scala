@@ -14,16 +14,16 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.omni
+package io.tokenanalyst.blockchainrpc.omni
 
 import cats.effect.IO
 import io.circe.generic.auto._
-import io.tokenanalyst.bitcoinrpc.Codecs._
-import io.tokenanalyst.bitcoinrpc.OmniMethods._
-import io.tokenanalyst.bitcoinrpc.BasicMethods._
-import io.tokenanalyst.bitcoinrpc.omni.Codecs._
-import io.tokenanalyst.bitcoinrpc.omni.Protocol._
-import io.tokenanalyst.bitcoinrpc.{BatchRequest, BatchResponse, Omni}
+import io.tokenanalyst.blockchainrpc.Codecs._
+import io.tokenanalyst.blockchainrpc.OmniMethods._
+import io.tokenanalyst.blockchainrpc.BasicMethods._
+import io.tokenanalyst.blockchainrpc.omni.Codecs._
+import io.tokenanalyst.blockchainrpc.omni.Protocol._
+import io.tokenanalyst.blockchainrpc.{BatchRequest, BatchResponse, Omni}
 
 object Instances {
   implicit val getNextBlockHashInstance =

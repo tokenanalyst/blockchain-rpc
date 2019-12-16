@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package io.tokenanalyst.bitcoinrpc.examples
+package io.tokenanalyst.blockchainrpc.examples
 
 import cats.effect.{ExitCode, IO, IOApp}
-import io.tokenanalyst.bitcoinrpc.{Config, RPCClient}
-import io.tokenanalyst.bitcoinrpc.omni.Syntax._
+import io.tokenanalyst.blockchainrpc.{Config, RPCClient}
+import io.tokenanalyst.blockchainrpc.omni.Syntax._
 
 import scala.concurrent.ExecutionContext.global
 
@@ -31,7 +31,7 @@ object OmniGetBlockTransactions extends IOApp {
       config.hosts,
       config.port,
       config.username,
-      config.password, 
+      config.password,
     ).use { omni =>
       for {
         bestBlockHeight <- omni.getBestBlockHeight()

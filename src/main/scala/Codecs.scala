@@ -1,4 +1,4 @@
-package io.tokenanalyst.bitcoinrpc
+package io.tokenanalyst.blockchainrpc
 
 import io.circe.{Decoder, Encoder, HCursor, Json}
 

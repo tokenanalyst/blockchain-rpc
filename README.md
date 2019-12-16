@@ -21,8 +21,8 @@ This is a simple example of how the RPCClient is generally used. We're using Cat
 import cats.effect.{ExitCode, IO, IOApp}
 import scala.concurrent.ExecutionContext.global
 
-import io.tokenanalyst.bitcoinrpc.RPCClient
-import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
+import io.tokenanalyst.blockchainrpc.RPCClient
+import io.tokenanalyst.blockchainrpc.bitcoin.Syntax._
 
 object GetBlockHash extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
@@ -50,9 +50,9 @@ object GetBlockHash extends IOApp {
 This example makes use of the EnvConfig import, which automatically configures RPC via ENV flags exported in the shell. The environment flags for it are BITCOIN_RPC_HOSTS, BITCOIN_RPC_USERNAME, BITCOIN_RPC_PASSWORD.
 
 ```scala
-import io.tokenanalyst.bitcoinrpc.Bitcoin
-import io.tokenanalyst.bitcoinrpc.{RPCClient, Config}
-import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
+import io.tokenanalyst.blockchainrpc.Bitcoin
+import io.tokenanalyst.blockchainrpc.{RPCClient, Config}
+import io.tokenanalyst.blockchainrpc.bitcoin.Syntax._
 
 object CatchupFromZero extends IOApp {
 

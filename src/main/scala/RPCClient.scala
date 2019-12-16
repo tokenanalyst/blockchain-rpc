@@ -14,7 +14,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc
+package io.tokenanalyst.blockchainrpc
 
 import cats.effect.{ContextShift, IO, Resource}
 import io.circe.{Decoder, Encoder, Json}
@@ -39,7 +39,7 @@ object RPCClient {
       username: Option[String] = None,
       password: Option[String] = None,
       zmqPort: Option[Int] = None,
-      onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit 
+      onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit
   )(
       implicit ec: ExecutionContext,
       cs: ContextShift[IO]
@@ -54,7 +54,7 @@ object RPCClient {
       username: Option[String] = None,
       password: Option[String] = None,
       zmqPort: Option[Int] = None,
-      onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit 
+      onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit
   )(
       implicit ec: ExecutionContext,
       cs: ContextShift[IO]
@@ -137,7 +137,7 @@ class RPCClient(
     val hostId = current % fallbacks.size
     val handle = (e: Exception) => {
       if (current <= max) for {
-        _ <- onErrorRetry(hostId, e) 
+        _ <- onErrorRetry(hostId, e)
         r <- retry(fallbacks, current + 1, max)(f)
       } yield r
       else

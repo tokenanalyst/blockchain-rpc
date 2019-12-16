@@ -14,12 +14,12 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.bitcoin
+package io.tokenanalyst.blockchainrpc.bitcoin
 
-import io.tokenanalyst.bitcoinrpc.BasicMethods._
-import io.tokenanalyst.bitcoinrpc.bitcoin.Instances._
-import io.tokenanalyst.bitcoinrpc.bitcoin.Protocol._
-import io.tokenanalyst.bitcoinrpc.{BatchResponse, Bitcoin}
+import io.tokenanalyst.blockchainrpc.BasicMethods._
+import io.tokenanalyst.blockchainrpc.bitcoin.Instances._
+import io.tokenanalyst.blockchainrpc.bitcoin.Protocol._
+import io.tokenanalyst.blockchainrpc.{BatchResponse, Bitcoin}
 
 object Syntax {
   implicit class BitcoinOps(b: Bitcoin) {
