@@ -45,9 +45,9 @@ object GetBlockHash extends IOApp {
 }
 ```
 
-## Example: Catch up from block zero
+## Example: Catch up bitcoin from block zero
 
-This example makes use of the EnvConfig import, which automatically configures RPC via ENV flags exported in the shell. The environment flags for it are BLOCKCHAIN_RPC_HOSTS, BLOCKCHAIN_RPC_USERNAME, BLOCKCHAIN_RPC_PASSWORD.
+This example makes use of the EnvConfig import, which automatically configures RPC via ENV flags exported in the shell. The environment flags for it are `BLOCKCHAIN_RPC_HOSTS`, `BLOCKCHAIN_RPC_USERNAME`, `BLOCKCHAIN_RPC_PASSWORD`.
 
 ```scala
 package io.tokenanalyst.blockchainrpc.examples.ethereum
@@ -84,6 +84,49 @@ object GetEthereumBlockByHash extends IOApp {
 }
 ```
 
+## Example: Fetch an Ethereum block by hash
+
+In this example, the Ethereum syntax is used to fetch a specific block. It uses `HexTools` to parse the blocknumber and prints the contents of the block. RPC configuration is acquired from the env vars `BLOCKCHAIN_RPC_HOSTS`, `BLOCKCHAIN_RPC_USERNAME`, and `BLOCKCHAIN_RPC_PASSWORD`.
+
+```scala
+package io.tokenanalyst.blockchainrpc.examples.ethereum
+
+import cats.effect.{ExitCode, IO, IOApp}
+import scala.concurrent.ExecutionContext.global
+
+import io.tokenanalyst.blockchainrpc.{RPCClient, Config}
+import io.tokenanalyst.blockchainrpc.ethereum.Syntax._
+import io.tokenanalyst.blockchainrpc.ethereum.HexTools
+
+object GetEthereumBlockByHash extends IOApp {
+  def run(args: List[String]): IO[ExitCode] = {
+
+
+    implicit val ec = global
+    implicit val config = Config.fromEnv
+    RPCClient
+      .ethereum(
+        config.hosts,
+        config.port,
+        config.username,
+        config.password,
+        onErrorRetry = { (_, e: Throwable) =>
+          IO(println(e))
+        }
+      )
+      .use { ethereum =>
+        for {
+          block <- ethereum.getBlockByHash(
+            "0x3bad41c70c9efac92490e8a74ab816558bbdada0984f2bcfa4cb1522ddb3ca16"
+          )
+          _ <- IO { println(s"block ${HexTools.parseQuantity(block.number)}: $block") }
+        } yield ExitCode(0)
+      }
+  }
+}
+
+```
+
 ## Supported Bitcoin methods
 
 | blockchain-rpc method  | description  |  bitcoin rpc method |
@@ -114,8 +157,8 @@ object GetEthereumBlockByHash extends IOApp {
 
 | variable  | description  | type |
 |---|---|---|
-| BLOCKCHAIN_RPC_HOSTS  | Comma-seperated IP list or hostname of full nodes | String |
-| BLOCKCHAIN_RPC_USERNAME  | RPC username | Optional String |
-| BLOCKCHAIN_RPC_PASSWORD  | RPC password | Optional String |
-| BLOCKCHAIN_RPC_PORT  | RPC port when not default | Optional Int |
-| BLOCKCHAIN_RPC_ZEROMQ_PORT  | ZeroMQ port when not default | Optional Int |
+| `BLOCKCHAIN_RPC_HOSTS`  | Comma-seperated IP list or hostname of full nodes | String |
+| `BLOCKCHAIN_RPC_USERNAME`  | RPC username | Optional String |
+| `BLOCKCHAIN_RPC_PASSWORD`  | RPC password | Optional String |
+| `BLOCKCHAIN_RPC_PORT`  | RPC port when not default | Optional Int |
+| `BLOCKCHAIN_RPC_ZEROMQ_PORT`  | ZeroMQ port when not default | Optional Int |

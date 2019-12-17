@@ -21,9 +21,12 @@ import scala.concurrent.ExecutionContext.global
 
 import io.tokenanalyst.blockchainrpc.{RPCClient, Config}
 import io.tokenanalyst.blockchainrpc.ethereum.Syntax._
+import io.tokenanalyst.blockchainrpc.ethereum.HexTools
 
 object GetEthereumBlockByHash extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
+
+
     implicit val ec = global
     implicit val config = Config.fromEnv
     RPCClient
@@ -41,7 +44,7 @@ object GetEthereumBlockByHash extends IOApp {
           block <- ethereum.getBlockByHash(
             "0x3bad41c70c9efac92490e8a74ab816558bbdada0984f2bcfa4cb1522ddb3ca16"
           )
-          _ <- IO { println(block) }
+          _ <- IO { println(s"block ${HexTools.parseQuantity(block.number)}: $block") }
         } yield ExitCode(0)
       }
   }
