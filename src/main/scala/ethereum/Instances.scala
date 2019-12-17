@@ -100,12 +100,6 @@ object Instances {
         )
     }
 
-  implicit val getNextBlockHashInstance =
-    new GetNextBlockHash[Ethereum] {
-      override def getNextBlockHash(a: Ethereum): IO[String] =
-        a.client.nextBlockHash()
-    }
-
   implicit val getBestBlockHeightInstance =
     new GetBestBlockHeight[Ethereum] {
       override def getBestBlockHeight(a: Ethereum): IO[Long] =
@@ -114,7 +108,7 @@ object Instances {
             .requestJson[BestBlockHeightRequest](new BestBlockHeightRequest)
         } yield HexTools
           .parseQuantity(json.asObject.get("result").get.asString.get)
-          .longValue()
+          .toLong
     }
 
   implicit val getTransactionsInstance =

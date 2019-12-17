@@ -2,8 +2,6 @@ package io.tokenanalyst.blockchainrpc.ethereum
 
 import akka.util.ByteString
 
-import scala.language.implicitConversions
-
 // scalastyle:off number.of.methods
 object UInt256 {
 

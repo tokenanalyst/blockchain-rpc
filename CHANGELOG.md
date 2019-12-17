@@ -1,3 +1,7 @@
+# 2.5.1 
+
+* changed Ethereum syntax got rid of getNextBlockHash (not implemented yet)
+
 # 2.5.0
 
 * added Ethereum 

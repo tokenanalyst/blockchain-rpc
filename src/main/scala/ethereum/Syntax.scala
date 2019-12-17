@@ -24,10 +24,7 @@ import io.tokenanalyst.blockchainrpc.ethereum.Protocol.{BlockResponse, _}
 
 object Syntax {
   implicit class EthereumOps(b: Ethereum) {
-
-    def getNextBlockHash() =
-      implicitly[GetNextBlockHash[Ethereum]].getNextBlockHash(b)
-
+    
     def getReceiptByHash(hash: String) =
       implicitly[GetReceipt[Ethereum, ReceiptResponse]].getReceipt(b, hash)
 

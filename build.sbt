@@ -1,6 +1,6 @@
 lazy val commonSettings = Seq(
   organization := "io.tokenanalyst",
-  version := "2.5.0-SNAPSHOT",
+  version := "2.5.1",
   scalaVersion := "2.12.10",
   crossScalaVersions := Seq("2.13.1", "2.12.10"),
   organizationHomepage := Some(
@@ -84,8 +84,8 @@ lazy val json = Seq(
 )
 lazy val scalaTest = Seq(
   "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
-  "com.softwaremill.diffx" %% "diffx-scalatest" % "0.3.14" % "test"
 )
+
 lazy val zmq = Seq(
   "org.zeromq" % "jeromq" % "0.5.1"
 )
