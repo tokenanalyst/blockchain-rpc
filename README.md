@@ -50,16 +50,31 @@ object GetBlockHash extends IOApp {
 This example makes use of the EnvConfig import, which automatically configures RPC via ENV flags exported in the shell. The environment flags for it are BLOCKCHAIN_RPC_HOSTS, BLOCKCHAIN_RPC_USERNAME, BLOCKCHAIN_RPC_PASSWORD.
 
 ```scala
-import io.tokenanalyst.blockchainrpc.Bitcoin
-import io.tokenanalyst.blockchainrpc.{RPCClient, Config}
-import io.tokenanalyst.blockchainrpc.bitcoin.Syntax._
+package io.tokenanalyst.blockchainrpc.examples.ethereum
+
+import cats.effect.{ExitCode, IO, IOApp}
+import io.tokenanalyst.blockchainrpc.ethereum.Syntax._
+import io.tokenanalyst.blockchainrpc.ethereum.HexTools
+import io.tokenanalyst.blockchainrpc.ethereum.Protocol.TransactionResponse
+import io.tokenanalyst.blockchainrpc.{BatchResponse, Config, Ethereum, RPCClient}
+
+import scala.concurrent.ExecutionContext.global
 
 object CatchupFromZero extends IOApp {
 
-  def loop(rpc: Bitcoin, current: Long = 0L, until: Long = 10L): IO[Unit] =
+  def getReceipts(rpc: Ethereum, txs: Seq[String]) =
+    for {
+      receipts <- rpc.getReceiptsByHash(txs)
+      _ <- IO(println(s"${receipts.seq.size} receipts"))
+    } yield ()
+
+  def loop(rpc: Ethereum, current: Long = 0, until: Long = 9120000): IO[Unit] =
     for {
       block <- rpc.getBlockByHeight(current)
-      _ <- IO { println(block) }
+      _ <- IO { println(s"block ${HexTools.parseQuantity(block.number)} - ${block.hash}: ${block.transactions.size} transactions") }
+      transactions <- if(block.transactions.nonEmpty) rpc.getTransactions(block.transactions) else IO.pure(BatchResponse[TransactionResponse](List()))
+      _ <- IO(println(s"transactions: ${transactions.seq.size}"))
+      _ <- if(block.transactions.nonEmpty) getReceipts(rpc, block.transactions) else IO.unit
       l <- if (current + 1 < until) loop(rpc, current + 1, until) else IO.unit
     } yield l
 
@@ -67,14 +82,23 @@ object CatchupFromZero extends IOApp {
     implicit val ec = global
     implicit val config = Config.fromEnv
     RPCClient
-      .bitcoin(config.hosts, config.port, config.username, config.password)
-      .use { rpc =>
+      .ethereum(
+        config.hosts,
+        config.port,
+        config.username,
+        config.password,
+        onErrorRetry = { (_, e: Throwable) =>
+          IO(println(e))
+        }
+      )
+      .use { ethereum =>
         for {
-          _ <- loop(rpc)
+          _ <- loop(ethereum)
         } yield ExitCode(0)
       }
   }
 }
+
 ```
 
 ## Supported Bitcoin methods
