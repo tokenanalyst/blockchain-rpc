@@ -28,14 +28,6 @@ object Syntax {
     def getNextBlockHash() =
       implicitly[GetNextBlockHash[Ethereum]].getNextBlockHash(b)
 
-    def getBlockWithTransactionsByHeight(height: Long) =
-      implicitly[GetBlockByHeight[Ethereum, BlockWithTransactionsResponse]]
-        .getBlockByHeight(b, height)
-
-    def getBlockWithTransactionsByHash(hash: String) =
-      implicitly[GetBlockByHash[Ethereum, BlockWithTransactionsResponse]]
-        .getBlockByHash(b, hash)
-
     def getReceiptByHash(hash: String) =
       implicitly[GetReceipt[Ethereum, ReceiptResponse]].getReceipt(b, hash)
 
@@ -57,5 +49,9 @@ object Syntax {
     def getTransaction(hash: String) =
       implicitly[GetTransaction[Ethereum, TransactionResponse]]
         .getTransaction(b, hash)
+
+    def getTransactions(hashes: Seq[String]) =
+      implicitly[GetTransactions[Ethereum, BatchResponse[TransactionResponse]]]
+        .getTransactions(b, hashes)
   }
 }

@@ -86,7 +86,7 @@ object Protocol {
       s: String,
       v: String,
       standardV: String,
-      to: String,
+      to: Option[String],
       transactionIndex: String,
       value: String,
       condition: Option[String],

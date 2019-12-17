@@ -261,7 +261,7 @@ class ProtocolSpec extends AnyFlatSpec with Matchers with DiffMatcher {
         "0x4ba69724e8f69de52f0125ad8b3c5c2cef33019bac3249e2c0a2192766d1721c",
         "0x25",
         "0x0",
-        "0xf02c1c8e6114b1dbe8937a39260b5b0a374432bb",
+        Some("0xf02c1c8e6114b1dbe8937a39260b5b0a374432bb"),
         "0x41",
         "0xf3dbb76162000",
         None,

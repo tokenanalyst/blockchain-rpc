@@ -97,9 +97,8 @@ object CatchupFromZero extends IOApp {
 | getBlockByHeight(long: Height) | Get a block by height | |
 | getBlockByHash(hash: String) |Get a block by hash | | 
 | getBestBlockHeight | Get the best block height | | 
-| getTransaction(hash: String) |Get a transaction by hash| |
-| getBlockWithTransactionsByHeight |  Get a block with transactions by height |  |
-| getBlockWithTransactionsByHash |Get a block with transactions by hash | |
+| getTransaction(hash: String) |Get a transaction by hash| eth_getTransactionByHash |
+| getTransactions(hashes: Seq[String]) |Get a batch of transaction by hash| eth_getTransactionByHash |
 | getReceiptByHash(hash: String) | Get a transaction receipt by hash | |
 | getReceiptsByHash(hashes: Seq[String]) |Get transaction receipts by hashes | | 
 

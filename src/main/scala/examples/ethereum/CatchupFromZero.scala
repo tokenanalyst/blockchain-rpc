@@ -19,7 +19,8 @@ package io.tokenanalyst.blockchainrpc.examples.ethereum
 import cats.effect.{ExitCode, IO, IOApp}
 import io.tokenanalyst.blockchainrpc.ethereum.Syntax._
 import io.tokenanalyst.blockchainrpc.ethereum.HexTools
-import io.tokenanalyst.blockchainrpc.{Config, Ethereum, RPCClient}
+import io.tokenanalyst.blockchainrpc.ethereum.Protocol.TransactionResponse
+import io.tokenanalyst.blockchainrpc.{BatchResponse, Config, Ethereum, RPCClient}
 
 import scala.concurrent.ExecutionContext.global
 
@@ -31,11 +32,13 @@ object CatchupFromZero extends IOApp {
       _ <- IO(println(s"${receipts.seq.size} receipts"))
     } yield ()
 
-  def loop(rpc: Ethereum, current: Long = 0L, until: Long = 1000000L): IO[Unit] =
+  def loop(rpc: Ethereum, current: Long = 9000000L, until: Long = 9120000): IO[Unit] =
     for {
-      block <- rpc.getBlockWithTransactionsByHeight(current)
+      block <- rpc.getBlockByHeight(current)
       _ <- IO { println(s"block ${HexTools.parseQuantity(block.number)} - ${block.hash}: ${block.transactions.size} transactions") }
-      _ <- if(block.transactions.nonEmpty) getReceipts(rpc, block.transactions.map(_.hash)) else IO.unit
+      transactions <- if(block.transactions.nonEmpty) rpc.getTransactions(block.transactions) else IO.pure(BatchResponse[TransactionResponse](List()))
+      _ <- IO(println(s"transactions: ${transactions.seq.size}"))
+      _ <- if(block.transactions.nonEmpty) getReceipts(rpc, block.transactions) else IO.unit
       l <- if (current + 1 < until) loop(rpc, current + 1, until) else IO.unit
     } yield l
 
