@@ -14,30 +14,32 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.examples
+package io.tokenanalyst.blockchainrpc.examples.ethereum
 
 import cats.effect.{ExitCode, IO, IOApp}
 import scala.concurrent.ExecutionContext.global
 
-import io.tokenanalyst.bitcoinrpc.{RPCClient, Config}
-import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
+import io.tokenanalyst.blockchainrpc.{RPCClient, Config}
+import io.tokenanalyst.blockchainrpc.ethereum.Syntax._
 
-object GetBlockHash extends IOApp {
+object GetEthereumBlockByHash extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
     implicit val config = Config.fromEnv
     RPCClient
-      .bitcoin(
+      .ethereum(
         config.hosts,
         config.port,
         config.username,
-        config.password, 
-        onErrorRetry = { (_, e: Throwable) => IO(println(e)) }
+        config.password,
+        onErrorRetry = { (_, e: Throwable) =>
+          IO(println(e))
+        }
       )
-      .use { bitcoin =>
+      .use { ethereum =>
         for {
-          block <- bitcoin.getBlockByHash(
-            "0000000000000000000759de6ab39c2d8fb01e4481ba581761ddc1d50a57358d"
+          block <- ethereum.getBlockByHash(
+            "0x3bad41c70c9efac92490e8a74ab816558bbdada0984f2bcfa4cb1522ddb3ca16"
           )
           _ <- IO { println(block) }
         } yield ExitCode(0)

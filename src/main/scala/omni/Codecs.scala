@@ -14,13 +14,13 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.omni
+package io.tokenanalyst.blockchainrpc.omni
 
 import io.circe.Json
-import io.tokenanalyst.bitcoinrpc.Codecs._
-import io.tokenanalyst.bitcoinrpc.RPCEncoder
-import io.tokenanalyst.bitcoinrpc.omni.Protocol.BlockRequest
-import io.tokenanalyst.bitcoinrpc.omni.Protocol.{
+import io.tokenanalyst.blockchainrpc.Codecs._
+import io.tokenanalyst.blockchainrpc.RPCEncoder
+import io.tokenanalyst.blockchainrpc.omni.Protocol.BlockRequest
+import io.tokenanalyst.blockchainrpc.omni.Protocol.{
   BestBlockHashRequest,
   BlockTransactionsRequest,
   TransactionRequest,

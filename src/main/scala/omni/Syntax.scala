@@ -14,25 +14,25 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.omni
+package io.tokenanalyst.blockchainrpc.omni
 
-import io.tokenanalyst.bitcoinrpc.BatchResponse
-import io.tokenanalyst.bitcoinrpc.Omni
-import io.tokenanalyst.bitcoinrpc.BasicMethods._
-import io.tokenanalyst.bitcoinrpc.OmniMethods._
-import io.tokenanalyst.bitcoinrpc.omni.Instances._
+import io.tokenanalyst.blockchainrpc.BatchResponse
+import io.tokenanalyst.blockchainrpc.Omni
+import io.tokenanalyst.blockchainrpc.BasicMethods._
+import io.tokenanalyst.blockchainrpc.OmniMethods._
+import io.tokenanalyst.blockchainrpc.omni.Instances._
 
 import Protocol._
 
 object Syntax {
   implicit class OmniOps(omni: Omni) {
-    def listBlockTransactions(height: Long) = 
+    def listBlockTransactions(height: Long) =
       implicitly[ListBlockTransactions].listBlockTransactions(omni, height)
 
-    def getTransaction(hash: String) = 
+    def getTransaction(hash: String) =
       implicitly[GetTransaction[Omni, TransactionResponse]].getTransaction(omni, hash)
 
-    def getTransactions(hashes: Seq[String]) = 
+    def getTransactions(hashes: Seq[String]) =
       implicitly[GetTransactions[Omni, BatchResponse[TransactionResponse]]]
       .getTransactions(omni, hashes)
 

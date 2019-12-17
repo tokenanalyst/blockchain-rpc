@@ -14,7 +14,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc
+package io.tokenanalyst.blockchainrpc
 
 import cats.effect.{ContextShift, IO, Resource}
 import io.circe.{Decoder, Encoder, Json}
@@ -39,7 +39,7 @@ object RPCClient {
       username: Option[String] = None,
       password: Option[String] = None,
       zmqPort: Option[Int] = None,
-      onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit 
+      onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit
   )(
       implicit ec: ExecutionContext,
       cs: ContextShift[IO]
@@ -48,13 +48,28 @@ object RPCClient {
     for (client <- make(config, onErrorRetry)) yield Bitcoin(client)
   }
 
+  def ethereum(
+      hosts: Seq[String],
+      port: Option[Int] = None,
+      username: Option[String] = None,
+      password: Option[String] = None,
+      zmqPort: Option[Int] = None,
+      onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit
+  )(
+      implicit ec: ExecutionContext,
+      cs: ContextShift[IO]
+  ): Resource[IO, Ethereum] = {
+    val config = Config(hosts, port, username, password, zmqPort)
+    for (client <- make(config, onErrorRetry)) yield Ethereum(client)
+  }
+
   def omni(
       hosts: Seq[String],
       port: Option[Int] = None,
       username: Option[String] = None,
       password: Option[String] = None,
       zmqPort: Option[Int] = None,
-      onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit 
+      onErrorRetry: (Int, Throwable) => IO[Unit] = (_,_) => IO.unit
   )(
       implicit ec: ExecutionContext,
       cs: ContextShift[IO]
@@ -80,7 +95,7 @@ object RPCClient {
   }
 }
 
-class RPCClient(
+class RPCClient (
     client: Client[IO],
     zmq: ZeroMQ.Socket,
     config: Config,
@@ -137,7 +152,7 @@ class RPCClient(
     val hostId = current % fallbacks.size
     val handle = (e: Exception) => {
       if (current <= max) for {
-        _ <- onErrorRetry(hostId, e) 
+        _ <- onErrorRetry(hostId, e)
         r <- retry(fallbacks, current + 1, max)(f)
       } yield r
       else

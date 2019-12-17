@@ -14,15 +14,15 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.bitcoin
+package io.tokenanalyst.blockchainrpc.bitcoin
 
 import cats.effect.IO
 import io.circe.generic.auto._
-import io.tokenanalyst.bitcoinrpc.BasicMethods._
-import io.tokenanalyst.bitcoinrpc.Codecs._
-import io.tokenanalyst.bitcoinrpc.bitcoin.Protocol._
-import io.tokenanalyst.bitcoinrpc.bitcoin.Codecs._
-import io.tokenanalyst.bitcoinrpc.{BatchRequest, BatchResponse, Bitcoin}
+import io.tokenanalyst.blockchainrpc.BasicMethods._
+import io.tokenanalyst.blockchainrpc.Codecs._
+import io.tokenanalyst.blockchainrpc.bitcoin.Protocol._
+import io.tokenanalyst.blockchainrpc.bitcoin.Codecs._
+import io.tokenanalyst.blockchainrpc.{BatchRequest, BatchResponse, Bitcoin}
 
 import scala.collection.mutable.ListBuffer
 
@@ -60,7 +60,7 @@ object Instances {
       ): IO[BlockResponse] =
         for {
           hash <- getBlockHashInstance.getBlockHash(a, height)
-          data <- getBlockByHashInstance.getBlockByHash(a, hash) 
+          data <- getBlockByHashInstance.getBlockByHash(a, hash)
         } yield data
     }
 

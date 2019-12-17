@@ -14,9 +14,9 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package io.tokenanalyst.bitcoinrpc.omni
+package io.tokenanalyst.blockchainrpc.omni
 
-import io.tokenanalyst.bitcoinrpc._
+import io.tokenanalyst.blockchainrpc._
 
 object Protocol {
   case class TransactionResponse(
@@ -28,7 +28,7 @@ object Protocol {
       version: Option[Int],
       blocktime: Long,
       valid: Option[Boolean],
-      invalidreason: Option[String], 
+      invalidreason: Option[String],
       type_int: Option[Int],
       `type`: Option[String],
       propertyid: Option[Int],

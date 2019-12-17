@@ -14,16 +14,16 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-  package io.tokenanalyst.bitcoinrpc.examples
+  package io.tokenanalyst.blockchainrpc.examples.bitcoin
 
   import cats.effect.{ExitCode, IO, IOApp}
   import scala.concurrent.ExecutionContext.global
-  
-  import io.tokenanalyst.bitcoinrpc.{RPCClient, Config}
-  import io.tokenanalyst.bitcoinrpc.bitcoin.Syntax._
-  
+
+  import io.tokenanalyst.blockchainrpc.{RPCClient, Config}
+  import io.tokenanalyst.blockchainrpc.bitcoin.Syntax._
+
   object GetAllTransactionsFromBlock extends IOApp {
-  
+
     def run(args: List[String]): IO[ExitCode] = {
       implicit val ec = global
       implicit val config = Config.fromEnv
@@ -40,4 +40,3 @@
         }
     }
   }
-  
