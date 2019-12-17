@@ -20,7 +20,6 @@ import io.circe.Json
 import io.tokenanalyst.blockchainrpc.Codecs._
 import io.tokenanalyst.blockchainrpc.RPCEncoder
 import io.tokenanalyst.blockchainrpc.ethereum.Protocol._
-import io.tokenanalyst.blockchainrpc.RPCEncoder
 
 object Codecs {
 

@@ -88,26 +88,26 @@ object GetEthereumBlockByHash extends IOApp {
 
 | blockchain-rpc method  | description  |  bitcoin rpc method |
 |---|---|---|
-| getBlockHash(height: Long)  | Gets the block hash at a specific height  | getblockhash  |
-| getBestBlockHash()  |  Gets the block tip hash | getbestblockhash  |
-| getBlockByHash(hash: String)  | Gets the block with transaction ids  | getblock |
-| getBlockByHeight(height: Long) | Gets the block with transaction ids  |  getblockhash, getblock |
-| getTransaction(hash: String) | Gets raw transaction data | getrawtransaction |
-| getTransactions(hashes: Seq[String])  | Gets raw transaction data | batch of getrawtransaction  |
-| estimateSmartFee(height: Long) | Estimates fee for include in block n | estimatesmartfee |
+| getBlockHash(height: Long)  | Gets the block hash at a specific height  | `getblockhash`  |
+| getBestBlockHash()  |  Gets the block tip hash | `getbestblockhash`  |
+| getBlockByHash(hash: String)  | Gets the block with transaction ids  | `getblock` |
+| getBlockByHeight(height: Long) | Gets the block with transaction ids  |  `getblockhash`, `getblock` |
+| getTransaction(hash: String) | Gets raw transaction data | `getrawtransaction` |
+| getTransactions(hashes: Seq[String])  | Gets raw transaction data | batch of `getrawtransaction`  |
+| estimateSmartFee(height: Long) | Estimates fee for include in block n | `estimatesmartfee` |
 | getNextBlockHash()  | Gets next block hash subscription | usage of ZeroMQ |
 
 ## Supported Ethereum methods
 
 | blockchain-rpc method | description  |  ethereum rpc method |
 |---|---|---|
-| getBlockByHeight(long: Height) | Get a block by height | |
-| getBlockByHash(hash: String) |Get a block by hash | | 
-| getBestBlockHeight | Get the best block height | | 
-| getTransaction(hash: String) |Get a transaction by hash| eth_getTransactionByHash |
-| getTransactions(hashes: Seq[String]) |Get a batch of transaction by hash| eth_getTransactionByHash |
-| getReceiptByHash(hash: String) | Get a transaction receipt by hash | |
-| getReceiptsByHash(hashes: Seq[String]) |Get transaction receipts by hashes | | 
+| getBlockByHeight(long: Height) | Get a block by height | `eth_getBlockByNumber` |
+| getBlockByHash(hash: String) |Get a block by hash | `eth_getBlockByHash` | 
+| getBestBlockHeight | Get the best block height | `eth_blockNumber` | 
+| getTransaction(hash: String) |Get a transaction by hash| `eth_getTransactionByHash` |
+| getTransactions(hashes: Seq[String]) |Get a batch of transaction by hash| `eth_getTransactionByHash` |
+| getReceiptByHash(hash: String) | Get a transaction receipt by hash | `eth_getTransactionReceipt` |
+| getReceiptsByHash(hashes: Seq[String]) |Get transaction receipts by hashes | Batch of `eth_getTransactionReceipt` | 
 
 
 ## Environment Variables
