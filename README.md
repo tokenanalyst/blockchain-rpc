@@ -53,31 +53,12 @@ This example makes use of the EnvConfig import, which automatically configures R
 package io.tokenanalyst.blockchainrpc.examples.ethereum
 
 import cats.effect.{ExitCode, IO, IOApp}
-import io.tokenanalyst.blockchainrpc.ethereum.Syntax._
-import io.tokenanalyst.blockchainrpc.ethereum.HexTools
-import io.tokenanalyst.blockchainrpc.ethereum.Protocol.TransactionResponse
-import io.tokenanalyst.blockchainrpc.{BatchResponse, Config, Ethereum, RPCClient}
-
 import scala.concurrent.ExecutionContext.global
 
-object CatchupFromZero extends IOApp {
+import io.tokenanalyst.blockchainrpc.{RPCClient, Config}
+import io.tokenanalyst.blockchainrpc.ethereum.Syntax._
 
-  def getReceipts(rpc: Ethereum, txs: Seq[String]) =
-    for {
-      receipts <- rpc.getReceiptsByHash(txs)
-      _ <- IO(println(s"${receipts.seq.size} receipts"))
-    } yield ()
-
-  def loop(rpc: Ethereum, current: Long = 0, until: Long = 9120000): IO[Unit] =
-    for {
-      block <- rpc.getBlockByHeight(current)
-      _ <- IO { println(s"block ${HexTools.parseQuantity(block.number)} - ${block.hash}: ${block.transactions.size} transactions") }
-      transactions <- if(block.transactions.nonEmpty) rpc.getTransactions(block.transactions) else IO.pure(BatchResponse[TransactionResponse](List()))
-      _ <- IO(println(s"transactions: ${transactions.seq.size}"))
-      _ <- if(block.transactions.nonEmpty) getReceipts(rpc, block.transactions) else IO.unit
-      l <- if (current + 1 < until) loop(rpc, current + 1, until) else IO.unit
-    } yield l
-
+object GetEthereumBlockByHash extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
     implicit val config = Config.fromEnv
@@ -93,12 +74,14 @@ object CatchupFromZero extends IOApp {
       )
       .use { ethereum =>
         for {
-          _ <- loop(ethereum)
+          block <- ethereum.getBlockByHash(
+            "0x3bad41c70c9efac92490e8a74ab816558bbdada0984f2bcfa4cb1522ddb3ca16"
+          )
+          _ <- IO { println(block) }
         } yield ExitCode(0)
       }
   }
 }
-
 ```
 
 ## Supported Bitcoin methods
