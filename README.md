@@ -50,34 +50,27 @@ object GetBlockHash extends IOApp {
 This example makes use of the EnvConfig import, which automatically configures RPC via ENV flags exported in the shell. The environment flags for it are `BLOCKCHAIN_RPC_HOSTS`, `BLOCKCHAIN_RPC_USERNAME`, `BLOCKCHAIN_RPC_PASSWORD`.
 
 ```scala
-package io.tokenanalyst.blockchainrpc.examples.ethereum
-
-import cats.effect.{ExitCode, IO, IOApp}
-import scala.concurrent.ExecutionContext.global
-
+import io.tokenanalyst.blockchainrpc.Bitcoin
 import io.tokenanalyst.blockchainrpc.{RPCClient, Config}
-import io.tokenanalyst.blockchainrpc.ethereum.Syntax._
+import io.tokenanalyst.blockchainrpc.bitcoin.Syntax._
 
-object GetEthereumBlockByHash extends IOApp {
+object CatchupFromZero extends IOApp {
+
+  def loop(rpc: Bitcoin, current: Long = 0L, until: Long = 10L): IO[Unit] =
+    for {
+      block <- rpc.getBlockByHeight(current)
+      _ <- IO { println(block) }
+      l <- if (current + 1 < until) loop(rpc, current + 1, until) else IO.unit
+    } yield l
+
   def run(args: List[String]): IO[ExitCode] = {
     implicit val ec = global
     implicit val config = Config.fromEnv
     RPCClient
-      .ethereum(
-        config.hosts,
-        config.port,
-        config.username,
-        config.password,
-        onErrorRetry = { (_, e: Throwable) =>
-          IO(println(e))
-        }
-      )
-      .use { ethereum =>
+      .bitcoin(config.hosts, config.port, config.username, config.password)
+      .use { rpc =>
         for {
-          block <- ethereum.getBlockByHash(
-            "0x3bad41c70c9efac92490e8a74ab816558bbdada0984f2bcfa4cb1522ddb3ca16"
-          )
-          _ <- IO { println(block) }
+          _ <- loop(rpc)
         } yield ExitCode(0)
       }
   }
