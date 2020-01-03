@@ -1,3 +1,7 @@
+# 2.5.2
+
+* changed Omni schema, propertyid is now Long
+
 # 2.5.1 
 
 * changed Ethereum syntax got rid of getNextBlockHash (not implemented yet)
