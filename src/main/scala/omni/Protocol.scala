@@ -31,7 +31,7 @@ object Protocol {
       invalidreason: Option[String],
       type_int: Option[Int],
       `type`: Option[String],
-      propertyid: Option[Int],
+      propertyid: Option[Long],
       amount: Option[Double],
       fee: Option[Double],
       sendingaddress: String,
