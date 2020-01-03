@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.tokenanalyst.blockchainrpc.examples
+package io.tokenanalyst.blockchainrpc.examples.omni
 
 import cats.effect.{ExitCode, IO, IOApp}
 import io.tokenanalyst.blockchainrpc.{Config, RPCClient}

@@ -12,7 +12,7 @@ blockchain-rpc is a typesafe RPC client for **Bitcoin**, **Ethereum** and **Omni
 Simply add the following dependency to your project.
 
 ```
-  libraryDependencies += "io.tokenanalyst" %% "blockchain-rpc" % "2.5.1"
+  libraryDependencies += "io.tokenanalyst" %% "blockchain-rpc" % "2.5.2"
 ```
 
 ## Example: Fetch Bitcoin Block 
